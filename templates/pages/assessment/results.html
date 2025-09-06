@@ -8,7 +8,9 @@
 ] %}
 
 {% block head_extra %}
-<link rel="stylesheet" href="{{ url_for('static', filename='dist/css/assessment.css') if url_for else '/static/dist/css/assessment.css' }}">
+{% block extra_css %}
+<!-- Assessment styles handled by Bootstrap -->
+{% endblock %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 {% endblock %}
 

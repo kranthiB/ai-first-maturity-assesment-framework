@@ -2,7 +2,9 @@
 {% set page_title = "Assessment - " + section.name if section else "Assessment" %}
 
 {% block head_extra %}
-<link rel="stylesheet" href="{{ url_for('static', filename='dist/css/assessment.css') if url_for else '/static/dist/css/assessment.css' }}">
+{% block extra_css %}
+<!-- Assessment styles handled by Bootstrap -->
+{% endblock %}
 <style>
 .section-assessment-container {
     background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
@@ -116,7 +118,7 @@
 
 .question-header {
     display: flex;
-    justify-content: between;
+    justify-content: space-between;
     align-items: flex-start;
     margin-bottom: 1.5rem;
 }
@@ -232,7 +234,7 @@
     padding: 2rem;
     border-top: 1px solid #e2e8f0;
     display: flex;
-    justify-content: between;
+    justify-content: space-between;
     align-items: center;
 }
 
@@ -281,6 +283,21 @@
 .completion-indicator {
     text-align: center;
     color: #718096;
+    flex: 1;
+    margin: 0 1rem;
+}
+
+.section-navigation > div:first-child,
+.section-navigation > div:last-child {
+    min-width: 200px;
+}
+
+.section-navigation > div:first-child {
+    justify-content: flex-start;
+}
+
+.section-navigation > div:last-child {
+    justify-content: flex-end;
 }
 
 @media (max-width: 768px) {
@@ -300,6 +317,16 @@
         flex-direction: column;
         gap: 1rem;
         text-align: center;
+    }
+    
+    .completion-indicator {
+        order: -1;
+        margin-bottom: 1rem;
+    }
+    
+    .section-navigation > div {
+        display: flex;
+        justify-content: center;
     }
     
     .step {
@@ -649,4 +676,7 @@ document.addEventListener('DOMContentLoaded', function() {
     updateProgress();
 });
 </script>
+
+<!-- Assessment functionality -->
+<script src="{{ url_for('static', filename='src/js/modules/assessment.js') }}" defer></script>
 {% endblock %}

@@ -1,812 +1,115 @@
-<!-- Ultra-Premium Navigation Bar with Distinct Design -->
-<nav class="navbar navbar-expand-lg navbar-dark ultra-premium-navbar sticky-top" id="mainNavbar">
-    <div class="container-fluid px-4">
-        <!-- Premium Brand Design with Enhanced Visual Hierarchy -->
-        <a class="navbar-brand ultra-premium-brand" href="{{ url_for('main.index') if url_for else '/' }}">
-            <div class="brand-container">
-                <div class="brand-icon-wrapper">
-                    <div class="brand-icon">
-                        <i class="bi bi-cpu-fill"></i>
+<!-- Clean Bootstrap-based Navigation Bar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top" id="mainNavbar">
+    <div class="container-fluid">
+        <!-- Brand -->
+        <a class="navbar-brand d-flex align-items-center" href="{{ url_for('main.index') if url_for else '/' }}">
+            <div class="d-flex align-items-center">
+                <div class="me-3">
+                    <div class="bg-success rounded-3 d-flex align-items-center justify-content-center" 
+                         style="width: 40px; height: 40px;">
+                        <i class="bi bi-cpu-fill text-white fs-5"></i>
                     </div>
-                    <div class="brand-pulse"></div>
                 </div>
-                <div class="brand-text">
-                    <span class="brand-name">AI-First Software Engineering</span>
-                    <span class="brand-subtitle">Maturity Assessment</span>
+                <div>
+                    <div class="text-white fw-bold fs-6">AI-First Software Engineering</div>
+                    <div class="text-white-50 small">Maturity Assessment</div>
                 </div>
             </div>
         </a>
         
-        <!-- Enhanced Mobile Toggle with Custom Animation -->
-        <button class="navbar-toggler ultra-premium-toggler" type="button" data-bs-toggle="collapse" 
+        <!-- Mobile Toggle -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
                 data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" 
                 aria-label="Toggle navigation">
-            <span class="toggler-line"></span>
-            <span class="toggler-line"></span>
-            <span class="toggler-line"></span>
+            <span class="navbar-toggler-icon"></span>
         </button>
         
-        <!-- Ultra-Premium Navigation Container -->
+        <!-- Navigation -->
         <div class="collapse navbar-collapse" id="navbarNav">
-            <!-- Central Navigation Hub with Advanced Design -->
-            <ul class="navbar-nav navigation-hub mx-auto">
+            <!-- Main Navigation -->
+            <ul class="navbar-nav mx-auto">
                 <li class="nav-item">
-                    <a class="nav-link nav-capsule {% if request.endpoint == 'main.index' %}active{% endif %}" 
-                       href="{{ url_for('main.index') if url_for else '/' }}"
-                       data-nav-tooltip="Start your AI journey">
-                        <span class="nav-icon-container">
-                            <span class="nav-icon">
-                                <i class="bi bi-house-door-fill"></i>
-                            </span>
-                            <span class="nav-ripple"></span>
-                        </span>
-                        <span class="nav-text">Home</span>
+                    <a class="nav-link {% if request.endpoint == 'main.index' %}active{% endif %}" 
+                       href="{{ url_for('main.index') if url_for else '/' }}">
+                        <i class="bi bi-house-door-fill me-2"></i>Home
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link nav-capsule {% if request.endpoint and 'assessment' in request.endpoint %}active{% endif %}" 
-                       href="{{ url_for('assessment.index') if url_for else '/assessment' }}"
-                       data-nav-tooltip="View insights & analytics">
-                        <span class="nav-icon-container">
-                            <span class="nav-icon">
-                                <i class="bi bi-graph-up-arrow"></i>
-                            </span>
-                            <span class="nav-ripple"></span>
-                        </span>
-                        <span class="nav-text">Dashboard</span>
+                    <a class="nav-link {% if request.endpoint and 'assessment' in request.endpoint %}active{% endif %}" 
+                       href="{{ url_for('assessment.index') if url_for else '/assessment' }}">
+                        <i class="bi bi-graph-up-arrow me-2"></i>Dashboard
                     </a>
                 </li>
-                <li class="nav-item dropdown ultra-premium-dropdown">
-                    <a class="nav-link nav-capsule dropdown-toggle" href="javascript:void(0)" id="toolsDropdown" 
-                       role="button" data-bs-toggle="dropdown" aria-expanded="false"
-                       data-nav-tooltip="Advanced tools & exports">
-                        <span class="nav-icon-container">
-                            <span class="nav-icon">
-                                <i class="bi bi-tools"></i>
-                            </span>
-                            <span class="nav-ripple"></span>
-                        </span>
-                        <span class="nav-text">Tools</span>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="toolsDropdown" 
+                       role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-tools me-2"></i>Tools
                     </a>
-                    <ul class="dropdown-menu ultra-premium-dropdown-menu" aria-labelledby="toolsDropdown">
-                        <li class="dropdown-header premium-header">
-                            <i class="bi bi-tools me-2"></i>Analysis Tools
-                        </li>
+                    <ul class="dropdown-menu" aria-labelledby="toolsDropdown">
+                        <li><h6 class="dropdown-header">Analysis Tools</h6></li>
                         <li>
-                            <a class="dropdown-item ultra-premium-dropdown-item" 
-                               href="{{ url_for('assessment.index') if url_for else '/assessment' }}">
-                                <div class="dropdown-item-content">
-                                    <div class="dropdown-icon-wrapper">
-                                        <div class="dropdown-icon">
-                                            <i class="bi bi-clipboard-data"></i>
-                                        </div>
-                                    </div>
-                                    <div class="dropdown-text">
-                                        <span class="dropdown-title">Assessment Dashboard</span>
-                                        <span class="dropdown-subtitle">View all assessments</span>
-                                    </div>
-                                    <div class="dropdown-arrow">
-                                        <i class="bi bi-arrow-right"></i>
-                                    </div>
-                                </div>
+                            <a class="dropdown-item" href="{{ url_for('assessment.index') if url_for else '/assessment' }}">
+                                <i class="bi bi-clipboard-data me-2"></i>Assessment Dashboard
                             </a>
                         </li>
-                        <li><hr class="dropdown-divider premium-divider"></li>
-                        <li class="dropdown-header premium-header">
-                            <i class="bi bi-gear me-2"></i>Administration
-                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><h6 class="dropdown-header">Administration</h6></li>
                         <li>
-                            <a class="dropdown-item ultra-premium-dropdown-item" 
-                               href="{{ url_for('main.about') if url_for else '/about' }}">
-                                <div class="dropdown-item-content">
-                                    <div class="dropdown-icon-wrapper">
-                                        <div class="dropdown-icon">
-                                            <i class="bi bi-info-circle"></i>
-                                        </div>
-                                    </div>
-                                    <div class="dropdown-text">
-                                        <span class="dropdown-title">About</span>
-                                        <span class="dropdown-subtitle">Learn more about this tool</span>
-                                    </div>
-                                    <div class="dropdown-arrow">
-                                        <i class="bi bi-arrow-right"></i>
-                                    </div>
-                                </div>
+                            <a class="dropdown-item" href="{{ url_for('main.about') if url_for else '/about' }}">
+                                <i class="bi bi-info-circle me-2"></i>About
                             </a>
                         </li>
                     </ul>
                 </li>
             </ul>
             
-            <!-- Ultra-Premium Action Zone -->
-            <ul class="navbar-nav action-zone">
-                <!-- Advanced Theme Toggle -->
+            <!-- Action Items -->
+            <ul class="navbar-nav">
+                <!-- Theme Toggle -->
                 <li class="nav-item dropdown">
-                    <button class="nav-link nav-action ultra-theme-toggle" id="themeToggle" 
+                    <button class="nav-link btn btn-link dropdown-toggle text-white" id="themeToggle" 
                             type="button" data-bs-toggle="dropdown" aria-expanded="false"
-                            data-nav-tooltip="Switch theme">
-                        <span class="action-icon-wrapper">
-                            <span class="theme-icon">
-                                <i class="bi bi-circle-half"></i>
-                            </span>
-                            <span class="action-ripple"></span>
-                        </span>
-                        <span class="theme-text d-none d-xl-inline">Theme</span>
+                            title="Switch theme">
+                        <i class="bi bi-circle-half"></i>
+                        <span class="d-none d-lg-inline ms-2">Theme</span>
                     </button>
-                    <ul class="dropdown-menu ultra-premium-dropdown-menu dropdown-menu-end theme-menu">
-                        <li class="dropdown-header premium-header">
-                            <i class="bi bi-palette me-2"></i>Appearance
-                        </li>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><h6 class="dropdown-header">Appearance</h6></li>
                         <li>
-                            <button type="button" class="dropdown-item ultra-premium-dropdown-item theme-option" 
-                                    data-bs-theme-value="light">
-                                <div class="dropdown-item-content">
-                                    <div class="dropdown-icon-wrapper">
-                                        <div class="dropdown-icon">
-                                            <i class="bi bi-sun-fill"></i>
-                                        </div>
-                                    </div>
-                                    <div class="dropdown-text">
-                                        <span class="dropdown-title">Light</span>
-                                        <span class="dropdown-subtitle">Bright & clean interface</span>
-                                    </div>
-                                    <div class="theme-check">
-                                        <i class="bi bi-check-lg"></i>
-                                    </div>
-                                </div>
+                            <button type="button" class="dropdown-item theme-option" data-bs-theme-value="light">
+                                <i class="bi bi-sun-fill me-2"></i>Light
                             </button>
                         </li>
                         <li>
-                            <button type="button" class="dropdown-item ultra-premium-dropdown-item theme-option" 
-                                    data-bs-theme-value="dark">
-                                <div class="dropdown-item-content">
-                                    <div class="dropdown-icon-wrapper">
-                                        <div class="dropdown-icon">
-                                            <i class="bi bi-moon-stars-fill"></i>
-                                        </div>
-                                    </div>
-                                    <div class="dropdown-text">
-                                        <span class="dropdown-title">Dark</span>
-                                        <span class="dropdown-subtitle">Easy on the eyes</span>
-                                    </div>
-                                    <div class="theme-check">
-                                        <i class="bi bi-check-lg"></i>
-                                    </div>
-                                </div>
+                            <button type="button" class="dropdown-item theme-option" data-bs-theme-value="dark">
+                                <i class="bi bi-moon-stars-fill me-2"></i>Dark
                             </button>
                         </li>
                         <li>
-                            <button type="button" class="dropdown-item ultra-premium-dropdown-item theme-option active" 
-                                    data-bs-theme-value="auto">
-                                <div class="dropdown-item-content">
-                                    <div class="dropdown-icon-wrapper">
-                                        <div class="dropdown-icon">
-                                            <i class="bi bi-circle-half"></i>
-                                        </div>
-                                    </div>
-                                    <div class="dropdown-text">
-                                        <span class="dropdown-title">Auto</span>
-                                        <span class="dropdown-subtitle">Match system preference</span>
-                                    </div>
-                                    <div class="theme-check">
-                                        <i class="bi bi-check-lg"></i>
-                                    </div>
-                                </div>
+                            <button type="button" class="dropdown-item theme-option active" data-bs-theme-value="auto">
+                                <i class="bi bi-circle-half me-2"></i>Auto
                             </button>
                         </li>
                     </ul>
                 </li>
                 
-                <!-- Enhanced Help Center -->
+                <!-- Help -->
                 <li class="nav-item">
-                    <a class="nav-link nav-action ultra-help-action" href="{{ url_for('main.about') if url_for else '/about' }}"
-                       data-nav-tooltip="Get help & documentation">
-                        <span class="action-icon-wrapper">
-                            <span class="help-icon">
-                                <i class="bi bi-question-circle-fill"></i>
-                            </span>
-                            <span class="action-ripple"></span>
-                        </span>
-                        <span class="help-text d-none d-xl-inline">Help</span>
+                    <a class="nav-link" href="{{ url_for('main.about') if url_for else '/about' }}"
+                       title="Get help & documentation">
+                        <i class="bi bi-question-circle-fill"></i>
+                        <span class="d-none d-lg-inline ms-2">Help</span>
                     </a>
                 </li>
-                
             </ul>
-        </div>
-    </div>
-    
-    <!-- Ultra-Premium Progress Indicator -->
-    <div class="navbar-progress-container">
-        <div class="progress-track">
-            <div class="progress-line ultra-gradient" id="navbarProgress"></div>
         </div>
     </div>
 </nav>
 
-<style>
-/* Ultra-Premium Navbar Design - Distinct from Home Page */
-.ultra-premium-navbar {
-    background: rgba(30, 41, 59, 0.95) !important;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(102, 126, 234, 0.2);
-    box-shadow: 0 8px 32px rgba(30, 41, 59, 0.3);
-    transition: all 0.3s ease;
-    position: relative;
-}
-
-.ultra-premium-navbar::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #059669 100%);
-}
-
-.ultra-premium-navbar.navbar-scrolled {
-    background: rgba(30, 41, 59, 0.98) !important;
-    box-shadow: 0 12px 48px rgba(30, 41, 59, 0.4);
-}
-
-/* Enhanced Brand Design */
-.ultra-premium-brand {
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-    transition: all 0.3s ease;
-}
-
-.ultra-premium-brand:hover {
-    transform: scale(1.02);
-}
-
-.brand-icon-wrapper {
-    position: relative;
-    margin-right: 0.75rem;
-}
-
-.brand-icon {
-    background: linear-gradient(135deg, #059669 0%, #047857 100%);
-    color: white;
-    width: 44px;
-    height: 44px;
-    border-radius: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 22px;
-    box-shadow: 0 6px 20px rgba(5, 150, 105, 0.4);
-    transition: all 0.3s ease;
-    position: relative;
-    z-index: 2;
-}
-
-.brand-pulse {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    border-radius: 14px;
-    background: linear-gradient(135deg, #059669 0%, #047857 100%);
-    opacity: 0.3;
-    animation: brand-pulse 2s infinite;
-    z-index: 1;
-}
-
-.brand-name {
-    color: white;
-    font-weight: 800;
-    font-size: 1.3rem;
-    letter-spacing: -0.02em;
-}
-
-.brand-subtitle {
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 0.85rem;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-}
-
-/* Ultra-Premium Navigation Capsules */
-.nav-capsule {
-    background: transparent;
-    border-radius: 16px;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    color: rgba(255, 255, 255, 0.8);
-    padding: 0.875rem 1.25rem;
-    margin: 0 0.25rem;
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-}
-
-.nav-capsule::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-    border-radius: 16px;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.nav-capsule:hover::before {
-    opacity: 1;
-}
-
-.nav-capsule:hover {
-    background: rgba(255, 255, 255, 0.08);
-    color: white;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.2);
-}
-
-.nav-capsule.active {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
-}
-
-.nav-icon-container {
-    position: relative;
-    margin-right: 0.5rem;
-}
-
-.nav-icon {
-    font-size: 1.1rem;
-    transition: all 0.3s ease;
-}
-
-.nav-ripple {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.3);
-    transform: translate(-50%, -50%);
-    transition: all 0.3s ease;
-}
-
-.nav-capsule:hover .nav-ripple {
-    width: 32px;
-    height: 32px;
-}
-
-.nav-text {
-    font-weight: 600;
-    font-size: 0.95rem;
-    letter-spacing: 0.01em;
-}
-
-/* Ultra-Premium Badge */
-.nav-badge.ultra-pulse {
-    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-    color: white;
-    font-size: 0.7rem;
-    padding: 3px 8px;
-    border-radius: 10px;
-    margin-left: 0.5rem;
-    font-weight: 700;
-    animation: ultra-pulse 2s infinite;
-    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
-}
-
-/* Ultra-Premium Dropdown */
-.ultra-premium-dropdown-menu {
-    background: rgba(255, 255, 255, 0.98);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    border: 1px solid rgba(102, 126, 234, 0.15);
-    border-radius: 20px;
-    box-shadow: 0 16px 64px rgba(30, 41, 59, 0.15);
-    padding: 0.75rem;
-    min-width: 280px;
-}
-
-.ultra-premium-dropdown-item {
-    border-radius: 14px;
-    padding: 0;
-    transition: all 0.3s ease;
-    border: none;
-    background: none;
-    width: 100%;
-}
-
-.dropdown-item-content {
-    display: flex;
-    align-items: center;
-    padding: 1rem;
-    transition: all 0.3s ease;
-}
-
-.dropdown-icon-wrapper {
-    margin-right: 0.75rem;
-}
-
-.dropdown-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #667eea;
-    font-size: 1.1rem;
-    transition: all 0.3s ease;
-}
-
-.dropdown-text {
-    flex: 1;
-}
-
-.dropdown-title {
-    display: block;
-    font-weight: 600;
-    color: #1e293b;
-    margin-bottom: 0.125rem;
-}
-
-.dropdown-subtitle {
-    display: block;
-    font-size: 0.85rem;
-    color: #64748b;
-}
-
-.dropdown-arrow {
-    color: #cbd5e1;
-    font-size: 0.9rem;
-    transition: all 0.3s ease;
-}
-
-.ultra-premium-dropdown-item:hover .dropdown-item-content {
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
-}
-
-.ultra-premium-dropdown-item:hover .dropdown-icon {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    transform: scale(1.05);
-}
-
-.ultra-premium-dropdown-item:hover .dropdown-arrow {
-    color: #667eea;
-    transform: translateX(4px);
-}
-
-.premium-header {
-    color: #475569;
-    font-weight: 700;
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    padding: 0.5rem 1rem;
-}
-
-.premium-divider {
-    margin: 0.5rem 0;
-    border-color: rgba(102, 126, 234, 0.1);
-}
-
-/* Ultra-Premium Action Zone */
-.nav-action {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 14px;
-    padding: 0.875rem;
-    margin: 0 0.25rem;
-    transition: all 0.4s ease;
-    color: rgba(255, 255, 255, 0.8);
-    position: relative;
-    overflow: hidden;
-}
-
-.action-icon-wrapper {
-    position: relative;
-}
-
-.action-ripple {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.2);
-    transform: translate(-50%, -50%);
-    transition: all 0.3s ease;
-}
-
-.nav-action:hover .action-ripple {
-    width: 28px;
-    height: 28px;
-}
-
-.nav-action:hover {
-    background: rgba(255, 255, 255, 0.15);
-    color: white;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(255, 255, 255, 0.1);
-}
-
-/* Ultra-Premium Progress Indicator */
-.navbar-progress-container {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: rgba(255, 255, 255, 0.1);
-}
-
-.progress-track {
-    height: 100%;
-    background: transparent;
-}
-
-.progress-line.ultra-gradient {
-    background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #059669 100%);
-    height: 100%;
-    border-radius: 2px;
-    transition: width 0.3s ease;
-    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
-}
-
-/* Enhanced Mobile Toggle */
-.ultra-premium-toggler {
-    border: none;
-    padding: 0.5rem;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-    transition: all 0.3s ease;
-}
-
-.ultra-premium-toggler:hover {
-    background: rgba(255, 255, 255, 0.15);
-}
-
-.toggler-line {
-    display: block;
-    width: 22px;
-    height: 2px;
-    background: white;
-    margin: 4px 0;
-    border-radius: 2px;
-    transition: all 0.3s ease;
-}
-
-.ultra-premium-toggler[aria-expanded="true"] .toggler-line:nth-child(1) {
-    transform: rotate(45deg) translate(5px, 5px);
-}
-
-.ultra-premium-toggler[aria-expanded="true"] .toggler-line:nth-child(2) {
-    opacity: 0;
-}
-
-.ultra-premium-toggler[aria-expanded="true"] .toggler-line:nth-child(3) {
-    transform: rotate(-45deg) translate(7px, -6px);
-}
-
-/* Theme Toggle Enhancements */
-.theme-option.active {
-    background: linear-gradient(135deg, rgba(5, 150, 105, 0.1) 0%, rgba(4, 120, 87, 0.1) 100%);
-}
-
-.theme-option.active .dropdown-icon {
-    background: linear-gradient(135deg, #059669 0%, #047857 100%);
-    color: white;
-}
-
-.theme-check {
-    color: #059669;
-    font-size: 1rem;
-}
-
-/* Animations */
-@keyframes brand-pulse {
-    0%, 100% { 
-        transform: scale(1);
-        opacity: 0.3;
-    }
-    50% { 
-        transform: scale(1.05);
-        opacity: 0.5;
-    }
-}
-
-@keyframes ultra-pulse {
-    0%, 100% { 
-        opacity: 1; 
-        transform: scale(1);
-        box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
-    }
-    50% { 
-        opacity: 0.8; 
-        transform: scale(1.05);
-        box-shadow: 0 4px 16px rgba(245, 158, 11, 0.4);
-    }
-}
-
-/* Mobile Responsive Design */
-@media (max-width: 991.98px) {
-    .ultra-premium-navbar {
-        background: rgba(30, 41, 59, 0.98) !important;
-    }
-    
-    .navbar-collapse {
-        background: rgba(30, 41, 59, 0.98);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border-radius: 20px;
-        margin-top: 1rem;
-        padding: 1.5rem;
-        border: 1px solid rgba(102, 126, 234, 0.2);
-    }
-    
-    .nav-capsule {
-        margin: 0.25rem 0;
-        padding: 1rem 1.25rem;
-    }
-    
-    .navigation-hub {
-        margin-bottom: 1rem;
-    }
-    
-    .action-zone {
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-        padding-top: 1rem;
-    }
-}
-
-/* Accessibility Enhancements */
-@media (prefers-reduced-motion: reduce) {
-    .nav-capsule,
-    .nav-action,
-    .brand-icon,
-    .dropdown-icon {
-        transition: none;
-    }
-    
-    .brand-pulse,
-    .nav-badge.ultra-pulse {
-        animation: none;
-    }
-}
-
-/* High Contrast Mode */
-@media (prefers-contrast: high) {
-    .ultra-premium-navbar {
-        background: #000 !important;
-        border-bottom: 2px solid #667eea;
-    }
-    
-    .nav-capsule,
-    .nav-action {
-        border: 1px solid #667eea;
-    }
-    
-    .nav-capsule.active {
-        background: #667eea !important;
-        border: 2px solid #667eea;
-    }
-}
-</style>
-
-<!-- Smart Assessment Progress -->
-{% if show_progress and current_assessment %}
-<div class="assessment-progress-container">
-    <div class="container-fluid px-4">
-        <div class="progress-content">
-            <div class="progress-info">
-                <span class="progress-label">Assessment Progress</span>
-                <span class="progress-percentage">{{ current_assessment.progress_percentage }}%</span>
-            </div>
-            <div class="progress-bar-container">
-                <div class="progress-bar-bg">
-                    <div class="progress-bar-fill" 
-                         style="width: {{ current_assessment.progress_percentage }}%"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-{% endif %}
-
-<!-- SVG Icons for theme toggle -->
-<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
-    <symbol id="check2" viewBox="0 0 16 16">
-        <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
-    </symbol>
-    <symbol id="circle-half" viewBox="0 0 16 16">
-        <path d="M8 15A7 7 0 1 0 8 1v14zm0 1A8 8 0 1 1 8 0a8 8 0 0 1 0 16z"/>
-    </symbol>
-    <symbol id="moon-stars-fill" viewBox="0 0 16 16">
-        <path d="M6 .278a.768.768 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277.527 0 1.04-.055 1.533-.16a.787.787 0 0 1 .81.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.752.752 0 0 1 6 .278z"/>
-        <path d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.734 1.734 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.734 1.734 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.734 1.734 0 0 0 1.097-1.097l.387-1.162zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.156 1.156 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.156 1.156 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732L13.863.1z"/>
-    </symbol>
-    <symbol id="sun-fill" viewBox="0 0 16 16">
-        <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z"/>
-    </symbol>
-</svg>
-
-<!-- Enhanced JavaScript for Premium Navigation -->
+<!-- Simple Theme Toggle JavaScript -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize premium navigation
-    initPremiumNavigation();
-    
-    // Navigation scroll effect
-    initScrollEffect();
-    
-    // Enhanced theme toggle
-    initThemeToggle();
-    
-    // Tooltip initialization
-    initTooltips();
-    
-    // Progress tracking
-    initProgressTracking();
-});
-
-function initPremiumNavigation() {
-    const navbar = document.getElementById('mainNavbar');
-    const navLinks = document.querySelectorAll('.nav-pill');
-    
-    // Add interactive states
-    navLinks.forEach(link => {
-        link.addEventListener('mouseenter', function() {
-            this.classList.add('nav-hover');
-        });
-        
-        link.addEventListener('mouseleave', function() {
-            this.classList.remove('nav-hover');
-        });
-        
-        link.addEventListener('click', function() {
-            // Add loading state
-            this.classList.add('nav-loading');
-            setTimeout(() => {
-                this.classList.remove('nav-loading');
-            }, 1000);
-        });
-    });
-}
-
-function initScrollEffect() {
-    const navbar = document.getElementById('mainNavbar');
-    const progressLine = document.getElementById('navbarProgress');
-    
-    window.addEventListener('scroll', function() {
-        const scrolled = window.pageYOffset;
-        
-        // Dynamic background opacity
-        if (scrolled > 50) {
-            navbar.classList.add('navbar-scrolled');
-        } else {
-            navbar.classList.remove('navbar-scrolled');
-        }
-        
-        // Reading progress
-        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-        const progress = (scrolled / docHeight) * 100;
-        
-        if (progressLine) {
-            progressLine.style.width = progress + '%';
-        }
-    });
-}
-
-function initThemeToggle() {
+    // Theme toggle functionality
     const themeToggle = document.getElementById('themeToggle');
     const themeOptions = document.querySelectorAll('.theme-option');
     
@@ -821,13 +124,24 @@ function initThemeToggle() {
             this.classList.add('active');
             
             // Apply theme
-            document.documentElement.setAttribute('data-bs-theme', theme);
+            if (theme === 'auto') {
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                document.documentElement.setAttribute('data-bs-theme', prefersDark ? 'dark' : 'light');
+            } else {
+                document.documentElement.setAttribute('data-bs-theme', theme);
+            }
             
             // Store preference
             localStorage.setItem('theme', theme);
             
             // Update toggle icon
-            updateThemeIcon(theme);
+            const themeIcon = themeToggle.querySelector('i');
+            const iconMap = {
+                'light': 'bi-sun-fill',
+                'dark': 'bi-moon-stars-fill',
+                'auto': 'bi-circle-half'
+            };
+            themeIcon.className = `bi ${iconMap[theme]}`;
         });
     });
     
@@ -837,90 +151,5 @@ function initThemeToggle() {
     if (activeOption) {
         activeOption.click();
     }
-}
-
-function updateThemeIcon(theme) {
-    const themeIcon = document.querySelector('.theme-icon i');
-    const iconMap = {
-        'light': 'bi-sun-fill',
-        'dark': 'bi-moon-stars-fill',
-        'auto': 'bi-circle-half'
-    };
-    
-    if (themeIcon) {
-        themeIcon.className = `bi ${iconMap[theme]}`;
-    }
-}
-
-function initTooltips() {
-    // Initialize Bootstrap tooltips for nav items
-    const tooltipElements = document.querySelectorAll('[data-nav-tooltip]');
-    tooltipElements.forEach(element => {
-        if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
-            // Check if tooltip is already initialized
-            if (!element.hasAttribute('data-tooltip-initialized')) {
-                new bootstrap.Tooltip(element, {
-                    placement: 'bottom',
-                    trigger: 'hover',
-                    delay: { show: 500, hide: 100 }
-                });
-                element.setAttribute('data-tooltip-initialized', 'true');
-            }
-        }
-    });
-}
-
-function initProgressTracking() {
-    // Track user navigation patterns
-    const navLinks = document.querySelectorAll('.nav-pill');
-    
-    navLinks.forEach(link => {
-        link.addEventListener('click', function() {
-            const page = this.getAttribute('href');
-            const timestamp = new Date().toISOString();
-            
-            // Store navigation analytics (could be sent to backend)
-            const navData = {
-                page: page,
-                timestamp: timestamp,
-                userAgent: navigator.userAgent
-            };
-            
-            console.log('Navigation tracked:', navData);
-        });
-    });
-}
-
-// Accessibility enhancements
-document.addEventListener('keydown', function(e) {
-    // Enhanced keyboard navigation
-    if (e.key === 'Tab') {
-        document.body.classList.add('keyboard-navigation');
-    }
-    
-    // Quick navigation shortcuts
-    if (e.altKey) {
-        switch(e.key) {
-            case 'h':
-                e.preventDefault();
-                const homeLink = document.querySelector('[href="/"]') || document.querySelector('[href*="index"]');
-                if (homeLink) homeLink.click();
-                break;
-            case 'a':
-                e.preventDefault();
-                const assessmentLink = document.querySelector('[href*="assessment"]');
-                if (assessmentLink) assessmentLink.click();
-                break;
-            case 'd':
-                e.preventDefault();
-                const dashboardLink = document.querySelector('[href*="dashboard"]');
-                if (dashboardLink) dashboardLink.click();
-                break;
-        }
-    }
-});
-
-document.addEventListener('mousedown', function() {
-    document.body.classList.remove('keyboard-navigation');
 });
 </script>

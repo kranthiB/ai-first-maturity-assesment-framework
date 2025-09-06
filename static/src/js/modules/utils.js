@@ -34,7 +34,14 @@ class Utils {
             slugify: this.slugify.bind(this),
             getTimeSince: this.getTimeSince.bind(this),
             getMaturityLevel: this.getMaturityLevel.bind(this),
-            calculateProgress: this.calculateProgress.bind(this)
+            calculateProgress: this.calculateProgress.bind(this),
+            // Loading utilities
+            showLoading: this.showLoading.bind(this),
+            hideLoading: this.hideLoading.bind(this),
+            // Form utilities
+            restoreFormData: this.restoreFormData.bind(this),
+            clearFormAutoSave: this.clearFormAutoSave.bind(this),
+            autoSaveForm: this.autoSaveForm.bind(this)
         };
     }
 

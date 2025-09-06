@@ -54,9 +54,17 @@ class MaturityAssessmentApp {
     }
 
     async initializeUtilities() {
-        // Utilities should already be initialized by utils.js
+        // Wait for utilities to be available
+        let retries = 0;
+        const maxRetries = 10;
+        
+        while (typeof window.utils === 'undefined' && retries < maxRetries) {
+            await new Promise(resolve => setTimeout(resolve, 100)); // Wait 100ms
+            retries++;
+        }
+        
         if (typeof window.utils === 'undefined') {
-            throw new Error('Utilities module not loaded');
+            throw new Error('Utilities module not loaded after waiting');
         }
         
         this.utils = window.utils;
@@ -187,9 +195,12 @@ class MaturityAssessmentApp {
         });
 
         // Handle window resize
-        window.addEventListener('resize', this.utils.debounce(() => {
-            this.handleWindowResize();
-        }, 250));
+        const resizeHandler = this.safeUtils('debounce', 
+            () => this.handleWindowResize(), 
+            250
+        ) || (() => this.handleWindowResize());
+        
+        window.addEventListener('resize', resizeHandler);
 
         // Handle keyboard shortcuts
         document.addEventListener('keydown', (e) => {
@@ -232,9 +243,9 @@ class MaturityAssessmentApp {
         // Restore auto-saved data
         const assessmentForm = document.querySelector('#assessment-form');
         if (assessmentForm) {
-            const restored = this.utils.restoreFormData(assessmentForm);
+            const restored = this.safeUtils('restoreFormData', assessmentForm);
             if (restored) {
-                this.utils.showToast('Previous session data restored', 'info');
+                this.safeUtils('showToast', 'Previous session data restored', 'info');
             }
         }
 
@@ -271,6 +282,15 @@ class MaturityAssessmentApp {
         return 'Default';
     }
 
+    // Safe utility methods
+    safeUtils(method, ...args) {
+        if (this.utils && typeof this.utils[method] === 'function') {
+            return this.utils[method](...args);
+        }
+        console.warn(`Utils method '${method}' not available`);
+        return null;
+    }
+
     // Event handlers
     async handleAjaxForm(form) {
         const formData = new FormData(form);
@@ -278,7 +298,7 @@ class MaturityAssessmentApp {
         const method = form.method || 'POST';
 
         try {
-            this.utils.showLoading(form);
+            this.safeUtils('showLoading', form);
             
             const response = await this.fetch(url, {
                 method: method,
@@ -294,13 +314,13 @@ class MaturityAssessmentApp {
         } catch (error) {
             this.handleAjaxFormError(form, error);
         } finally {
-            this.utils.hideLoading(form);
+            this.safeUtils('hideLoading', form);
         }
     }
 
     handleAjaxFormSuccess(form, result) {
         if (result.message) {
-            this.utils.showToast(result.message, result.type || 'success');
+            this.safeUtils('showToast', result.message, result.type || 'success');
         }
 
         if (result.redirect) {
@@ -310,21 +330,21 @@ class MaturityAssessmentApp {
         }
 
         // Clear auto-save data
-        this.utils.clearFormAutoSave(form);
+        this.safeUtils('clearFormAutoSave', form);
 
         this.dispatchEvent('form:success', { form, result });
     }
 
     handleAjaxFormError(form, error) {
         this.handleError('Form Submission Error', error, { form: form.id });
-        this.utils.showToast('Form submission failed. Please try again.', 'danger');
+        this.safeUtils('showToast', 'Form submission failed. Please try again.', 'danger');
         this.dispatchEvent('form:error', { form, error });
     }
 
     handleNavigation(e) {
         // Add loading state for navigation
         if (!e.target.dataset.noLoading) {
-            this.utils.showLoading(document.body, 'Loading page...');
+            this.safeUtils('showLoading', document.body, 'Loading page...');
         }
     }
 
@@ -352,11 +372,11 @@ class MaturityAssessmentApp {
 
     handleOnlineStatus(online) {
         if (online) {
-            this.utils.showToast('Connection restored', 'success', 3000);
+            this.safeUtils('showToast', 'Connection restored', 'success', 3000);
             // Retry failed requests
             this.retryFailedRequests();
         } else {
-            this.utils.showToast('Connection lost - working offline', 'warning', 5000);
+            this.safeUtils('showToast', 'Connection lost - working offline', 'warning', 5000);
         }
         
         this.dispatchEvent('network:status', { online });
@@ -430,7 +450,7 @@ class MaturityAssessmentApp {
                 <p>The application encountered an error during startup. Please refresh the page to try again.</p>
                 <hr>
                 <p class="mb-0">
-                    <small>Error: ${this.utils.sanitizeHtml(error.message)}</small>
+                    <small>Error: ${this.safeUtils('sanitizeHtml', error.message) || error.message}</small>
                 </p>
                 <button class="btn btn-outline-danger btn-sm mt-2" onclick="window.location.reload()">
                     Refresh Page
@@ -456,7 +476,7 @@ class MaturityAssessmentApp {
 
         const questions = form.querySelectorAll('.question');
         const answered = form.querySelectorAll('.question.answered').length;
-        const progress = this.utils.calculateProgress(answered, questions.length);
+        const progress = this.safeUtils('calculateProgress', answered, questions.length) || Math.round((answered / questions.length) * 100);
 
         const progressBar = document.querySelector('.assessment-progress .progress-bar');
         if (progressBar) {
@@ -631,7 +651,7 @@ window.addEventListener('beforeunload', function() {
     if (window.app) {
         // Auto-save any active forms
         document.querySelectorAll('form[data-auto-save]:not([data-auto-save="false"])').forEach(form => {
-            window.app.utils.autoSaveForm(form);
+            window.app.safeUtils('autoSaveForm', form);
         });
     }
 });
