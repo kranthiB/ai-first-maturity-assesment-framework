@@ -6,34 +6,35 @@
 
 ## Overview
 
-The **AI-First Software Engineering (AFS) Maturity Assessment Framework** is a comprehensive self-evaluation tool that measures your development team's maturity in adopting AI-driven software engineering practices. This assessment evaluates four critical dimensions of modern software development: Foundational Capabilities, Transformation Capabilities, Enterprise Integration, and Strategic Governance.
+The **AI-First Software Engineering (AFS) Maturity Assessment Framework** is a comprehensive self-evaluation tool that measures your team's maturity in adopting AI-driven software engineering practices. This assessment evaluates four critical dimensions of modern software development: Foundational Capabilities, Transformation Capabilities, Enterprise Integration, and Strategic Governance.
 
 ## Features
 
-- **Comprehensive Assessment**: 22 detailed questions across 4 major dimensions
+- **Comprehensive Assessment**: 23 detailed areas across 4 major dimensions
 - **Maturity Scoring**: 4-level maturity classification (Traditional → AI-Assisted → AI-Augmented → AI-First)
-- **Visual Reports**: Assessment results with detailed scoring breakdowns
+- **Visual Reports**: Assessment results with detailed scoring breakdowns and recommendations
 - **Enterprise Ready**: Multi-database support, Docker deployment, and scalable architecture
 - **Core Assessment Engine**: Streamlined assessment workflow and recommendation system
+
 
 ## Assessment Framework
 
 ### Four Key Dimensions
 
-1. **Foundational Capabilities** (4 areas)
+1. **Foundational Capabilities (FC)** - 4 areas
    - AI Infrastructure & Tooling
    - Team AI Literacy & Skills
    - Code Generation & Review
    - Documentation & Knowledge Management
 
-2. **Transformation Capabilities** (5 areas)
+2. **Transformation Capabilities (TC)** - 5 areas
    - Intent-to-Architecture Translation
    - AI-Driven Testing & Quality Assurance
    - Continuous Integration & Deployment
    - Monitoring & Observability
    - Legacy System Modernization
 
-3. **Enterprise Integration** (6 areas)
+3. **Enterprise Integration (EI)** - 6 areas
    - Data Governance & Management
    - Vendor & Tool Standardization
    - Integration with Enterprise Systems
@@ -41,20 +42,20 @@ The **AI-First Software Engineering (AFS) Maturity Assessment Framework** is a c
    - Performance & Scalability Management
    - Business Continuity & Disaster Recovery
 
-4. **Strategic Governance** (7 areas)
+4. **Strategic Governance (SG)** - 8 areas
    - AI Ethics & Responsible AI
-   - Regulatory Compliance
+   - Performance Measurement & Value Realization
    - Intellectual Property Management
    - Risk Management & Security
    - Organizational Change Management
-   - Performance Measurement & Value Realization
    - Cross-functional AI Collaboration
+   - Regulatory Compliance
    - Innovation & Future Readiness
 
 ### Maturity Levels
 
 - **Level 1 (Basic)**: Traditional/manual approaches
-- **Level 2 (Developing)**: Basic AI assistance
+- **Level 2 (Evolving)**: Basic AI assistance
 - **Level 3 (Advanced)**: Systematic AI integration
 - **Level 4 (Optimized)**: Autonomous/AI-first approaches
 
@@ -63,8 +64,6 @@ The **AI-First Software Engineering (AFS) Maturity Assessment Framework** is a c
 - **Backend**: Python 3.8+, Flask 2.3+, SQLAlchemy
 - **Database**: Multi-adapter support (H2, PostgreSQL, MySQL, SQLite)
 - **Frontend**: Jinja2 templates, Bootstrap 5, Custom JavaScript
-- **Infrastructure**: Docker, Docker Compose, Gunicorn
-- **Testing**: pytest, coverage
 - **Development**: Code formatting and validation
 
 ## Quick Start
@@ -72,7 +71,6 @@ The **AI-First Software Engineering (AFS) Maturity Assessment Framework** is a c
 ### Prerequisites
 
 - Python 3.8 or higher
-- Docker and Docker Compose (optional)
 - Git
 
 ### Installation
@@ -94,24 +92,31 @@ The **AI-First Software Engineering (AFS) Maturity Assessment Framework** is a c
    pip install -r requirements.txt
    ```
 
-4. **Set up environment variables**
+4. **Initialize the database**
    ```bash
-   cp .env.example .env
-   # Edit .env with your configuration
+   python scripts/setup_database.py
    ```
 
-5. **Initialize the database**
-   ```bash
-   python scripts/setup.py
-   python scripts/seed_database.py
-   ```
+   This will:
+   - Create the database schema (tables, indexes, views)
+   - Populate with framework seed data (sections, areas, questions)
+   - Verify the setup was successful
 
 6. **Run the application**
    ```bash
    python run.py
    ```
 
-   The application will be available at `http://localhost:5000`
+   The application will be available at `http://127.0.0.1:5000`
+
+## Database Structure
+
+The framework includes:
+- **Core Framework Tables**: sections, areas, questions
+- **Assessment Tables**: assessments, responses, assessment_sections  
+- **Analytics Tables**: analytics_summary, question_analytics, team_progress
+- **Support Tables**: assessment_recommendations, assessment_exports
+- **Views**: Performance analytics and reporting views
 
 ## Core Workflow
 
@@ -137,15 +142,6 @@ The assessment framework provides a streamlined workflow:
 - `/assessment/{id}/results` - View assessment results
 - `/about` - About the framework and methodology
 
-### Docker Deployment
-
-```bash
-# Build and run with Docker Compose
-docker-compose up --build
-
-# Access the application
-open http://localhost:8000
-```
 
 ## Project Structure
 
@@ -165,50 +161,14 @@ open http://localhost:8000
 ├── config/                # Configuration files
 ├── data/                  # Database migrations and seed data
 ├── scripts/               # Management and deployment scripts
+│   ├── setup_database.py  # Automated database setup
+│   ├── database_schema.sql # Complete database schema (DDL)
+│   └── database_seed_data.sql # Framework seed data (DML)
 ├── static/                # Static assets (CSS, JavaScript, images)
 ├── templates/             # Jinja2 templates
+├── instance/              # Instance-specific files (databases, configs)
 └── tests/                 # Test suite
 ```
-
-## Development
-
-### Running Tests
-
-```bash
-# Run all tests
-pytest
-
-# Run with coverage
-pytest --cov=app --cov-report=html
-
-# Run specific test file
-pytest tests/unit/test_models.py
-```
-
-### Code Quality
-
-```bash
-# Install development dependencies
-pip install -r requirements-dev.txt
-
-# Run code formatting
-black app/ tests/
-isort app/ tests/
-
-# Run linting
-flake8 app/ tests/
-```
-
-## API Documentation
-
-The application provides RESTful APIs for:
-
-- Assessment management
-- Question retrieval
-- Response submission
-- Basic analytics
-
-Core API endpoints are available at `/api/v1/` when running the application.
 
 ## Contributing
 
