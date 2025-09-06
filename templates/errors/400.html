@@ -1,0 +1,46 @@
+{% extends "base/layout.html" %}
+{% set page_title = "Bad Request" %}
+{% set hide_breadcrumbs = true %}
+
+{% block head_extra %}
+<style>
+.error-container {
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.error-code {
+    font-size: 6rem;
+    font-weight: bold;
+    color: #ffc107;
+    margin-bottom: 0;
+}
+
+.error-message {
+    font-size: 1.5rem;
+    color: #6c757d;
+    margin-bottom: 2rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="error-container">
+        <div class="text-center">
+            <h1 class="error-code">400</h1>
+            <p class="error-message">Bad Request</p>
+            <p class="text-muted mb-4">
+                The request was invalid or cannot be processed.
+            </p>
+            <a href="{{ url_for('main.index') if url_for else '/' }}" 
+               class="btn btn-primary">
+                <i class="bi bi-house me-2"></i>Go Home
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

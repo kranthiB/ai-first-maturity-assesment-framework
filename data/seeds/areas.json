@@ -1,0 +1,234 @@
+{
+  "areas": [
+    {
+      "id": "FC-AIT",
+      "section_id": "FC",
+      "name": "AI Infrastructure & Tooling",
+      "description": "Deployment and management of AI development tools, platforms, and infrastructure to support team productivity and collaboration",
+      "display_order": 1,
+      "timeline_l1_l2": "6-8 weeks",
+      "timeline_l2_l3": "8-10 weeks", 
+      "timeline_l3_l4": "16-20 weeks"
+    },
+    {
+      "id": "FC-ALS",
+      "section_id": "FC",
+      "name": "Team AI Literacy & Skills",
+      "description": "Development of team competencies in AI tools, prompt engineering, and AI-first development methodologies",
+      "display_order": 2,
+      "timeline_l1_l2": "6-8 weeks",
+      "timeline_l2_l3": "10-12 weeks",
+      "timeline_l3_l4": "20-24 weeks"
+    },
+    {
+      "id": "FC-CGR",
+      "section_id": "FC", 
+      "name": "Code Generation & Review",
+      "description": "Integration of AI assistance in code creation, review, and quality assurance processes",
+      "display_order": 3,
+      "timeline_l1_l2": "6-8 weeks",
+      "timeline_l2_l3": "8-10 weeks",
+      "timeline_l3_l4": "16-20 weeks"
+    },
+    {
+      "id": "FC-DKM",
+      "section_id": "FC",
+      "name": "Documentation & Knowledge Management", 
+      "description": "Use of AI to automate and enhance documentation creation, maintenance, and knowledge discovery",
+      "display_order": 4,
+      "timeline_l1_l2": "5-6 weeks",
+      "timeline_l2_l3": "10-12 weeks",
+      "timeline_l3_l4": "20-24 weeks"
+    },
+    {
+      "id": "TC-IAT",
+      "section_id": "TC",
+      "name": "Intent-to-Architecture Translation",
+      "description": "AI-powered translation of business requirements and intent into technical architecture and system design", 
+      "display_order": 1,
+      "timeline_l1_l2": "6-8 weeks",
+      "timeline_l2_l3": "10-12 weeks",
+      "timeline_l3_l4": "20-24 weeks"
+    },
+    {
+      "id": "TC-ATQ",
+      "section_id": "TC",
+      "name": "AI-Driven Testing & Quality Assurance",
+      "description": "Automation of testing processes using AI for test generation, execution, maintenance, and quality prediction",
+      "display_order": 2,
+      "timeline_l1_l2": "7-8 weeks", 
+      "timeline_l2_l3": "10-12 weeks",
+      "timeline_l3_l4": "20-24 weeks"
+    },
+    {
+      "id": "TC-CID",
+      "section_id": "TC",
+      "name": "Continuous Integration & Deployment",
+      "description": "AI-enhanced CI/CD pipelines with intelligent decision-making, optimization, and automated deployment strategies",
+      "display_order": 3,
+      "timeline_l1_l2": "6-8 weeks",
+      "timeline_l2_l3": "10-12 weeks", 
+      "timeline_l3_l4": "20-24 weeks"
+    },
+    {
+      "id": "TC-MOB",
+      "section_id": "TC",
+      "name": "Monitoring & Observability",
+      "description": "AI-powered system monitoring, anomaly detection, incident response, and predictive issue prevention",
+      "display_order": 4,
+      "timeline_l1_l2": "9-12 months",
+      "timeline_l2_l3": "18-24 months",
+      "timeline_l3_l4": "30-36 months"
+    },
+    {
+      "id": "TC-LSM",
+      "section_id": "TC", 
+      "name": "Legacy System Modernization",
+      "description": "AI-assisted analysis, planning, and execution of legacy system transformation and modernization initiatives",
+      "display_order": 5,
+      "timeline_l1_l2": "12-15 months",
+      "timeline_l2_l3": "18-24 months",
+      "timeline_l3_l4": "30-36 months"
+    },
+    {
+      "id": "EI-DGM",
+      "section_id": "EI",
+      "name": "Data Governance & Management",
+      "description": "Governance frameworks and management systems for data used in AI development, ensuring compliance and quality",
+      "display_order": 1,
+      "timeline_l1_l2": "12-15 months",
+      "timeline_l2_l3": "18-24 months", 
+      "timeline_l3_l4": "30-36 months"
+    },
+    {
+      "id": "EI-VTS",
+      "section_id": "EI",
+      "name": "Vendor & Tool Standardization",
+      "description": "Enterprise-wide standardization of AI vendors, tools, and platforms with strategic partnership management",
+      "display_order": 2,
+      "timeline_l1_l2": "12-15 months",
+      "timeline_l2_l3": "18-24 months",
+      "timeline_l3_l4": "30-36 months"
+    },
+    {
+      "id": "EI-IES",
+      "section_id": "EI",
+      "name": "Integration with Enterprise Systems",
+      "description": "Connection and integration of AI development tools with existing enterprise systems (ERP, CRM, ITSM, etc.)",
+      "display_order": 3,
+      "timeline_l1_l2": "12-15 months",
+      "timeline_l2_l3": "18-24 months",
+      "timeline_l3_l4": "30-36 months"
+    },
+    {
+      "id": "EI-CMR",
+      "section_id": "EI",
+      "name": "Cost Management & ROI Tracking", 
+      "description": "Financial management, cost optimization, and return-on-investment measurement for AI development initiatives",
+      "display_order": 4,
+      "timeline_l1_l2": "12-15 months",
+      "timeline_l2_l3": "18-24 months",
+      "timeline_l3_l4": "30-36 months"
+    },
+    {
+      "id": "EI-PSM",
+      "section_id": "EI",
+      "name": "Performance & Scalability Management",
+      "description": "Management of AI development practices scalability across teams, projects, and organizational growth",
+      "display_order": 5,
+      "timeline_l1_l2": "12-15 weeks",
+      "timeline_l2_l3": "15-18 weeks",
+      "timeline_l3_l4": "20-24 weeks"
+    },
+    {
+      "id": "EI-BCD",
+      "section_id": "EI",
+      "name": "Business Continuity & Disaster Recovery",
+      "description": "Resilience planning and disaster recovery capabilities for AI-dependent development processes and systems",
+      "display_order": 6,
+      "timeline_l1_l2": "7-8 weeks",
+      "timeline_l2_l3": "10-12 weeks",
+      "timeline_l3_l4": "20-24 weeks"
+    },
+    {
+      "id": "SG-AER",
+      "section_id": "SG",
+      "name": "AI Ethics & Responsible AI",
+      "description": "Frameworks and practices ensuring ethical, fair, and responsible use of AI in software development",
+      "display_order": 1,
+      "timeline_l1_l2": "8-10 weeks",
+      "timeline_l2_l3": "10-12 weeks",
+      "timeline_l3_l4": "20-24 weeks"
+    },
+    {
+      "id": "SG-PMV",
+      "section_id": "SG", 
+      "name": "Performance Measurement & Value Realization",
+      "description": "Systematic measurement and optimization of business value delivered through AI-first development practices",
+      "display_order": 2,
+      "timeline_l1_l2": "6-8 weeks",
+      "timeline_l2_l3": "10-12 weeks",
+      "timeline_l3_l4": "20-24 weeks"
+    },
+    {
+      "id": "SG-IPM",
+      "section_id": "SG",
+      "name": "Intellectual Property Management",
+      "description": "Management of intellectual property concerns and legal compliance for AI-generated code and content",
+      "display_order": 3,
+      "timeline_l1_l2": "8-10 weeks",
+      "timeline_l2_l3": "10-12 weeks", 
+      "timeline_l3_l4": "20-24 weeks"
+    },
+    {
+      "id": "SG-RMS",
+      "section_id": "SG",
+      "name": "Risk Management & Security",
+      "description": "Identification, assessment, and mitigation of risks associated with AI-powered development processes",
+      "display_order": 4,
+      "timeline_l1_l2": "8-10 weeks",
+      "timeline_l2_l3": "10-12 weeks",
+      "timeline_l3_l4": "20-24 weeks"
+    },
+    {
+      "id": "SG-OCM",
+      "section_id": "SG",
+      "name": "Organizational Change Management",
+      "description": "Management of organizational transformation to AI-first development culture, processes, and operating models",
+      "display_order": 5,
+      "timeline_l1_l2": "8-10 weeks",
+      "timeline_l2_l3": "10-12 weeks",
+      "timeline_l3_l4": "20-24 weeks"
+    },
+    {
+      "id": "SG-CAC",
+      "section_id": "SG",
+      "name": "Cross-functional AI Collaboration", 
+      "description": "Coordination and collaboration between AI agents and humans across different functional domains",
+      "display_order": 6,
+      "timeline_l1_l2": "7-8 weeks",
+      "timeline_l2_l3": "10-12 weeks",
+      "timeline_l3_l4": "20-24 weeks"
+    },
+    {
+      "id": "SG-REC",
+      "section_id": "SG",
+      "name": "Regulatory Compliance",
+      "description": "Compliance management for AI development activities with applicable laws, regulations, and industry standards",
+      "display_order": 7,
+      "timeline_l1_l2": "8-10 weeks",
+      "timeline_l2_l3": "10-12 weeks",
+      "timeline_l3_l4": "20-24 weeks"
+    },
+    {
+      "id": "SG-IFR",
+      "section_id": "SG",
+      "name": "Innovation & Future Readiness",
+      "description": "Strategic preparation for emerging AI technologies and continuous innovation in development practices",
+      "display_order": 8,
+      "timeline_l1_l2": "8-10 weeks",
+      "timeline_l2_l3": "10-12 weeks", 
+      "timeline_l3_l4": "20-24 weeks"
+    }
+  ]
+}

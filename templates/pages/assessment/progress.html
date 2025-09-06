@@ -1,0 +1,400 @@
+{% extends "base/layout.html" %}
+{% set page_title = "Assessment Progress" %}
+{% set show_breadcrumbs = true %}
+{% set breadcrumbs = [
+    {"name": "Home", "url": url_for('main.index') if url_for else '/'},
+    {"name": "Assessment", "url": url_for('assessment.start') if url_for else '/assessment/start'},
+    {"name": "Progress", "url": "#", "active": true}
+] %}
+
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', filename='dist/css/assessment.css') if url_for else '/static/dist/css/assessment.css' }}">
+{% endblock %}
+
+{% block content %}
+<div class="assessment-progress-container">
+    <div class="container">
+        <!-- Header Section -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card bg-gradient-primary text-white">
+                    <div class="card-body text-center py-4">
+                        <h2 class="card-title mb-3">
+                            <i class="bi bi-clipboard-data me-3"></i>
+                            Assessment Progress
+                        </h2>
+                        <p class="card-text lead">
+                            {{ assessment.organization_name }} • {{ assessment.assessment_type.title() }} Assessment
+                        </p>
+                        <div class="mt-3">
+                            <span class="badge bg-light text-primary fs-6 px-3 py-2">
+                                Started: {{ assessment.created_at.strftime('%B %d, %Y at %I:%M %p') }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Overall Progress -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="mb-0">
+                            <i class="bi bi-graph-up me-2"></i>
+                            Overall Progress
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <div class="progress-info mb-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="fw-semibold">Completion Status</span>
+                                        <span class="text-muted">{{ completed_questions }} of {{ total_questions }} questions</span>
+                                    </div>
+                                    <div class="progress assessment-progress">
+                                        <div class="progress-bar" role="progressbar" 
+                                             style="width: {{ overall_progress }}%" 
+                                             aria-valuenow="{{ overall_progress }}" 
+                                             aria-valuemin="0" aria-valuemax="100">
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-between text-muted small mt-1">
+                                        <span>Started {{ time_elapsed }} ago</span>
+                                        <span>{{ overall_progress }}% Complete</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Estimated Time -->
+                                <div class="row text-center">
+                                    <div class="col-4">
+                                        <div class="fw-bold text-primary">{{ time_spent }}</div>
+                                        <div class="small text-muted">Time Spent</div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="fw-bold text-success">{{ estimated_remaining }}</div>
+                                        <div class="small text-muted">Est. Remaining</div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="fw-bold text-info">{{ estimated_completion }}</div>
+                                        <div class="small text-muted">Est. Completion</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-center">
+                                <div class="score-circle-large mx-auto mb-3" style="width: 120px; height: 120px;">
+                                    <div class="d-flex flex-column align-items-center justify-content-center h-100">
+                                        <div class="fw-bold" style="font-size: 2rem;">{{ overall_progress }}%</div>
+                                        <div class="small">Complete</div>
+                                    </div>
+                                </div>
+                                {% if assessment.status == 'in_progress' %}
+                                <a href="{{ url_for('assessment.resume', assessment_id=assessment.id) if url_for else '/assessment/' + assessment.id|string + '/resume' }}" 
+                                   class="btn btn-primary">
+                                    <i class="bi bi-play-circle me-2"></i>Continue Assessment
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section Progress -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="mb-0">
+                            <i class="bi bi-list-check me-2"></i>
+                            Section Progress
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            {% for section in sections %}
+                            <div class="col-md-6 mb-4">
+                                <div class="section-progress-card h-100">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="section-icon bg-{{ section.color or 'primary' }} text-white rounded-circle me-3 d-flex align-items-center justify-content-center" 
+                                             style="width: 48px; height: 48px;">
+                                            <i class="bi bi-{{ section.icon or 'gear' }}"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <h5 class="mb-1">{{ section.name }}</h5>
+                                            <p class="text-muted small mb-0">{{ section.description }}</p>
+                                        </div>
+                                        <div class="section-status">
+                                            {% if section.status == 'completed' %}
+                                                <span class="badge bg-success">
+                                                    <i class="bi bi-check-circle me-1"></i>Complete
+                                                </span>
+                                            {% elif section.status == 'in_progress' %}
+                                                <span class="badge bg-warning text-dark">
+                                                    <i class="bi bi-clock me-1"></i>In Progress
+                                                </span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">
+                                                    <i class="bi bi-circle me-1"></i>Pending
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="progress mb-2">
+                                        <div class="progress-bar bg-{{ section.color or 'primary' }}" role="progressbar" 
+                                             style="width: {{ section.progress }}%" 
+                                             aria-valuenow="{{ section.progress }}" 
+                                             aria-valuemin="0" aria-valuemax="100">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="text-muted small">
+                                            {{ section.completed_questions }} of {{ section.total_questions }} questions
+                                        </span>
+                                        <span class="fw-semibold">{{ section.progress }}%</span>
+                                    </div>
+                                    
+                                    {% if section.current_score is not none %}
+                                    <div class="mt-2">
+                                        <span class="text-muted small">Current Score: </span>
+                                        <span class="badge bg-primary">{{ "%.1f"|format(section.current_score) }}</span>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Response Summary -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="mb-0">
+                            <i class="bi bi-bar-chart me-2"></i>
+                            Response Summary
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Response Distribution</h6>
+                                <div class="response-distribution mb-3">
+                                    {% for score, count in response_distribution.items() %}
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span>Score {{ score }}</span>
+                                        <div class="d-flex align-items-center">
+                                            <div class="progress me-3" style="width: 100px; height: 8px;">
+                                                <div class="progress-bar" role="progressbar" 
+                                                     style="width: {{ (count / completed_questions * 100) if completed_questions > 0 else 0 }}%">
+                                                </div>
+                                            </div>
+                                            <span class="badge bg-light text-dark">{{ count }}</span>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <h6>Current Insights</h6>
+                                <div class="insights-list">
+                                    {% if current_score %}
+                                    <div class="insight-item mb-2">
+                                        <i class="bi bi-graph-up text-success me-2"></i>
+                                        <span>Current average score: <strong>{{ "%.1f"|format(current_score) }}</strong></span>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    {% if strongest_area %}
+                                    <div class="insight-item mb-2">
+                                        <i class="bi bi-trophy text-warning me-2"></i>
+                                        <span>Strongest area: <strong>{{ strongest_area }}</strong></span>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    {% if improvement_area %}
+                                    <div class="insight-item mb-2">
+                                        <i class="bi bi-target text-info me-2"></i>
+                                        <span>Improvement opportunity: <strong>{{ improvement_area }}</strong></span>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    <div class="insight-item">
+                                        <i class="bi bi-clock text-muted me-2"></i>
+                                        <span>Average time per question: <strong>{{ avg_time_per_question }}</strong></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        {% if recent_responses %}
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="mb-0">
+                            <i class="bi bi-clock-history me-2"></i>
+                            Recent Activity
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="timeline">
+                            {% for response in recent_responses %}
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-primary"></div>
+                                <div class="timeline-content">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6 class="mb-1">{{ response.question.text|truncate(60) }}</h6>
+                                            <p class="text-muted small mb-1">{{ response.question.section.name }}</p>
+                                            <span class="badge bg-primary">Score: {{ response.value }}</span>
+                                        </div>
+                                        <small class="text-muted">{{ response.updated_at.strftime('%I:%M %p') }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Actions -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <h5 class="mb-1">Ready to continue?</h5>
+                                <p class="text-muted mb-0">
+                                    {% if assessment.status == 'completed' %}
+                                        Your assessment is complete! View your results and recommendations.
+                                    {% else %}
+                                        Complete the remaining {{ total_questions - completed_questions }} questions to get your full assessment report.
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <div class="col-md-4 text-md-end">
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                    {% if assessment.status == 'completed' %}
+                                        <a href="{{ url_for('assessment.results', assessment_id=assessment.id) if url_for else '/assessment/' + assessment.id|string + '/results' }}" 
+                                           class="btn btn-success">
+                                            <i class="bi bi-bar-chart me-2"></i>View Results
+                                        </a>
+                                    {% else %}
+                                        <a href="{{ url_for('assessment.resume', assessment_id=assessment.id) if url_for else '/assessment/' + assessment.id|string + '/resume' }}" 
+                                           class="btn btn-primary">
+                                            <i class="bi bi-play-circle me-2"></i>Continue Assessment
+                                        </a>
+                                    {% endif %}
+                                    
+                                    <a href="{{ url_for('assessment.index') if url_for else '/assessment' }}" 
+                                       class="btn btn-outline-secondary">
+                                        <i class="bi bi-clipboard-data me-2"></i>All Assessments
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-refresh progress every 30 seconds if assessment is in progress
+    {% if assessment.status == 'in_progress' %}
+    setInterval(function() {
+        fetch(window.location.href, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.text())
+        .then(html => {
+            // Update only the progress sections
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            
+            // Update overall progress
+            const newOverallProgress = doc.querySelector('.assessment-progress-container');
+            if (newOverallProgress) {
+                // Update specific progress elements without full page reload
+                updateProgressElements(doc);
+            }
+        })
+        .catch(error => {
+            console.error('Progress refresh failed:', error);
+        });
+    }, 30000);
+    {% endif %}
+    
+    function updateProgressElements(doc) {
+        // Update progress bars
+        const progressBars = document.querySelectorAll('.progress-bar');
+        const newProgressBars = doc.querySelectorAll('.progress-bar');
+        
+        progressBars.forEach((bar, index) => {
+            if (newProgressBars[index]) {
+                const newWidth = newProgressBars[index].style.width;
+                const newValue = newProgressBars[index].getAttribute('aria-valuenow');
+                
+                // Animate progress change
+                bar.style.transition = 'width 0.5s ease-in-out';
+                bar.style.width = newWidth;
+                bar.setAttribute('aria-valuenow', newValue);
+            }
+        });
+        
+        // Update counters
+        const completedText = document.querySelector('.progress-info .text-muted');
+        const newCompletedText = doc.querySelector('.progress-info .text-muted');
+        if (completedText && newCompletedText) {
+            completedText.textContent = newCompletedText.textContent;
+        }
+    }
+    
+    // Initialize tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+    
+    // Add smooth animations for progress bars
+    setTimeout(() => {
+        const progressBars = document.querySelectorAll('.progress-bar');
+        progressBars.forEach(bar => {
+            const targetWidth = bar.style.width;
+            bar.style.width = '0%';
+            bar.style.transition = 'width 1s ease-out';
+            
+            setTimeout(() => {
+                bar.style.width = targetWidth;
+            }, 100);
+        });
+    }, 500);
+});
+</script>
+{% endblock %}

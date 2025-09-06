@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="auto" class="h-100">
+<head>
+    <!-- Favicon and app icons -->
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='assets/images/logo/favicon.ico') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='assets/images/logo/favicon-192x192.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='assets/images/logo/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='assets/images/logo/favicon-16x16.png') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="{% block meta_description %}Transform your software engineering with AI-first maturity assessment. Get actionable insights and personalized roadmaps for your organization's AI journey.{% endblock %}">
+    <meta name="keywords" content="{% block meta_keywords %}AI-first, software engineering, maturity assessment, DevIQ, digital transformation, machine learning, automation{% endblock %}">
+    <meta name="author" content="AI-First Software Engineering Team">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request.url }}">
+    <meta property="og:title" content="{% block og_title %}{{ self.title() }}{% endblock %}">
+    <meta property="og:description" content="{{ self.meta_description() }}">
+    <meta property="og:image" content="{{ url_for('static', filename='assets/images/og-image.png', _external=True) }}">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="{{ request.url }}">
+    <meta property="twitter:title" content="{{ self.og_title() }}">
+    <meta property="twitter:description" content="{{ self.meta_description() }}">
+    <meta property="twitter:image" content="{{ url_for('static', filename='assets/images/og-image.png', _external=True) }}">
+    
+    <title>{% block title %}AI-First Software Engineering Maturity Assessment{% endblock %}</title>
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" as="style">
+    <link rel="preload" href="{{ url_for('static', filename='dist/css/main.css') }}" as="style">
+    <link rel="preload" href="{{ url_for('static', filename='dist/css/navbar.css') }}" as="style">
+    
+    <!-- Favicon and app icons -->
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='assets/images/favicon.ico') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='assets/images/logo/apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='assets/images/logo/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='assets/images/logo/favicon-16x16.png') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    
+    <!-- Bootstrap 5 CSS with SRI -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" 
+          integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <!-- Google Fonts - Optimized loading -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link href="{{ url_for('static', filename='dist/css/main.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='dist/css/navbar.css') }}" rel="stylesheet">
+    
+    <!-- Chart.js for visualizations -->
+    <!-- Temporarily disabled to fix loading issues -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.js" defer></script> -->
+    
+    <!-- Additional CSS -->
+    {% block head_extra %}{% endblock %}
+    {% block extra_css %}{% endblock %}
+    
+    <!-- Performance and Analytics -->
+    <script>
+        // Performance monitoring
+        window.performance && performance.mark('page-start');
+        
+        // Theme management - prevent FOUC
+        (() => {
+            'use strict'
+            const getStoredTheme = () => localStorage.getItem('theme')
+            const setStoredTheme = theme => localStorage.setItem('theme', theme)
+            const getPreferredTheme = () => {
+                const storedTheme = getStoredTheme()
+                if (storedTheme) return storedTheme
+                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+            }
+            const setTheme = theme => {
+                if (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.documentElement.setAttribute('data-bs-theme', 'dark')
+                } else {
+                    document.documentElement.setAttribute('data-bs-theme', theme)
+                }
+            }
+            setTheme(getPreferredTheme())
+        })()
+    </script>
+</head>
+<body class="d-flex flex-column h-100 modern-app">
+    <!-- Skip navigation for accessibility -->
+    <a class="skip-link visually-hidden-focusable" href="#main-content">Skip to main content</a>
+    
+    <!-- Navigation -->
+    {% include 'base/components/navbar.html' %}
+    
+    <!-- Alert messages -->
+    {% include 'base/components/alerts.html' %}
+    
+    <!-- Main content wrapper -->
+    <main id="main-content" class="flex-grow-1 main-content">
+        {% block content %}
+        <div class="container-fluid modern-container">
+            <div class="row justify-content-center">
+                <div class="col-12 col-lg-10 col-xl-8">
+                    <div class="welcome-section">
+                        <div class="welcome-icon">
+                            <i class="bi bi-cpu-fill"></i>
+                        </div>
+                        <h1 class="welcome-title">Welcome to AI-First Assessment</h1>
+                        <p class="welcome-subtitle">Transform your software engineering with intelligent insights and personalized roadmaps.</p>
+                        <div class="welcome-actions">
+                            <a href="/assessment/create" class="btn btn-premium-primary">
+                                <i class="bi bi-rocket-takeoff me-2"></i>Start Assessment
+                            </a>
+                            <a href="/about" class="btn btn-outline-primary">
+                                <i class="bi bi-info-circle me-2"></i>Learn More
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endblock content %}
+    </main>
+    
+    <!-- Modals -->
+    {% include 'base/components/modals.html' %}
+    
+    <!-- Cookie consent banner -->
+    <div id="cookie-banner" class="cookie-banner d-none">
+        <div class="cookie-content">
+            <div class="cookie-text">
+                <i class="bi bi-shield-check me-2"></i>
+                We use cookies to enhance your experience and analyze usage. 
+                <a href="/privacy" class="cookie-link">Learn more</a>
+            </div>
+            <div class="cookie-actions">
+                <button class="btn btn-sm btn-outline-light me-2" id="cookie-decline">Decline</button>
+                <button class="btn btn-sm btn-light" id="cookie-accept">Accept</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Offline indicator -->
+    <div id="offline-indicator" class="offline-indicator d-none">
+        <div class="offline-content">
+            <i class="bi bi-wifi-off me-2"></i>
+            You're currently offline. Some features may be limited.
+        </div>
+    </div>
+    
+    <!-- Bootstrap 5 JavaScript Bundle with SRI -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" 
+            integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    
+    <!-- Custom JavaScript -->
+    <!-- Temporarily disabled to fix loading issues -->
+    <!-- <script src="{{ url_for('static', filename='dist/js/main.js') }}" defer></script> -->
+    
+    <!-- Page-specific JavaScript -->
+    {% block scripts %}{% endblock %}
+    {% block extra_js %}{% endblock %}
+    
+    <!-- Enhanced application scripts -->
+    <script>
+        // Initialize Bootstrap tooltips and handle hash link issues
+        document.addEventListener('DOMContentLoaded', function() {
+            // Global tooltip management
+            window.initializeTooltips = function() {
+                if (typeof bootstrap !== 'undefined') {
+                    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                    tooltipTriggerList.forEach(function(tooltipTriggerEl) {
+                        // Check if tooltip is already initialized
+                        if (!tooltipTriggerEl.hasAttribute('data-tooltip-initialized')) {
+                            // Dispose any existing tooltip instance
+                            const existingTooltip = bootstrap.Tooltip.getInstance(tooltipTriggerEl);
+                            if (existingTooltip) {
+                                existingTooltip.dispose();
+                            }
+                            const tooltip = new bootstrap.Tooltip(tooltipTriggerEl);
+                            tooltipTriggerEl.setAttribute('data-tooltip-initialized', 'true');
+                        }
+                    });
+                }
+            };
+            
+            // Initialize tooltips
+            window.initializeTooltips();
+            
+            // Global handler for problematic hash links
+            document.addEventListener('click', function(event) {
+                const anchor = event.target.closest('a');
+                if (!anchor) return;
+                
+                const href = anchor.getAttribute('href');
+                
+                // Handle dropdown toggles and links with onclick handlers
+                if (href === '#' && anchor.hasAttribute('onclick')) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    return;
+                }
+                
+                // Handle Bootstrap dropdown toggles
+                if (href === '#' && (anchor.hasAttribute('data-bs-toggle') || anchor.classList.contains('dropdown-toggle'))) {
+                    // Let Bootstrap handle it
+                    return;
+                }
+                
+                // Handle only problematic hash links (empty hash or just hash symbol)
+                if (href === '#' || href === '') {
+                    // Only prevent default if there's no other handler
+                    if (!anchor.hasAttribute('onclick') && !anchor.hasAttribute('data-bs-toggle')) {
+                        event.preventDefault();
+                        return false;
+                    }
+                }
+            });
+            
+            // Override querySelector to handle invalid selectors gracefully
+            const originalQuerySelector = document.querySelector;
+            document.querySelector = function(selector) {
+                try {
+                    // Only catch truly invalid selectors like lone hash or empty strings
+                    if (selector === '#' || selector === '') {
+                        console.warn('Invalid selector attempted:', selector);
+                        return null;
+                    }
+                    return originalQuerySelector.call(this, selector);
+                } catch (error) {
+                    console.warn('querySelector error with selector:', selector, error);
+                    return null;
+                }
+            };
+        });
+        
+        // Basic theme management
+        (function() {
+            'use strict';
+            
+            const getStoredTheme = function() { return localStorage.getItem('theme'); };
+            const setStoredTheme = function(theme) { localStorage.setItem('theme', theme); };
+            const getPreferredTheme = function() {
+                const storedTheme = getStoredTheme();
+                if (storedTheme) {
+                    return storedTheme;
+                }
+                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            };
+            
+            const setTheme = function(theme) {
+                if (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.documentElement.setAttribute('data-bs-theme', 'dark');
+                } else {
+                    document.documentElement.setAttribute('data-bs-theme', theme);
+                }
+            };
+            
+            setTheme(getPreferredTheme());
+        })();
+        
+        // Framework section visibility and smooth scroll
+        document.addEventListener('DOMContentLoaded', function() {
+            // Hide all framework-related sections initially
+            const sectionsToHide = [];
+            
+            // Get all sections except the hero section
+            const allSections = document.querySelectorAll('section');
+            allSections.forEach(function(section, index) {
+                // Skip the hero section (first section)
+                if (!section.classList.contains('hero-section') && index > 0) {
+                    sectionsToHide.push(section);
+                    section.style.display = 'none';
+                }
+            });
+            
+            // Also specifically target sections by content/title
+            const additionalSelectors = [
+                // Target sections by their heading content
+                'h2:contains("AFS Assessment Framework")',
+                'h2:contains("AFS Maturity Levels")', 
+                'h2:contains("Assessment Benefits")',
+                'h2:contains("Ready to Assess Your AI-First Maturity")'
+            ];
+            
+            // Find sections by their heading text and hide them
+            const headings = document.querySelectorAll('h2');
+            headings.forEach(function(heading) {
+                const text = heading.textContent.trim();
+                if (text.includes('AFS Assessment Framework') || 
+                    text.includes('AFS Maturity Levels') || 
+                    text.includes('Assessment Benefits') || 
+                    text.includes('Ready to Assess Your AI-First Maturity')) {
+                    
+                    // Find the parent section and hide it
+                    let parentSection = heading.closest('section');
+                    if (parentSection && !sectionsToHide.includes(parentSection)) {
+                        sectionsToHide.push(parentSection);
+                        parentSection.style.display = 'none';
+                    }
+                }
+            });
+            
+            // Handle Learn Framework button click
+            const learnButtons = document.querySelectorAll('a[href="#framework"]');
+            learnButtons.forEach(function(button) {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Show all hidden framework-related sections
+                    sectionsToHide.forEach(function(section) {
+                        section.style.display = 'block';
+                    });
+                    
+                    // Adjust hero section height when additional content is shown
+                    const heroSection = document.querySelector('.hero-section');
+                    if (heroSection) {
+                        heroSection.classList.add('with-additional-content');
+                    }
+                    
+                    // Smooth scroll to the first framework section
+                    const firstFrameworkSection = document.getElementById('framework') || sectionsToHide[0];
+                    
+                    if (firstFrameworkSection) {
+                        setTimeout(function() {
+                            firstFrameworkSection.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'start'
+                            });
+                        }, 100);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

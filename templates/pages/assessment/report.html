@@ -1,0 +1,611 @@
+{% extends "base/layout.html" %}
+{% set page_title = "Assessment Report" %}
+{% set show_breadcrumbs = true %}
+{% set breadcrumbs = [
+    {"name": "Home", "url": url_for('main.index') if url_for else '/'},
+    {"name": "Assessment", "url": url_for('assessment.start') if url_for else '/assessment/start'},
+    {"name": "Report", "url": "#", "active": true}
+] %}
+
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', filename='dist/css/assessment.css') if url_for else '/static/dist/css/assessment.css' }}">
+<style>
+@media print {
+    .no-print { display: none !important; }
+    .card { border: 1px solid #ddd !important; box-shadow: none !important; }
+    .page-break { page-break-before: always; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="assessment-report-container">
+    <!-- Report Header -->
+    <div class="report-header bg-white border-bottom py-4 mb-4 no-print">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="h3 mb-2">
+                        <i class="bi bi-file-text me-2"></i>
+                        Comprehensive Assessment Report
+                    </h1>
+                    <p class="text-muted mb-0">{{ assessment.organization_name }} • {{ assessment.completion_date.strftime('%B %d, %Y') }}</p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <div class="btn-group">
+                        <button class="btn btn-outline-primary" onclick="window.print()">
+                            <i class="bi bi-printer me-2"></i>Print Report
+                        </button>
+                        <div class="dropdown">
+                            <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-download me-2"></i>Download
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for('api.export_assessment', assessment_id=assessment.id, format='pdf') if url_for else '/api/v1/export/assessment/' + assessment.id|string + '/pdf' }}">
+                                        <i class="bi bi-file-pdf me-2"></i>PDF Report
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for('api.export_assessment', assessment_id=assessment.id, format='excel') if url_for else '/api/v1/export/assessment/' + assessment.id|string + '/excel' }}">
+                                        <i class="bi bi-file-excel me-2"></i>Excel Data
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Executive Summary -->
+    <div class="container">
+        <div class="executive-summary mb-5">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h4 mb-0">
+                        <i class="bi bi-graph-up me-2"></i>
+                        Executive Summary
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h3 class="h5 mb-3">Assessment Overview</h3>
+                            <p class="lead">
+                                {{ assessment.organization_name }} has achieved a AFS score of 
+                                <strong>{{ "%.1f"|format(assessment.overall_score) }}</strong>, 
+                                placing the organization at the <strong>{{ assessment.maturity_level }}</strong> 
+                                maturity level for AI-first software engineering practices.
+                            </p>
+                            
+                            <div class="key-findings mb-4">
+                                <h4 class="h6 mb-3">Key Findings:</h4>
+                                <ul class="findings-list">
+                                    <li><strong>Strongest Area:</strong> {{ strongest_section.name }} ({{ "%.1f"|format(strongest_section.score) }})</li>
+                                    <li><strong>Greatest Opportunity:</strong> {{ improvement_section.name }} ({{ "%.1f"|format(improvement_section.score) }})</li>
+                                    <li><strong>Assessment Completion:</strong> {{ total_questions }} questions answered over {{ assessment_duration }}</li>
+                                    <li><strong>Consistency:</strong> {{ consistency_level }} score distribution across sections</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="recommendations-summary">
+                                <h4 class="h6 mb-3">Priority Recommendations:</h4>
+                                <ol class="recommendations-list">
+                                    {% for rec in top_recommendations %}
+                                    <li>{{ rec.title }} ({{ rec.category }}, {{ rec.timeline }})</li>
+                                    {% endfor %}
+                                </ol>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="score-summary text-center">
+                                <div class="overall-score-circle bg-primary text-white rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" 
+                                     style="width: 120px; height: 120px;">
+                                    <div>
+                                        <div class="fw-bold" style="font-size: 2.5rem;">{{ "%.1f"|format(assessment.overall_score) }}</div>
+                                        <div class="small">AFS Score</div>
+                                    </div>
+                                </div>
+                                <h4 class="text-primary mb-3">{{ assessment.maturity_level }}</h4>
+                                
+                                <div class="score-breakdown mt-4">
+                                    {% for section in section_scores %}
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="small">{{ section.name }}</span>
+                                        <span class="badge bg-primary">{{ "%.1f"|format(section.score) }}</span>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detailed Section Analysis -->
+        <div class="page-break"></div>
+        <div class="section-analysis mb-5">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="h4 mb-0">
+                        <i class="bi bi-list-check me-2"></i>
+                        Detailed Section Analysis
+                    </h2>
+                </div>
+                <div class="card-body">
+                    {% for section in detailed_section_results %}
+                    <div class="section-detail mb-5 {% if not loop.last %}border-bottom pb-4{% endif %}">
+                        <div class="section-header mb-4">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <h3 class="h5 mb-2">
+                                        <i class="bi bi-{{ section.icon }} me-2"></i>
+                                        {{ section.name }}
+                                    </h3>
+                                    <p class="text-muted">{{ section.description }}</p>
+                                </div>
+                                <div class="col-md-4 text-md-end">
+                                    <div class="section-score">
+                                        <div class="fw-bold fs-2 text-primary">{{ "%.1f"|format(section.score) }}</div>
+                                        <div class="text-muted">Section Score</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Area Breakdown -->
+                        <div class="area-breakdown mb-4">
+                            <h4 class="h6 mb-3">Area Performance</h4>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Area</th>
+                                            <th>Score</th>
+                                            <th>Questions</th>
+                                            <th>Performance</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for area in section.areas %}
+                                        <tr>
+                                            <td>{{ area.name }}</td>
+                                            <td><span class="badge bg-primary">{{ "%.1f"|format(area.score) }}</span></td>
+                                            <td>{{ area.question_count }}</td>
+                                            <td>
+                                                <div class="progress" style="height: 8px;">
+                                                    <div class="progress-bar" role="progressbar" 
+                                                         style="width: {{ (area.score / 4 * 100) }}%">
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <!-- Question Details -->
+                        <div class="question-details mb-4">
+                            <h4 class="h6 mb-3">Question Responses</h4>
+                            <div class="row">
+                                {% for question in section.questions %}
+                                <div class="col-md-6 mb-3">
+                                    <div class="question-summary p-3 border rounded">
+                                        <h6 class="mb-2">Q{{ question.number }}: {{ question.text|truncate(60) }}</h6>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="text-muted small">{{ question.area_name }}</span>
+                                            <span class="badge bg-primary">{{ question.response_score }}</span>
+                                        </div>
+                                        {% if question.response_comments %}
+                                        <div class="mt-2">
+                                            <small class="text-muted">{{ question.response_comments|truncate(100) }}</small>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <!-- Section Insights -->
+                        <div class="section-insights">
+                            <h4 class="h6 mb-3">Key Insights & Analysis</h4>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6 class="small fw-bold mb-2">Strengths:</h6>
+                                    <ul class="insights-list small">
+                                        {% for strength in section.strengths %}
+                                        <li class="mb-1">{{ strength }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6 class="small fw-bold mb-2">Improvement Areas:</h6>
+                                    <ul class="insights-list small">
+                                        {% for improvement in section.improvements %}
+                                        <li class="mb-1">{{ improvement }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Maturity Assessment -->
+        <div class="page-break"></div>
+        <div class="maturity-assessment mb-5">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="h4 mb-0">
+                        <i class="bi bi-award me-2"></i>
+                        Maturity Level Analysis
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h3 class="h5 mb-3">Current Maturity: {{ assessment.maturity_level }}</h3>
+                            <p class="lead">{{ maturity_description }}</p>
+                            
+                            <div class="maturity-characteristics mb-4">
+                                <h4 class="h6 mb-3">Characteristics at This Level:</h4>
+                                <ul class="characteristics-list">
+                                    {% for characteristic in maturity_characteristics %}
+                                    <li class="mb-2">{{ characteristic }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            
+                            {% if next_maturity_level %}
+                            <div class="next-level-info">
+                                <h4 class="h6 mb-3">Path to {{ next_maturity_level.name }}:</h4>
+                                <p>{{ next_maturity_level.description }}</p>
+                                <div class="requirements mb-3">
+                                    <h6 class="small fw-bold mb-2">Key Requirements:</h6>
+                                    <ul class="requirements-list small">
+                                        {% for requirement in next_maturity_level.requirements %}
+                                        <li class="mb-1">{{ requirement }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                                <div class="progress-to-next">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="small">Progress to Next Level</span>
+                                        <span class="small">{{ progress_to_next_level }}%</span>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar" role="progressbar" 
+                                             style="width: {{ progress_to_next_level }}%">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="maturity-ladder">
+                                <h4 class="h6 mb-3">Maturity Progression</h4>
+                                {% for level in maturity_levels %}
+                                <div class="maturity-step mb-3 {{ 'current' if level.name == assessment.maturity_level else '' }} {{ 'completed' if level.order < current_maturity_order else '' }}">
+                                    <div class="d-flex align-items-center">
+                                        <div class="step-indicator me-3">
+                                            {% if level.name == assessment.maturity_level %}
+                                                <i class="bi bi-arrow-right-circle text-primary"></i>
+                                            {% elif level.order < current_maturity_order %}
+                                                <i class="bi bi-check-circle text-success"></i>
+                                            {% else %}
+                                                <i class="bi bi-circle text-muted"></i>
+                                            {% endif %}
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0 {{ 'text-primary' if level.name == assessment.maturity_level else '' }}">
+                                                {{ level.name }}
+                                            </h6>
+                                            <small class="text-muted">{{ level.score_range }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recommendations & Action Plan -->
+        <div class="page-break"></div>
+        <div class="recommendations-action-plan mb-5">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="h4 mb-0">
+                        <i class="bi bi-lightbulb me-2"></i>
+                        Recommendations & Action Plan
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="action-plan-intro mb-4">
+                        <p class="lead">
+                            Based on your assessment results, we've identified priority areas for improvement 
+                            and developed a structured action plan to advance your AI-first software engineering maturity.
+                        </p>
+                    </div>
+                    
+                    <!-- Priority Matrix -->
+                    <div class="priority-matrix mb-5">
+                        <h3 class="h5 mb-3">Recommendation Priority Matrix</h3>
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Priority</th>
+                                        <th>Recommendation</th>
+                                        <th>Impact</th>
+                                        <th>Effort</th>
+                                        <th>Timeline</th>
+                                        <th>Section</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for rec in recommendations %}
+                                    <tr>
+                                        <td>
+                                            <span class="badge bg-{{ rec.priority_color }}">{{ rec.priority_order }}</span>
+                                        </td>
+                                        <td>
+                                            <strong>{{ rec.title }}</strong>
+                                            <br><small class="text-muted">{{ rec.description|truncate(80) }}</small>
+                                        </td>
+                                        <td><span class="badge bg-success">{{ rec.impact }}</span></td>
+                                        <td><span class="badge bg-info">{{ rec.effort }}</span></td>
+                                        <td><span class="badge bg-primary">{{ rec.timeline }}</span></td>
+                                        <td>{{ rec.section }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Detailed Recommendations -->
+                    <div class="detailed-recommendations">
+                        <h3 class="h5 mb-4">Detailed Implementation Guide</h3>
+                        {% for rec in recommendations %}
+                        <div class="recommendation-detail mb-4 p-4 border rounded">
+                            <div class="recommendation-header mb-3">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <h4 class="h6 mb-0">
+                                        <span class="badge bg-{{ rec.priority_color }} me-2">{{ rec.priority_order }}</span>
+                                        {{ rec.title }}
+                                    </h4>
+                                    <span class="badge badge-{{ rec.category.lower() }}">{{ rec.category }}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="recommendation-content">
+                                <p class="mb-3">{{ rec.description }}</p>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-3">
+                                        <h6 class="small fw-bold mb-1">Expected Impact</h6>
+                                        <span class="badge bg-success">{{ rec.impact }}</span>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <h6 class="small fw-bold mb-1">Required Effort</h6>
+                                        <span class="badge bg-info">{{ rec.effort }}</span>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <h6 class="small fw-bold mb-1">Timeline</h6>
+                                        <span class="badge bg-primary">{{ rec.timeline }}</span>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <h6 class="small fw-bold mb-1">Target Section</h6>
+                                        <span class="badge bg-secondary">{{ rec.section }}</span>
+                                    </div>
+                                </div>
+                                
+                                {% if rec.implementation_steps %}
+                                <div class="implementation-steps mb-3">
+                                    <h6 class="small fw-bold mb-2">Implementation Steps:</h6>
+                                    <ol class="small">
+                                        {% for step in rec.implementation_steps %}
+                                        <li class="mb-1">{{ step }}</li>
+                                        {% endfor %}
+                                    </ol>
+                                </div>
+                                {% endif %}
+                                
+                                {% if rec.success_metrics %}
+                                <div class="success-metrics mb-3">
+                                    <h6 class="small fw-bold mb-2">Success Metrics:</h6>
+                                    <ul class="small">
+                                        {% for metric in rec.success_metrics %}
+                                        <li class="mb-1">{{ metric }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                                {% endif %}
+                                
+                                {% if rec.resources %}
+                                <div class="resources">
+                                    <h6 class="small fw-bold mb-2">Recommended Resources:</h6>
+                                    <ul class="small">
+                                        {% for resource in rec.resources %}
+                                        <li class="mb-1">
+                                            <a href="{{ resource.url }}" target="_blank">{{ resource.title }}</a>
+                                            {% if resource.type %}- {{ resource.type }}{% endif %}
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Appendix -->
+        <div class="page-break"></div>
+        <div class="appendix mb-5">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="h4 mb-0">
+                        <i class="bi bi-file-text me-2"></i>
+                        Appendix
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <!-- Assessment Methodology -->
+                    <div class="methodology mb-4">
+                        <h3 class="h5 mb-3">Assessment Methodology</h3>
+                        <p>
+                            The AI-First Software Engineering Maturity Assessment is based on a comprehensive 
+                            framework that evaluates organizations across four key dimensions:
+                        </p>
+                        <ul>
+                            <li><strong>Engineering Practices:</strong> Code quality, testing, CI/CD, and development workflows</li>
+                            <li><strong>AI Integration:</strong> AI tool adoption, automation, and intelligent systems</li>
+                            <li><strong>Team & Culture:</strong> Collaboration, learning, and organizational readiness</li>
+                            <li><strong>Governance & Risk:</strong> Security, compliance, and risk management practices</li>
+                        </ul>
+                        
+                        <h4 class="h6 mt-4 mb-2">Scoring Scale</h4>
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Score</th>
+                                        <th>Level</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1.0</td>
+                                        <td>Reactive</td>
+                                        <td>No formal processes, ad-hoc approach</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2.0</td>
+                                        <td>Evolving</td>
+                                        <td>Basic processes established, some repeatability</td>
+                                    </tr>
+                                    <tr>
+                                        <td>3.0</td>
+                                        <td>Advanced</td>
+                                        <td>Standardized processes, well-documented</td>
+                                    </tr>
+                                    <tr>
+                                        <td>4.0</td>
+                                        <td>Optimized</td>
+                                        <td>Continuous improvement, data-driven optimization</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Assessment Details -->
+                    <div class="assessment-details mb-4">
+                        <h3 class="h5 mb-3">Assessment Details</h3>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <table class="table table-sm">
+                                    <tr>
+                                        <th>Organization:</th>
+                                        <td>{{ assessment.organization_name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Assessment ID:</th>
+                                        <td>{{ assessment.id }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Started:</th>
+                                        <td>{{ assessment.created_at.strftime('%B %d, %Y at %I:%M %p') }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Completed:</th>
+                                        <td>{{ assessment.completion_date.strftime('%B %d, %Y at %I:%M %p') }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <table class="table table-sm">
+                                    <tr>
+                                        <th>Duration:</th>
+                                        <td>{{ assessment_duration }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Questions:</th>
+                                        <td>{{ total_questions }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Assessment Type:</th>
+                                        <td>{{ assessment.assessment_type.title() }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Report Generated:</th>
+                                        <td>{{ current_date.strftime('%B %d, %Y at %I:%M %p') }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Definitions & Glossary -->
+                    <div class="definitions">
+                        <h3 class="h5 mb-3">Definitions & Glossary</h3>
+                        <dl class="row">
+                            <dt class="col-sm-3">AFS Score</dt>
+                            <dd class="col-sm-9">Development Intelligence Quotient - overall maturity score (1.0-4.0)</dd>
+                            
+                            <dt class="col-sm-3">AI-First</dt>
+                            <dd class="col-sm-9">Approach that prioritizes AI integration in all aspects of software development</dd>
+                            
+                            <dt class="col-sm-3">Maturity Level</dt>
+                            <dd class="col-sm-9">Classification of organizational capability based on AFS score</dd>
+                            
+                            <dt class="col-sm-3">Section Score</dt>
+                            <dd class="col-sm-9">Average score across all areas within a specific section</dd>
+                            
+                            <dt class="col-sm-3">Area Score</dt>
+                            <dd class="col-sm-9">Average score of questions within a specific capability area</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Print functionality
+    window.addEventListener('beforeprint', function() {
+        document.title = '{{ assessment.organization_name }} - Assessment Report - {{ assessment.completion_date.strftime("%Y-%m-%d") }}';
+    });
+    
+    // Initialize tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
+</script>
+{% endblock %}

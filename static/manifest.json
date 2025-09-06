@@ -1,0 +1,27 @@
+{
+  "name": "AI-First Software Engineering Assessment",
+  "short_name": "AFS Assessment",
+  "description": "Evaluate your AI-driven development maturity across foundational, transformation, enterprise, and governance dimensions.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#4f46e5",
+  "theme_color": "#4f46e5",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/static/assets/images/logo/favicon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/assets/images/logo/favicon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "productivity", "developer"],
+  "lang": "en",
+  "dir": "ltr"
+}

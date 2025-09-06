@@ -1,0 +1,470 @@
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmationModalLabel">
+                    <i class="bi bi-question-circle text-warning me-2"></i>
+                    Confirm Action
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmationMessage">Are you sure you want to proceed with this action?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmActionBtn">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Modal -->
+<div class="modal fade" id="loadingModal" tabindex="-1" aria-labelledby="loadingModalLabel" aria-hidden="true" 
+     data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-body text-center py-4">
+                <div class="spinner-border text-primary mb-3" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mb-0" id="loadingMessage">Processing your request...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Assessment Export Modal -->
+<div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exportModalLabel">
+                    <i class="bi bi-download me-2"></i>
+                    Export Assessment Data
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="exportForm">
+                    <div class="mb-3">
+                        <label for="exportFormat" class="form-label">Export Format</label>
+                        <select class="form-select" id="exportFormat" name="format" required>
+                            <option value="">Choose format...</option>
+                            <option value="csv">CSV (Comma Separated Values)</option>
+                            <option value="excel">Excel Workbook (.xlsx)</option>
+                            <option value="pdf">PDF Report</option>
+                        </select>
+                        <div class="form-text">Select the format for your exported data.</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Include Options</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="includeResponses" name="include_responses" checked>
+                            <label class="form-check-label" for="includeResponses">
+                                Include detailed responses
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="includeCharts" name="include_charts" checked>
+                            <label class="form-check-label" for="includeCharts">
+                                Include chart data
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="includeRecommendations" name="include_recommendations" checked>
+                            <label class="form-check-label" for="includeRecommendations">
+                                Include recommendations
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3" id="assessmentSelection" style="display: none;">
+                        <label for="selectedAssessments" class="form-label">Select Assessments</label>
+                        <select class="form-select" id="selectedAssessments" name="assessment_ids" multiple>
+                            <!-- Options will be populated dynamically -->
+                        </select>
+                        <div class="form-text">Hold Ctrl/Cmd to select multiple assessments.</div>
+                    </div>
+                </form>
+                
+                <div id="exportProgress" class="d-none">
+                    <div class="d-flex align-items-center">
+                        <div class="spinner-border spinner-border-sm me-2" role="status">
+                            <span class="visually-hidden">Exporting...</span>
+                        </div>
+                        <span>Generating export file...</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="startExportBtn">
+                    <i class="bi bi-download me-1"></i>Export
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Assessment Details Modal -->
+<div class="modal fade" id="assessmentDetailsModal" tabindex="-1" aria-labelledby="assessmentDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="assessmentDetailsModalLabel">
+                    <i class="bi bi-clipboard-data me-2"></i>
+                    Assessment Details
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="assessmentDetailsContent">
+                <!-- Content will be loaded dynamically -->
+                <div class="text-center py-4">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Loading assessment details...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="editAssessmentBtn" style="display: none;">
+                    <i class="bi bi-pencil me-1"></i>Edit
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Image/Chart Preview Modal -->
+<div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-labelledby="imagePreviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imagePreviewModalLabel">
+                    <i class="bi bi-image me-2"></i>
+                    Preview
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="previewImage" src="" alt="Preview" class="img-fluid">
+                <div id="previewChart" style="height: 400px;"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="downloadPreviewBtn">
+                    <i class="bi bi-download me-1"></i>Download
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Settings/Preferences Modal -->
+<div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="settingsModalLabel">
+                    <i class="bi bi-gear me-2"></i>
+                    Settings & Preferences
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="settingsForm">
+                    <!-- Theme Settings -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold">Appearance</h6>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="theme" id="themeLight" value="light">
+                            <label class="form-check-label" for="themeLight">
+                                <i class="bi bi-sun me-1"></i>Light Theme
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="theme" id="themeDark" value="dark">
+                            <label class="form-check-label" for="themeDark">
+                                <i class="bi bi-moon me-1"></i>Dark Theme
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="theme" id="themeAuto" value="auto" checked>
+                            <label class="form-check-label" for="themeAuto">
+                                <i class="bi bi-circle-half me-1"></i>Auto (System)
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Notification Settings -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold">Notifications</h6>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="emailNotifications" checked>
+                            <label class="form-check-label" for="emailNotifications">
+                                Email notifications
+                            </label>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="browserNotifications">
+                            <label class="form-check-label" for="browserNotifications">
+                                Browser notifications
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Assessment Settings -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold">Assessment Preferences</h6>
+                        <div class="mb-3">
+                            <label for="defaultPageSize" class="form-label">Default items per page</label>
+                            <select class="form-select form-select-sm" id="defaultPageSize">
+                                <option value="10">10</option>
+                                <option value="25" selected>25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="autoSaveProgress" checked>
+                            <label class="form-check-label" for="autoSaveProgress">
+                                Auto-save assessment progress
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveSettingsBtn">
+                    <i class="bi bi-check me-1"></i>Save Settings
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for modal functionality -->
+<script>
+    // Modal utilities
+    window.ModalUtils = {
+        // Show confirmation modal
+        confirm: function(message, title = 'Confirm Action', onConfirm = null, buttonText = 'Confirm') {
+            const modal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+            document.getElementById('confirmationModalLabel').innerHTML = 
+                '<i class="bi bi-question-circle text-warning me-2"></i>' + title;
+            document.getElementById('confirmationMessage').textContent = message;
+            
+            const confirmBtn = document.getElementById('confirmActionBtn');
+            confirmBtn.textContent = buttonText;
+            
+            // Remove previous event listeners
+            const newConfirmBtn = confirmBtn.cloneNode(true);
+            confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+            
+            if (onConfirm) {
+                newConfirmBtn.addEventListener('click', function() {
+                    modal.hide();
+                    onConfirm();
+                });
+            }
+            
+            modal.show();
+        },
+        
+        // Show loading modal
+        showLoading: function(message = 'Processing your request...') {
+            document.getElementById('loadingMessage').textContent = message;
+            const modal = new bootstrap.Modal(document.getElementById('loadingModal'));
+            modal.show();
+            return modal;
+        },
+        
+        // Hide loading modal
+        hideLoading: function() {
+            const modalElement = document.getElementById('loadingModal');
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            if (modal) {
+                modal.hide();
+            }
+        },
+        
+        // Show export modal
+        showExport: function(assessmentId = null, multiple = false) {
+            const modal = new bootstrap.Modal(document.getElementById('exportModal'));
+            
+            // Show/hide assessment selection for multiple exports
+            const assessmentSelection = document.getElementById('assessmentSelection');
+            if (multiple) {
+                assessmentSelection.style.display = 'block';
+                // Load available assessments
+                this.loadAssessmentOptions();
+            } else {
+                assessmentSelection.style.display = 'none';
+            }
+            
+            modal.show();
+        },
+        
+        // Show assessment details modal
+        showAssessmentDetails: function(assessmentId) {
+            const modal = new bootstrap.Modal(document.getElementById('assessmentDetailsModal'));
+            
+            // Load assessment details
+            this.loadAssessmentDetails(assessmentId);
+            
+            modal.show();
+        },
+        
+        // Show image/chart preview modal
+        showImagePreview: function(imageSrc, title = 'Preview') {
+            const modal = new bootstrap.Modal(document.getElementById('imagePreviewModal'));
+            document.getElementById('imagePreviewModalLabel').innerHTML = 
+                '<i class="bi bi-image me-2"></i>' + title;
+            document.getElementById('previewImage').src = imageSrc;
+            
+            modal.show();
+        },
+        
+        // Load assessment options for export
+        loadAssessmentOptions: function() {
+            // This would typically fetch from an API
+            const select = document.getElementById('selectedAssessments');
+            select.innerHTML = '<option value="">Loading assessments...</option>';
+            
+            // Simulated API call
+            setTimeout(() => {
+                select.innerHTML = `
+                    <option value="1">Assessment 1 - Organization A</option>
+                    <option value="2">Assessment 2 - Organization B</option>
+                    <option value="3">Assessment 3 - Organization C</option>
+                `;
+            }, 500);
+        },
+        
+        // Load assessment details
+        loadAssessmentDetails: function(assessmentId) {
+            const content = document.getElementById('assessmentDetailsContent');
+            
+            // Show loading state
+            content.innerHTML = `
+                <div class="text-center py-4">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Loading assessment details...</p>
+                </div>
+            `;
+            
+            // Simulated API call
+            setTimeout(() => {
+                content.innerHTML = `
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Assessment Information</h6>
+                            <p><strong>ID:</strong> ${assessmentId}</p>
+                            <p><strong>Status:</strong> <span class="badge bg-success">Completed</span></p>
+                            <p><strong>Created:</strong> 2024-01-15</p>
+                            <p><strong>Completed:</strong> 2024-01-15</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Scores</h6>
+                            <p><strong>Overall Score:</strong> 3.2/4.0</p>
+                            <p><strong>Maturity Level:</strong> Managed</p>
+                            <p><strong>Sections Completed:</strong> 4/4</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <h6>Section Scores</h6>
+                    <div class="row">
+                        <div class="col-sm-6 col-lg-3 mb-2">
+                            <div class="card text-center">
+                                <div class="card-body py-2">
+                                    <div class="h5 mb-0">3.4</div>
+                                    <small class="text-muted">Leadership</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-lg-3 mb-2">
+                            <div class="card text-center">
+                                <div class="card-body py-2">
+                                    <div class="h5 mb-0">3.1</div>
+                                    <small class="text-muted">Process</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-lg-3 mb-2">
+                            <div class="card text-center">
+                                <div class="card-body py-2">
+                                    <div class="h5 mb-0">3.0</div>
+                                    <small class="text-muted">Technology</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-lg-3 mb-2">
+                            <div class="card text-center">
+                                <div class="card-body py-2">
+                                    <div class="h5 mb-0">3.3</div>
+                                    <small class="text-muted">Culture</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Show edit button
+                document.getElementById('editAssessmentBtn').style.display = 'inline-block';
+            }, 1000);
+        }
+    };
+    
+    // Initialize modal event handlers
+    document.addEventListener('DOMContentLoaded', function() {
+        // Export form submission
+        document.getElementById('startExportBtn').addEventListener('click', function() {
+            const form = document.getElementById('exportForm');
+            const formData = new FormData(form);
+            
+            // Show progress
+            document.getElementById('exportProgress').classList.remove('d-none');
+            this.disabled = true;
+            
+            // Simulate export process
+            setTimeout(() => {
+                window.AlertUtils.success('Export completed successfully!');
+                bootstrap.Modal.getInstance(document.getElementById('exportModal')).hide();
+                
+                // Reset form
+                document.getElementById('exportProgress').classList.add('d-none');
+                this.disabled = false;
+            }, 2000);
+        });
+        
+        // Settings form submission
+        document.getElementById('saveSettingsBtn').addEventListener('click', function() {
+            // Save settings to localStorage
+            const formData = new FormData(document.getElementById('settingsForm'));
+            const settings = Object.fromEntries(formData);
+            
+            localStorage.setItem('userSettings', JSON.stringify(settings));
+            
+            window.AlertUtils.success('Settings saved successfully!');
+            bootstrap.Modal.getInstance(document.getElementById('settingsModal')).hide();
+        });
+        
+        // Load saved settings
+        const savedSettings = localStorage.getItem('userSettings');
+        if (savedSettings) {
+            const settings = JSON.parse(savedSettings);
+            
+            // Apply saved theme
+            if (settings.theme) {
+                document.querySelector(`input[name="theme"][value="${settings.theme}"]`).checked = true;
+            }
+        }
+    });
+</script>

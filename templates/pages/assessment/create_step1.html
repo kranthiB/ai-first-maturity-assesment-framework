@@ -1,0 +1,649 @@
+{% extends "base/base.html" %}
+{% set page_title = "AI-First Assessment - Organization Details" %}
+
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', filename='dist/css/assessment.css') if url_for else '/static/dist/css/assessment.css' }}">
+<style>
+.assessment-form-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    padding: 2rem 0;
+}
+
+
+.form-card {
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    overflow: hidden;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.form-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+    text-align: center;
+}
+
+.form-body {
+    padding: 4rem;
+}
+
+.form-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 4rem;
+    align-items: start;
+}
+
+.form-main {
+    order: 1;
+}
+
+.form-sidebar {
+    order: 2;
+    background: #f8fafc;
+    border-radius: 0.75rem;
+    padding: 2rem;
+    border-left: 4px solid #667eea;
+    height: fit-content;
+    position: sticky;
+    top: 2rem;
+}
+
+.form-step-indicator {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.step {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 0.5rem;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.step.active {
+    background: #667eea;
+    color: white;
+}
+
+.step.inactive {
+    background: #e9ecef;
+    color: #6c757d;
+}
+
+.step-connector {
+    width: 60px;
+    height: 2px;
+    background: #e9ecef;
+    margin-top: 19px;
+}
+
+.form-group-enhanced {
+    margin-bottom: 1.5rem;
+}
+
+.form-label-enhanced {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.form-control-enhanced {
+    border: 2px solid #e9ecef;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-control-enhanced:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+.btn-next {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    padding: 0.875rem 2rem;
+    border-radius: 0.5rem;
+    color: white;
+    font-weight: 600;
+    width: 100%;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+}
+
+.btn-next:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+}
+
+.industry-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.industry-option {
+    border: 2px solid #e9ecef;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.industry-option:hover {
+    border-color: #667eea;
+    background: #f8f9ff;
+}
+
+.industry-option.selected {
+    border-color: #667eea;
+    background: #667eea;
+    color: white;
+}
+
+.industry-option input[type="radio"] {
+    display: none;
+}
+
+.assessment-info {
+    background: #e0f2fe;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border-left: 4px solid #0891b2;
+}
+
+.progress-overview {
+    background: #f0f9ff;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid #e0f2fe;
+}
+
+.feature-list {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0;
+}
+
+.feature-list li {
+    padding: 0.5rem 0;
+    color: #374151;
+    display: flex;
+    align-items: center;
+}
+
+.feature-list li i {
+    color: #0891b2;
+    margin-right: 0.75rem;
+    width: 16px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 1rem;
+    background: white;
+    border-radius: 0.5rem;
+    border: 1px solid #e5e7eb;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #0891b2;
+    margin-bottom: 0.25rem;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+@media (max-width: 768px) {
+    .form-body {
+        padding: 2rem;
+    }
+    
+    .form-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .form-sidebar {
+        order: 1;
+        position: static;
+    }
+    
+    .form-main {
+        order: 2;
+    }
+    
+    .industry-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .form-body {
+        padding: 2rem;
+    }
+    
+    .industry-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="assessment-form-container">
+    <div class="container-fluid px-3">
+        <div class="row">
+            <div class="col-12">
+                <div class="form-card">
+                    <!-- Form Header -->
+                    <div class="form-header">
+                        <h1 class="mb-2">
+                            <i class="bi bi-building me-2"></i>
+                            Organization Information
+                        </h1>
+                        <p class="mb-0 opacity-75">
+                            Let's start by gathering some basic information about your organization
+                        </p>
+                    </div>
+                    
+                    <!-- Form Body -->
+                    <div class="form-body">
+                        <!-- Step Indicator -->
+                        <div class="form-step-indicator">
+                            <div class="step active">1</div>
+                            <div class="step-connector"></div>
+                            <div class="step inactive">2</div>
+                            <div class="step-connector"></div>
+                            <div class="step inactive">3</div>
+                            <div class="step-connector"></div>
+                            <div class="step inactive">4</div>
+                        </div>
+                        
+                        <!-- Two Column Layout -->
+                        <div class="form-content">
+                            <!-- Main Form Content -->
+                            <div class="form-main">
+                                <!-- Organization Form -->
+                                <form method="POST" action="{{ url_for('assessment.create') if url_for else '/assessment/create' }}" id="organizationForm">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                    
+                                    <!-- Organization Name -->
+                                    <div class="form-group-enhanced">
+                                        <label for="organizationName" class="form-label-enhanced">
+                                            <i class="bi bi-building me-2"></i>
+                                            Organization Name *
+                                        </label>
+                                        <input type="text" class="form-control form-control-enhanced" 
+                                               id="organizationName" name="organization_name" 
+                                               placeholder="Enter your organization name" 
+                                               required maxlength="200">
+                                        <div class="form-text">The name of your company or organization</div>
+                                    </div>
+                                    
+                                    <!-- Account Name -->
+                                    <div class="form-group-enhanced">
+                                        <label for="accountName" class="form-label-enhanced">
+                                            <i class="bi bi-person-badge me-2"></i>
+                                            Account Name *
+                                        </label>
+                                        <input type="text" class="form-control form-control-enhanced" 
+                                               id="accountName" name="account_name" 
+                                               placeholder="Enter your account name" 
+                                               required maxlength="200">
+                                        <div class="form-text">Your specific account or team name within the organization</div>
+                                    </div>
+                                    
+                                    <!-- Candidate Information -->
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group-enhanced">
+                                                <label for="firstName" class="form-label-enhanced">
+                                                    <i class="bi bi-person me-2"></i>
+                                                    First Name *
+                                                </label>
+                                                <input type="text" class="form-control form-control-enhanced" 
+                                                       id="firstName" name="first_name" 
+                                                       placeholder="Your first name" 
+                                                       required maxlength="100">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group-enhanced">
+                                                <label for="lastName" class="form-label-enhanced">
+                                                    Last Name *
+                                                </label>
+                                                <input type="text" class="form-control form-control-enhanced" 
+                                                       id="lastName" name="last_name" 
+                                                       placeholder="Your last name" 
+                                                       required maxlength="100">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Email -->
+                                    <div class="form-group-enhanced">
+                                        <label for="email" class="form-label-enhanced">
+                                            <i class="bi bi-envelope me-2"></i>
+                                            Email Address *
+                                        </label>
+                                        <input type="email" class="form-control form-control-enhanced" 
+                                               id="email" name="email" 
+                                               placeholder="your.email@company.com" 
+                                               required maxlength="200">
+                                        <div class="form-text">We'll use this to send you your assessment results</div>
+                                    </div>
+                                    
+                                    <!-- Industry Selector -->
+                                    <div class="form-group-enhanced">
+                                        <label class="form-label-enhanced">
+                                            <i class="bi bi-briefcase me-2"></i>
+                                            Industry *
+                                        </label>
+                                        <div class="industry-grid">
+                                            <div class="industry-option" data-industry="automotive">
+                                                <input type="radio" name="industry" value="automotive" id="automotive">
+                                                <label for="automotive">
+                                                    <i class="bi bi-car-front d-block mb-2" style="font-size: 1.5rem;"></i>
+                                                    Automotive
+                                                </label>
+                                            </div>
+                                            <div class="industry-option" data-industry="bfsi">
+                                                <input type="radio" name="industry" value="bfsi" id="bfsi">
+                                                <label for="bfsi">
+                                                    <i class="bi bi-bank d-block mb-2" style="font-size: 1.5rem;"></i>
+                                                    BFSI
+                                                </label>
+                                            </div>
+                                            <div class="industry-option" data-industry="energy_utilities">
+                                                <input type="radio" name="industry" value="energy_utilities" id="energy_utilities">
+                                                <label for="energy_utilities">
+                                                    <i class="bi bi-lightning d-block mb-2" style="font-size: 1.5rem;"></i>
+                                                    Energy & Utilities
+                                                </label>
+                                            </div>
+                                            <div class="industry-option" data-industry="government">
+                                                <input type="radio" name="industry" value="government" id="government">
+                                                <label for="government">
+                                                    <i class="bi bi-building-check d-block mb-2" style="font-size: 1.5rem;"></i>
+                                                    Government Public Sector
+                                                </label>
+                                            </div>
+                                            <div class="industry-option" data-industry="travel_transport_tourism">
+                                                <input type="radio" name="industry" value="travel_transport_tourism" id="travel_transport_tourism">
+                                                <label for="travel_transport_tourism">
+                                                    <i class="bi bi-airplane d-block mb-2" style="font-size: 1.5rem;"></i>
+                                                    Travel, Transport & Tourism
+                                                </label>
+                                            </div>
+                                            <div class="industry-option" data-industry="healthcare">
+                                                <input type="radio" name="industry" value="healthcare" id="healthcare">
+                                                <label for="healthcare">
+                                                    <i class="bi bi-heart-pulse d-block mb-2" style="font-size: 1.5rem;"></i>
+                                                    Healthcare
+                                                </label>
+                                            </div>
+                                            <div class="industry-option" data-industry="media_communications">
+                                                <input type="radio" name="industry" value="media_communications" id="media_communications">
+                                                <label for="media_communications">
+                                                    <i class="bi bi-broadcast d-block mb-2" style="font-size: 1.5rem;"></i>
+                                                    Media & Communications
+                                                </label>
+                                            </div>
+                                            <div class="industry-option" data-industry="retail_commerce">
+                                                <input type="radio" name="industry" value="retail_commerce" id="retail_commerce">
+                                                <label for="retail_commerce">
+                                                    <i class="bi bi-shop d-block mb-2" style="font-size: 1.5rem;"></i>
+                                                    Retail & Commerce
+                                                </label>
+                                            </div>
+                                            <div class="industry-option" data-industry="technology">
+                                                <input type="radio" name="industry" value="technology" id="technology">
+                                                <label for="technology">
+                                                    <i class="bi bi-laptop d-block mb-2" style="font-size: 1.5rem;"></i>
+                                                    Technology
+                                                </label>
+                                            </div>
+                                            <div class="industry-option" data-industry="other">
+                                                <input type="radio" name="industry" value="other" id="other">
+                                                <label for="other">
+                                                    <i class="bi bi-three-dots d-block mb-2" style="font-size: 1.5rem;"></i>
+                                                    Other
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Submit Button -->
+                                    <button type="submit" class="btn btn-next mt-4" id="submitBtn">
+                                        <span class="btn-text">
+                                            Start Assessment
+                                            <i class="bi bi-arrow-right ms-2"></i>
+                                        </span>
+                                        <span class="btn-loading d-none">
+                                            <span class="spinner-border spinner-border-sm me-2"></span>
+                                            Processing...
+                                        </span>
+                                    </button>
+                                </form>
+                            </div>
+                            
+                            <!-- Sidebar with Assessment Information -->
+                            <div class="form-sidebar">
+                                <!-- Assessment Information -->
+                                <div class="assessment-info">
+                                    <h6 class="mb-3">
+                                        <i class="bi bi-info-circle me-2"></i>
+                                        About This Assessment
+                                    </h6>
+                                    <p class="mb-3 small">
+                                        This comprehensive assessment evaluates your organization's AI-first software engineering maturity across 4 key areas.
+                                    </p>
+                                    <ul class="feature-list">
+                                        <li><i class="bi bi-check-circle"></i> Foundational Capabilities</li>
+                                        <li><i class="bi bi-check-circle"></i> Transformation Capabilities</li>
+                                        <li><i class="bi bi-check-circle"></i> Enterprise Integration</li>
+                                        <li><i class="bi bi-check-circle"></i> Strategic Governance</li>
+                                    </ul>
+                                </div>
+                                
+                                <!-- Progress Overview -->
+                                <div class="progress-overview">
+                                    <h6 class="mb-3">
+                                        <i class="bi bi-clock me-2"></i>
+                                        Assessment Overview
+                                    </h6>
+                                    <div class="stats-grid">
+                                        <div class="stat-item">
+                                            <div class="stat-value">23</div>
+                                            <div class="stat-label">Areas</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-value">4</div>
+                                            <div class="stat-label">Sections</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-value">~30</div>
+                                            <div class="stat-label">Minutes</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-value">100%</div>
+                                            <div class="stat-label">Confidential</div>
+                                        </div>
+                                    </div>
+                                    <p class="small text-muted mt-3 mb-0">
+                                        <i class="bi bi-shield-check me-1"></i>
+                                        Your data is secure and will only be used for generating your assessment report.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('organizationForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const industryOptions = document.querySelectorAll('.industry-option');
+    const requiredFields = form.querySelectorAll('input[required]');
+    
+    // Industry selection handler
+    industryOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            // Remove selected class from all options
+            industryOptions.forEach(opt => opt.classList.remove('selected'));
+            
+            // Add selected class to clicked option
+            this.classList.add('selected');
+            
+            // Check the radio input
+            const radioInput = this.querySelector('input[type="radio"]');
+            if (radioInput) {
+                radioInput.checked = true;
+            }
+            
+            validateForm();
+        });
+    });
+    
+    // Form validation
+    function validateForm() {
+        let isValid = true;
+        
+        // Check required fields
+        requiredFields.forEach(field => {
+            if (!field.value.trim()) {
+                isValid = false;
+            }
+        });
+        
+        // Check industry selection
+        const industrySelected = document.querySelector('input[name="industry"]:checked');
+        if (!industrySelected) {
+            isValid = false;
+        }
+        
+        // Enable/disable submit button
+        submitBtn.disabled = !isValid;
+        
+        return isValid;
+    }
+    
+    // Add event listeners to all form inputs
+    requiredFields.forEach(field => {
+        field.addEventListener('input', validateForm);
+        field.addEventListener('blur', validateForm);
+    });
+    
+    // Form submission handler
+    form.addEventListener('submit', function(e) {
+        if (!validateForm()) {
+            e.preventDefault();
+            
+            // Find first empty required field and focus it
+            const firstEmpty = Array.from(requiredFields).find(field => !field.value.trim());
+            if (firstEmpty) {
+                firstEmpty.focus();
+                firstEmpty.classList.add('is-invalid');
+                setTimeout(() => firstEmpty.classList.remove('is-invalid'), 3000);
+            }
+            
+            // Check industry selection
+            const industrySelected = document.querySelector('input[name="industry"]:checked');
+            if (!industrySelected) {
+                alert('Please select your industry before continuing.');
+            }
+            
+            return false;
+        }
+        
+        // Show loading state
+        const btnText = submitBtn.querySelector('.btn-text');
+        const btnLoading = submitBtn.querySelector('.btn-loading');
+        
+        btnText.classList.add('d-none');
+        btnLoading.classList.remove('d-none');
+        submitBtn.disabled = true;
+    });
+    
+    // Email validation
+    const emailField = document.getElementById('email');
+    emailField.addEventListener('blur', function() {
+        const email = this.value.trim();
+        if (email && !isValidEmail(email)) {
+            this.classList.add('is-invalid');
+            setTimeout(() => this.classList.remove('is-invalid'), 3000);
+        }
+    });
+    
+    function isValidEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    }
+    
+    // Initialize form validation state
+    validateForm();
+    
+    // Character counters for text inputs
+    const textInputs = document.querySelectorAll('input[type="text"], input[type="email"]');
+    textInputs.forEach(input => {
+        const maxLength = input.getAttribute('maxlength');
+        if (maxLength) {
+            input.addEventListener('input', function() {
+                const remaining = maxLength - this.value.length;
+                const formText = this.parentNode.querySelector('.form-text');
+                if (formText && remaining < 20) {
+                    formText.textContent = `${remaining} characters remaining`;
+                    if (remaining < 5) {
+                        formText.style.color = '#dc3545';
+                    } else {
+                        formText.style.color = '#6c757d';
+                    }
+                }
+            });
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,144 @@
+{% extends "base/layout.html" %}
+{% set page_title = "Under Maintenance" %}
+{% set hide_breadcrumbs = true %}
+
+{% block head_extra %}
+<style>
+.maintenance-container {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.maintenance-icon {
+    font-size: 8rem;
+    color: #0d6efd;
+    margin-bottom: 2rem;
+}
+
+.maintenance-title {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #495057;
+    margin-bottom: 1rem;
+}
+
+.maintenance-message {
+    font-size: 1.25rem;
+    color: #6c757d;
+    margin-bottom: 2rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.progress-indicator {
+    background: #e9ecef;
+    border-radius: 50px;
+    height: 8px;
+    overflow: hidden;
+    margin: 2rem 0;
+}
+
+.progress-bar {
+    background: linear-gradient(90deg, #0d6efd, #6f42c1);
+    height: 100%;
+    border-radius: 50px;
+    animation: progress 3s ease-in-out infinite;
+}
+
+@keyframes progress {
+    0% { width: 0%; }
+    50% { width: 70%; }
+    100% { width: 0%; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="maintenance-container">
+        <div class="text-center">
+            <div class="maintenance-icon">
+                <i class="bi bi-tools"></i>
+            </div>
+            <h1 class="maintenance-title">Under Maintenance</h1>
+            <p class="maintenance-message">
+                We're currently performing scheduled maintenance to improve your experience. 
+                We'll be back online shortly.
+            </p>
+            
+            <div class="progress-indicator">
+                <div class="progress-bar"></div>
+            </div>
+            
+            <div class="maintenance-details">
+                <p class="text-muted">
+                    <strong>Maintenance Window:</strong> {{ maintenance_start or 'In Progress' }} - {{ maintenance_end or 'Estimated 30 minutes' }}
+                </p>
+                <p class="text-muted">
+                    <strong>What's Being Updated:</strong>
+                </p>
+                <ul class="list-unstyled text-muted">
+                    <li>• Database optimizations</li>
+                    <li>• Performance improvements</li>
+                    <li>• Security updates</li>
+                    <li>• New feature deployments</li>
+                </ul>
+            </div>
+            
+            <div class="mt-4">
+                <button onclick="location.reload()" class="btn btn-primary btn-lg me-2">
+                    <i class="bi bi-arrow-clockwise me-2"></i>Check Again
+                </button>
+                <a href="mailto:support@afs-framework.com" class="btn btn-outline-secondary btn-lg">
+                    <i class="bi bi-envelope me-2"></i>Contact Support
+                </a>
+            </div>
+            
+            <div class="mt-5">
+                <h5>Follow Our Status</h5>
+                <p class="text-muted">
+                    Get real-time updates on our system status and maintenance schedules.
+                </p>
+                <div class="social-links">
+                    <a href="#" class="btn btn-outline-primary me-2">
+                        <i class="bi bi-twitter"></i> @AFSFramework
+                    </a>
+                    <a href="#" class="btn btn-outline-info">
+                        <i class="bi bi-globe"></i> Status Page
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-refresh every 2 minutes
+    setInterval(() => {
+        location.reload();
+    }, 120000);
+    
+    // Show countdown
+    let countdown = 120;
+    const countdownElement = document.createElement('p');
+    countdownElement.className = 'text-muted mt-3';
+    countdownElement.innerHTML = `<small>Auto-refresh in <span id="countdown">${countdown}</span> seconds</small>`;
+    document.querySelector('.maintenance-container .text-center').appendChild(countdownElement);
+    
+    setInterval(() => {
+        countdown--;
+        document.getElementById('countdown').textContent = countdown;
+        if (countdown <= 0) {
+            countdown = 120;
+        }
+    }, 1000);
+});
+</script>
+{% endblock %}

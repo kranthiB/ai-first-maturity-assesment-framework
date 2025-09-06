@@ -1,0 +1,473 @@
+{% extends "base/layout.html" %}
+{% set page_title = "Assessment Question " + question.number|string %}
+{% set show_breadcrumbs = true %}
+{% set show_progress = true %}
+{% set breadcrumbs = [
+    {"name": "Home", "url": url_for('main.index') if url_for else '/'},
+    {"name": "Assessment", "url": url_for('assessment.start') if url_for else '/assessment/start'},
+    {"name": "Question " + question.number|string, "url": "#", "active": true}
+] %}
+
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', filename='dist/css/assessment.css') if url_for else '/static/dist/css/assessment.css' }}">
+{% endblock %}
+
+{% block content %}
+<div class="assessment-question-container">
+    <!-- Progress Bar -->
+    <div class="progress-section mb-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="progress-wrapper">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="fw-semibold">Assessment Progress</span>
+                            <span class="text-muted">
+                                Question {{ current_question_number }} of {{ total_questions }}
+                            </span>
+                        </div>
+                        <div class="progress assessment-progress mb-2">
+                            <div class="progress-bar" role="progressbar" 
+                                 style="width: {{ progress_percentage }}%" 
+                                 aria-valuenow="{{ progress_percentage }}" 
+                                 aria-valuemin="0" aria-valuemax="100">
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between text-muted small">
+                            <span>{{ section_name }}</span>
+                            <span>{{ progress_percentage }}% Complete</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-xl-8">
+                <!-- Question Card -->
+                <div class="question-card fade-in">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white border-bottom-0 pb-0">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="d-flex align-items-center">
+                                    <div class="question-number me-3">
+                                        {{ current_question_number }}
+                                    </div>
+                                    <div>
+                                        <h6 class="text-muted mb-1">{{ section_name }}</h6>
+                                        <h5 class="mb-0">{{ area_name }}</h5>
+                                    </div>
+                                </div>
+                                <div class="question-meta text-end">
+                                    <span class="badge bg-light text-dark border">
+                                        {{ question.difficulty or 'Standard' }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card-body pt-4">
+                            <!-- Question Text -->
+                            <div class="question-text mb-4">
+                                <h4 class="mb-3">{{ question.text }}</h4>
+                                {% if question.description %}
+                                <p class="text-muted">{{ question.description }}</p>
+                                {% endif %}
+                            </div>
+
+                            <!-- Response Form -->
+                            <form id="questionForm" method="POST" 
+                                  action="{{ url_for('assessment.submit_response', assessment_id=assessment.id, question_id=question.id) if url_for else '/assessment/' + assessment.id|string + '/question/' + question.id|string }}">
+                                {{ csrf_token() if csrf_token }}
+                                
+                                <div class="response-options">
+                                    {% for option in question.response_options %}
+                                    <div class="response-option" data-value="{{ option.value }}">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" 
+                                                   name="response_value" id="option{{ option.value }}" 
+                                                   value="{{ option.value }}"
+                                                   {% if current_response and current_response.value == option.value %}checked{% endif %}>
+                                            <label class="form-check-label w-100" for="option{{ option.value }}">
+                                                <div class="option-content">
+                                                    <div class="d-flex justify-content-between align-items-start">
+                                                        <div class="option-text flex-grow-1">
+                                                            <h6 class="mb-2">{{ option.label }}</h6>
+                                                            <p class="text-muted mb-0 small">{{ option.description }}</p>
+                                                        </div>
+                                                        <div class="option-score ms-3">
+                                                            <span class="badge bg-primary">{{ option.score }}</span>
+                                                        </div>
+                                                    </div>
+                                                    {% if option.examples %}
+                                                    <div class="option-examples mt-2">
+                                                        <small class="text-muted">
+                                                            <strong>Examples:</strong> {{ option.examples }}
+                                                        </small>
+                                                    </div>
+                                                    {% endif %}
+                                                </div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+
+                                <!-- Additional Comments -->
+                                <div class="mt-4">
+                                    <label for="comments" class="form-label">
+                                        <i class="bi bi-chat-text me-2"></i>
+                                        Additional Comments (Optional)
+                                    </label>
+                                    <textarea class="form-control" id="comments" name="comments" 
+                                              rows="3" placeholder="Share any additional context or thoughts about this question...">{{ current_response.comments if current_response else '' }}</textarea>
+                                </div>
+
+                                <!-- Save as Draft Option -->
+                                <div class="mt-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="saveAsDraft" name="save_as_draft">
+                                        <label class="form-check-label" for="saveAsDraft">
+                                            Save as draft (continue later)
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="question-actions mt-4 pt-3 border-top">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-6">
+                                            <div class="d-flex gap-2">
+                                                {% if has_previous %}
+                                                <a href="{{ url_for('assessment.question', assessment_id=assessment.id, question_number=current_question_number-1) if url_for else '/assessment/' + assessment.id|string + '/question/' + (current_question_number-1)|string }}" 
+                                                   class="btn btn-outline-secondary">
+                                                    <i class="bi bi-arrow-left me-2"></i>Previous
+                                                </a>
+                                                {% endif %}
+                                                
+                                                <button type="button" class="btn btn-outline-info" id="helpBtn" 
+                                                        data-bs-toggle="modal" data-bs-target="#helpModal">
+                                                    <i class="bi bi-question-circle me-2"></i>Help
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                                            <div class="d-flex gap-2 justify-content-md-end">
+                                                <button type="submit" name="action" value="save_and_continue" 
+                                                        class="btn btn-primary" id="continueBtn" disabled>
+                                                    {% if has_next %}
+                                                        <span>Next</span>
+                                                        <i class="bi bi-arrow-right ms-2"></i>
+                                                    {% else %}
+                                                        <span>Complete Assessment</span>
+                                                        <i class="bi bi-check-circle ms-2"></i>
+                                                    {% endif %}
+                                                </button>
+                                                
+                                                <button type="submit" name="action" value="save_and_exit" 
+                                                        class="btn btn-outline-secondary">
+                                                    <i class="bi bi-pause-circle me-2"></i>Save & Exit
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question Context & Guidance -->
+                {% if question.guidance or question.references %}
+                <div class="question-guidance mt-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="mb-0">
+                                <i class="bi bi-info-circle me-2"></i>
+                                Additional Guidance
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            {% if question.guidance %}
+                            <div class="guidance-section mb-3">
+                                <h6>Understanding This Question</h6>
+                                <p class="text-muted">{{ question.guidance }}</p>
+                            </div>
+                            {% endif %}
+                            
+                            {% if question.references %}
+                            <div class="references-section">
+                                <h6>Learn More</h6>
+                                <ul class="list-unstyled">
+                                    {% for reference in question.references %}
+                                    <li class="mb-2">
+                                        <a href="{{ reference.url }}" target="_blank" class="text-decoration-none">
+                                            <i class="bi bi-link-45deg me-2"></i>{{ reference.title }}
+                                        </a>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Section Progress -->
+                <div class="section-progress mt-4">
+                    <div class="card bg-light">
+                        <div class="card-body py-3">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <h6 class="mb-1">{{ section_name }} Progress</h6>
+                                    <div class="progress">
+                                        <div class="progress-bar bg-success" role="progressbar" 
+                                             style="width: {{ section_progress }}%" 
+                                             aria-valuenow="{{ section_progress }}" 
+                                             aria-valuemin="0" aria-valuemax="100">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 text-md-end">
+                                    <span class="text-muted">
+                                        {{ section_completed_questions }} of {{ section_total_questions }} completed
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Help Modal -->
+<div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="helpModalLabel">
+                    <i class="bi bi-question-circle me-2"></i>
+                    Question Help
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6>Scoring Guide</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Score</th>
+                                <th>Maturity Level</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="badge bg-danger">1.0</span></td>
+                                <td>Reactive</td>
+                                <td>No formal processes, ad-hoc approach</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge bg-warning text-dark">2.0</span></td>
+                                <td>Managed</td>
+                                <td>Basic processes established, some repeatability</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge bg-primary">3.0</span></td>
+                                <td>Defined</td>
+                                <td>Standardized processes, well-documented</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge bg-success">4.0</span></td>
+                                <td>Optimizing</td>
+                                <td>Continuous improvement, data-driven optimization</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <h6 class="mt-4">Assessment Tips</h6>
+                <ul>
+                    <li>Answer based on your current organizational state, not aspirational goals</li>
+                    <li>Consider the majority of your teams/projects, not just the most advanced</li>
+                    <li>Use the additional comments to provide context or clarification</li>
+                    <li>You can save your progress and return later if needed</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Got it!</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('questionForm');
+    const continueBtn = document.getElementById('continueBtn');
+    const responseOptions = document.querySelectorAll('.response-option');
+    const radioInputs = document.querySelectorAll('input[name="response_value"]');
+    
+    // Enable/disable continue button based on selection
+    function updateContinueButton() {
+        const selectedOption = document.querySelector('input[name="response_value"]:checked');
+        continueBtn.disabled = !selectedOption;
+    }
+    
+    // Handle response option selection
+    responseOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            // Remove selected class from all options
+            responseOptions.forEach(opt => opt.classList.remove('selected'));
+            
+            // Add selected class to clicked option
+            this.classList.add('selected');
+            
+            // Check the radio input
+            const radioInput = this.querySelector('input[type="radio"]');
+            if (radioInput) {
+                radioInput.checked = true;
+                updateContinueButton();
+            }
+        });
+    });
+    
+    // Handle radio input changes
+    radioInputs.forEach(input => {
+        input.addEventListener('change', updateContinueButton);
+    });
+    
+    // Auto-save draft functionality
+    let autoSaveTimer;
+    function autoSave() {
+        const selectedOption = document.querySelector('input[name="response_value"]:checked');
+        const comments = document.getElementById('comments').value;
+        
+        if (selectedOption || comments.trim()) {
+            const formData = new FormData(form);
+            formData.set('save_as_draft', 'true');
+            
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            }).then(response => {
+                if (response.ok) {
+                    console.log('Draft saved');
+                    // Show brief success indicator
+                    showAutoSaveIndicator();
+                }
+            }).catch(error => {
+                console.error('Auto-save failed:', error);
+            });
+        }
+    }
+    
+    function showAutoSaveIndicator() {
+        const indicator = document.createElement('div');
+        indicator.className = 'alert alert-success position-fixed top-0 end-0 m-3 fade show';
+        indicator.style.zIndex = '9999';
+        indicator.innerHTML = '<i class="bi bi-check-circle me-2"></i>Draft saved';
+        document.body.appendChild(indicator);
+        
+        setTimeout(() => {
+            indicator.classList.remove('show');
+            setTimeout(() => indicator.remove(), 150);
+        }, 2000);
+    }
+    
+    // Set up auto-save on input changes
+    function resetAutoSaveTimer() {
+        clearTimeout(autoSaveTimer);
+        autoSaveTimer = setTimeout(autoSave, 5000); // Auto-save after 5 seconds of inactivity
+    }
+    
+    radioInputs.forEach(input => {
+        input.addEventListener('change', resetAutoSaveTimer);
+    });
+    
+    document.getElementById('comments').addEventListener('input', resetAutoSaveTimer);
+    
+    // Form submission handling
+    form.addEventListener('submit', function(e) {
+        const action = e.submitter?.value;
+        
+        if (action === 'save_and_continue') {
+            const selectedOption = document.querySelector('input[name="response_value"]:checked');
+            if (!selectedOption) {
+                e.preventDefault();
+                alert('Please select a response before continuing.');
+                return;
+            }
+        }
+        
+        // Show loading state
+        const submitBtn = e.submitter;
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
+        }
+    });
+    
+    // Keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+            e.preventDefault();
+            const selectedOption = document.querySelector('.response-option.selected');
+            let targetOption;
+            
+            if (e.key === 'ArrowDown') {
+                targetOption = selectedOption ? 
+                    selectedOption.nextElementSibling : 
+                    responseOptions[0];
+            } else {
+                targetOption = selectedOption ? 
+                    selectedOption.previousElementSibling : 
+                    responseOptions[responseOptions.length - 1];
+            }
+            
+            if (targetOption && targetOption.classList.contains('response-option')) {
+                targetOption.click();
+                targetOption.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        } else if (e.key === 'Enter' && !e.ctrlKey) {
+            const selectedOption = document.querySelector('input[name="response_value"]:checked');
+            if (selectedOption && !continueBtn.disabled) {
+                e.preventDefault();
+                continueBtn.click();
+            }
+        }
+    });
+    
+    // Initialize state
+    updateContinueButton();
+    
+    // Mark currently selected option if any
+    const checkedInput = document.querySelector('input[name="response_value"]:checked');
+    if (checkedInput) {
+        checkedInput.closest('.response-option').classList.add('selected');
+    }
+    
+    // Initialize tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        // Check if tooltip is already initialized
+        if (!tooltipTriggerEl.hasAttribute('data-tooltip-initialized')) {
+            const tooltip = new bootstrap.Tooltip(tooltipTriggerEl);
+            tooltipTriggerEl.setAttribute('data-tooltip-initialized', 'true');
+            return tooltip;
+        }
+    });
+});
+</script>
+{% endblock %}

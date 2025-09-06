@@ -1,0 +1,1011 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+<div class="modern-layout">
+    <!-- Enhanced Page Header with Microinteractions -->
+    {% block page_header %}
+    {% if not hide_page_header %}
+    <section class="page-header-modern">
+        <div class="container-fluid modern-container">
+            <div class="page-header-content">
+                <div class="page-header-main">
+                    <div class="page-title-wrapper">
+                        {% if page_icon %}
+                        <div class="page-icon">
+                            <i class="bi bi-{{ page_icon }}"></i>
+                        </div>
+                        {% endif %}
+                        <div class="page-title-text">
+                            <h1 class="page-title">{% block page_title %}Page Title{% endblock %}</h1>
+                            {% block page_subtitle %}
+                            {% if page_description %}
+                            <p class="page-description">{% block page_description %}{{ page_description }}{% endblock %}</p>
+                            {% endif %}
+                            {% endblock %}
+                        </div>
+                    </div>
+                    
+                    <!-- Page Metadata -->
+                    {% if show_page_meta %}
+                    <div class="page-meta">
+                        {% if last_updated %}
+                        <div class="meta-item">
+                            <i class="bi bi-clock-history"></i>
+                            <span>Updated {{ last_updated.strftime('%b %d, %Y') }}</span>
+                        </div>
+                        {% endif %}
+                        {% if page_status %}
+                        <div class="meta-item">
+                            <span class="status-badge status-{{ page_status.lower() }}">{{ page_status }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Page Actions -->
+                <div class="page-header-actions">
+                    {% block page_actions %}{% endblock %}
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+    {% endblock page_header %}
+    
+    <!-- Smart Breadcrumb Navigation -->
+    {% block breadcrumb %}
+    {% if breadcrumbs and not hide_breadcrumbs %}
+    <section class="breadcrumb-modern">
+        <div class="container-fluid modern-container">
+            <nav aria-label="breadcrumb" class="breadcrumb-nav">
+                <ol class="breadcrumb smart-breadcrumb">
+                    {% for breadcrumb in breadcrumbs %}
+                        {% if loop.first %}
+                            <li class="breadcrumb-item home-item">
+                                <a href="{{ breadcrumb.url }}" class="breadcrumb-link">
+                                    <i class="bi bi-house-door"></i>
+                                    <span class="d-none d-md-inline">{{ breadcrumb.text }}</span>
+                                </a>
+                            </li>
+                        {% elif loop.last %}
+                            <li class="breadcrumb-item active current-item" aria-current="page">
+                                <span class="current-text">{{ breadcrumb.text }}</span>
+                            </li>
+                        {% else %}
+                            <li class="breadcrumb-item">
+                                <a href="{{ breadcrumb.url }}" class="breadcrumb-link">
+                                    {{ breadcrumb.text }}
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ol>
+            </nav>
+        </div>
+    </section>
+    {% endif %}
+    {% endblock breadcrumb %}
+    
+    <!-- Modern Content Layout -->
+    <section class="content-modern">
+        <div class="container-fluid modern-container">
+            <div class="content-grid">
+                <!-- Intelligent Sidebar -->
+                {% block sidebar %}
+                {% if show_sidebar %}
+                <aside class="sidebar-modern" id="sidebar">
+                    <div class="sidebar-content">
+                        {% block sidebar_content %}
+                        <div class="sidebar-section">
+                            <div class="sidebar-header">
+                                <h6 class="sidebar-title">
+                                    <i class="bi bi-compass me-2"></i>Navigation
+                                </h6>
+                                <button class="sidebar-toggle d-lg-none" type="button" data-bs-toggle="collapse" 
+                                        data-bs-target="#sidebarCollapse" aria-expanded="false">
+                                    <i class="bi bi-chevron-up"></i>
+                                </button>
+                            </div>
+                            <div class="sidebar-nav collapse d-lg-block" id="sidebarCollapse">
+                                {% for nav_item in sidebar_nav %}
+                                <a class="sidebar-link {% if nav_item.active %}active{% endif %}" 
+                                   href="{{ nav_item.url }}"
+                                   {% if nav_item.description %}data-bs-toggle="tooltip" title="{{ nav_item.description }}"{% endif %}>
+                                    <div class="sidebar-link-content">
+                                        {% if nav_item.icon %}
+                                        <div class="sidebar-icon">
+                                            <i class="bi bi-{{ nav_item.icon }}"></i>
+                                        </div>
+                                        {% endif %}
+                                        <div class="sidebar-text">
+                                            <span class="sidebar-label">{{ nav_item.text }}</span>
+                                            {% if nav_item.badge %}
+                                            <span class="sidebar-badge">{{ nav_item.badge }}</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <!-- Additional Sidebar Widgets -->
+                        {% block sidebar_widgets %}{% endblock %}
+                        {% endblock sidebar_content %}
+                    </div>
+                </aside>
+                {% endif %}
+                {% endblock sidebar %}
+                
+                <!-- Main Content Area -->
+                <main class="main-content-modern {% if not show_sidebar %}full-width{% endif %}">
+                    {% block main_content %}
+                    <div class="content-card modern-card">
+                        <div class="card-header-modern">
+                            <div class="card-title-wrapper">
+                                <h2 class="card-title">{% block card_title %}Content{% endblock %}</h2>
+                                {% if card_subtitle %}
+                                <p class="card-subtitle">{{ card_subtitle }}</p>
+                                {% endif %}
+                            </div>
+                            {% block card_actions %}{% endblock %}
+                        </div>
+                        <div class="card-body-modern">
+                            {% block card_content %}
+                            <div class="empty-state">
+                                <div class="empty-state-icon">
+                                    <i class="bi bi-file-text"></i>
+                                </div>
+                                <h3 class="empty-state-title">No Content</h3>
+                                <p class="empty-state-text">Override the <code>card_content</code> block to add your content.</p>
+                                <div class="empty-state-actions">
+                                    <button class="btn btn-premium-primary">Get Started</button>
+                                </div>
+                            </div>
+                            {% endblock card_content %}
+                        </div>
+                        {% block card_footer %}{% endblock %}
+                    </div>
+                    {% endblock main_content %}
+                </main>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Additional Content Sections -->
+    {% block additional_content %}{% endblock %}
+    
+    <!-- Smart Action Bar -->
+    {% block action_buttons %}
+    {% if show_action_buttons %}
+    <section class="action-bar-modern">
+        <div class="container-fluid modern-container">
+            <div class="action-bar-content">
+                <div class="action-bar-left">
+                    {% block left_actions %}{% endblock %}
+                </div>
+                <div class="action-bar-right">
+                    {% block right_actions %}
+                    <button type="button" class="btn btn-ghost me-3" id="cancel-action">
+                        <i class="bi bi-x-lg me-2"></i>Cancel
+                    </button>
+                    <button type="button" class="btn btn-premium-primary" id="save-action">
+                        <i class="bi bi-check-lg me-2"></i>Save Changes
+                    </button>
+                    {% endblock right_actions %}
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+    {% endblock action_buttons %}
+</div>
+
+<!-- Enhanced Loading Overlay -->
+<div id="loading-overlay" class="loading-overlay d-none">
+    <div class="loading-content">
+        <div class="loading-spinner">
+            <div class="spinner-ring"></div>
+            <div class="spinner-ring"></div>
+            <div class="spinner-ring"></div>
+        </div>
+        <div class="loading-text">Processing...</div>
+        <div class="loading-progress">
+            <div class="progress-bar"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Floating Action Button (optional) -->
+{% if show_fab %}
+<div class="fab-container">
+    <button class="fab-button" type="button" data-bs-toggle="tooltip" title="{{ fab_tooltip or 'Quick Action' }}">
+        <i class="bi bi-{{ fab_icon or 'plus-lg' }}"></i>
+    </button>
+</div>
+{% endif %}
+{% endblock content %}
+
+{% block extra_css %}
+<style>
+/* ============================================================================
+   Modern Layout System - Human-Centric Design
+   ============================================================================ */
+
+.modern-layout {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.modern-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+/* Enhanced Page Header */
+.page-header-modern {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 249, 250, 0.95) 100%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    padding: 32px 0;
+    position: sticky;
+    top: 80px;
+    z-index: 1000;
+}
+
+.page-header-content {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.page-title-wrapper {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    flex: 1;
+}
+
+.page-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 24px;
+    flex-shrink: 0;
+    box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+}
+
+.page-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0;
+    line-height: 1.2;
+    letter-spacing: -0.025em;
+}
+
+.page-description {
+    font-size: 1.125rem;
+    color: #6b7280;
+    margin: 8px 0 0 0;
+    line-height: 1.6;
+}
+
+.page-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 12px;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.status-badge {
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-active { background: #d1fae5; color: #065f46; }
+.status-draft { background: #fef3c7; color: #92400e; }
+.status-review { background: #dbeafe; color: #1e40af; }
+
+/* Smart Breadcrumb */
+.breadcrumb-modern {
+    padding: 16px 0;
+    background: rgba(248, 249, 250, 0.5);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.smart-breadcrumb {
+    background: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.breadcrumb-item {
+    display: flex;
+    align-items: center;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    content: "";
+    width: 16px;
+    height: 16px;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%236b7280'%3e%3cpath fill-rule='evenodd' d='M6.776 1.553a.5.5 0 0 1 .671.223l3 6a.5.5 0 0 1 0 .448l-3 6a.5.5 0 1 1-.894-.448L9.44 8 6.553 2.224a.5.5 0 0 1 .223-.671z'/%3e%3c/svg%3e");
+    margin: 0 8px;
+}
+
+.breadcrumb-link {
+    color: #6b7280;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.breadcrumb-link:hover {
+    background: rgba(102, 126, 234, 0.1);
+    color: #667eea;
+}
+
+.home-item .breadcrumb-link {
+    background: rgba(102, 126, 234, 0.1);
+    color: #667eea;
+}
+
+.current-text {
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+/* Content Grid */
+.content-modern {
+    flex: 1;
+    padding: 32px 0;
+}
+
+.content-grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 32px;
+    align-items: start;
+}
+
+.content-grid.full-width {
+    grid-template-columns: 1fr;
+}
+
+/* Modern Sidebar */
+.sidebar-modern {
+    width: 280px;
+    position: sticky;
+    top: 180px;
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+}
+
+.sidebar-content {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.sidebar-title {
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.sidebar-toggle {
+    background: none;
+    border: none;
+    color: #6b7280;
+    padding: 4px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.sidebar-toggle:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: #1a1a1a;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.sidebar-link {
+    display: block;
+    text-decoration: none;
+    color: #6b7280;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.sidebar-link:hover {
+    background: rgba(102, 126, 234, 0.08);
+    color: #667eea;
+    transform: translateX(4px);
+}
+
+.sidebar-link.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+}
+
+.sidebar-link-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+}
+
+.sidebar-icon {
+    width: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+}
+
+.sidebar-text {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.sidebar-label {
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.sidebar-badge {
+    background: rgba(255, 255, 255, 0.2);
+    color: currentColor;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* Modern Content Card */
+.content-card {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.content-card:hover {
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.card-header-modern {
+    padding: 32px 32px 24px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    background: linear-gradient(135deg, rgba(248, 249, 250, 0.8) 0%, rgba(255, 255, 255, 0.8) 100%);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+.card-title-wrapper {
+    flex: 1;
+}
+
+.card-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0;
+    line-height: 1.3;
+}
+
+.card-subtitle {
+    color: #6b7280;
+    margin: 8px 0 0 0;
+    font-size: 1rem;
+}
+
+.card-body-modern {
+    padding: 32px;
+    min-height: 400px;
+}
+
+/* Empty State */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-height: 300px;
+    padding: 48px 24px;
+}
+
+.empty-state-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9ca3af;
+    font-size: 32px;
+    margin-bottom: 24px;
+}
+
+.empty-state-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 12px;
+}
+
+.empty-state-text {
+    color: #6b7280;
+    margin-bottom: 24px;
+    max-width: 400px;
+}
+
+/* Action Bar */
+.action-bar-modern {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    padding: 20px 0;
+    position: sticky;
+    bottom: 0;
+    z-index: 1000;
+}
+
+.action-bar-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.action-bar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Enhanced Loading Overlay */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.loading-content {
+    text-align: center;
+    max-width: 300px;
+}
+
+.loading-spinner {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 24px;
+}
+
+.spinner-ring {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border: 2px solid transparent;
+    border-top: 2px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.spinner-ring:nth-child(2) {
+    animation-delay: 0.3s;
+    border-top-color: #764ba2;
+}
+
+.spinner-ring:nth-child(3) {
+    animation-delay: 0.6s;
+    border-top-color: #ff6b6b;
+}
+
+.loading-text {
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 16px;
+}
+
+.loading-progress {
+    width: 200px;
+    height: 4px;
+    background: #e5e7eb;
+    border-radius: 2px;
+    overflow: hidden;
+    margin: 0 auto;
+}
+
+.loading-progress .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    border-radius: 2px;
+    animation: progress 2s ease-in-out infinite;
+}
+
+/* Floating Action Button */
+.fab-container {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    z-index: 1050;
+}
+
+.fab-button {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 32px rgba(102, 126, 234, 0.4);
+    transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+    cursor: pointer;
+}
+
+.fab-button:hover {
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 12px 48px rgba(102, 126, 234, 0.5);
+}
+
+/* Animations */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes progress {
+    0% { transform: translateX(-100%); }
+    50% { transform: translateX(0); }
+    100% { transform: translateX(100%); }
+}
+
+/* Dark Theme Adjustments */
+[data-bs-theme="dark"] .page-header-modern {
+    background: linear-gradient(135deg, rgba(33, 37, 41, 0.95) 0%, rgba(52, 58, 64, 0.95) 100%);
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-bs-theme="dark"] .page-title {
+    color: #f8f9fa;
+}
+
+[data-bs-theme="dark"] .page-description {
+    color: #adb5bd;
+}
+
+[data-bs-theme="dark"] .content-card {
+    background: rgba(33, 37, 41, 0.8);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-bs-theme="dark"] .card-header-modern {
+    background: linear-gradient(135deg, rgba(52, 58, 64, 0.8) 0%, rgba(33, 37, 41, 0.8) 100%);
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-bs-theme="dark"] .card-title {
+    color: #f8f9fa;
+}
+
+[data-bs-theme="dark"] .sidebar-content {
+    background: rgba(33, 37, 41, 0.7);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-bs-theme="dark"] .sidebar-title {
+    color: #f8f9fa;
+}
+
+[data-bs-theme="dark"] .loading-overlay {
+    background: rgba(33, 37, 41, 0.95);
+}
+
+/* Responsive Design */
+@media (max-width: 1199.98px) {
+    .content-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+    
+    .sidebar-modern {
+        width: 100%;
+        position: static;
+        max-height: none;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .modern-container {
+        padding: 0 16px;
+    }
+    
+    .page-header-modern {
+        padding: 24px 0;
+        top: 60px;
+    }
+    
+    .page-header-content {
+        flex-direction: column;
+        gap: 16px;
+    }
+    
+    .page-title {
+        font-size: 1.5rem;
+    }
+    
+    .content-modern {
+        padding: 24px 0;
+    }
+    
+    .card-header-modern,
+    .card-body-modern {
+        padding: 24px 20px;
+    }
+    
+    .fab-container {
+        bottom: 24px;
+        right: 24px;
+    }
+}
+</style>
+{% endblock extra_css %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Enhanced layout functionality
+    initModernLayout();
+    
+    // Smart sidebar behavior
+    initSmartSidebar();
+    
+    // Loading utilities
+    initLoadingSystem();
+    
+    // Action bar behavior
+    initActionBar();
+});
+
+function initModernLayout() {
+    // Smooth scrolling for internal links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const href = this.getAttribute('href');
+            // Skip if href is just "#" or empty
+            if (href === '#' || href === '' || href.length <= 1) {
+                return;
+            }
+            const target = document.querySelector(href);
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+    
+    // Auto-resize textareas
+    document.querySelectorAll('textarea[data-auto-resize]').forEach(textarea => {
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = this.scrollHeight + 'px';
+        });
+    });
+}
+
+function initSmartSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    if (!sidebar) return;
+    
+    // Auto-collapse on mobile after navigation
+    if (window.innerWidth < 992) {
+        document.querySelectorAll('.sidebar-link').forEach(link => {
+            link.addEventListener('click', () => {
+                const collapse = document.getElementById('sidebarCollapse');
+                if (collapse) {
+                    const bsCollapse = new bootstrap.Collapse(collapse, { toggle: false });
+                    bsCollapse.hide();
+                }
+            });
+        });
+    }
+    
+    // Highlight active section based on scroll
+    const observerOptions = {
+        rootMargin: '-20% 0px -70% 0px',
+        threshold: 0
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const id = entry.target.id;
+                if (id) {
+                    document.querySelectorAll('.sidebar-link').forEach(link => {
+                        link.classList.remove('active');
+                        if (link.getAttribute('href') === '#' + id) {
+                            link.classList.add('active');
+                        }
+                    });
+                }
+            }
+        });
+    }, observerOptions);
+    
+    document.querySelectorAll('[id]').forEach(el => observer.observe(el));
+}
+
+function initLoadingSystem() {
+    // Enhanced loading overlay utilities
+    window.LoadingUtils = {
+        show: function(text = 'Loading...') {
+            const overlay = document.getElementById('loading-overlay');
+            const textElement = overlay?.querySelector('.loading-text');
+            
+            if (overlay) {
+                if (textElement) textElement.textContent = text;
+                overlay.classList.remove('d-none');
+                document.body.style.overflow = 'hidden';
+            }
+        },
+        
+        hide: function() {
+            const overlay = document.getElementById('loading-overlay');
+            if (overlay) {
+                overlay.classList.add('d-none');
+                document.body.style.overflow = '';
+            }
+        },
+        
+        progress: function(text, progress = 0) {
+            this.show(text);
+            const progressBar = document.querySelector('.loading-progress .progress-bar');
+            if (progressBar) {
+                progressBar.style.width = progress + '%';
+                progressBar.style.animation = 'none';
+            }
+        }
+    };
+    
+    // Auto-hide loading on page load
+    window.addEventListener('load', () => {
+        setTimeout(() => window.LoadingUtils?.hide(), 300);
+    });
+}
+
+function initActionBar() {
+    // Smart action bar behavior
+    const actionBar = document.querySelector('.action-bar-modern');
+    if (!actionBar) return;
+    
+    // Save button with loading state
+    const saveButton = document.getElementById('save-action');
+    if (saveButton) {
+        saveButton.addEventListener('click', function() {
+            if (this.classList.contains('loading')) return;
+            
+            this.classList.add('loading');
+            this.disabled = true;
+            
+            const originalContent = this.innerHTML;
+            this.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
+            
+            // Simulate save operation (replace with actual save logic)
+            setTimeout(() => {
+                this.classList.remove('loading');
+                this.disabled = false;
+                this.innerHTML = originalContent;
+                
+                if (window.AlertUtils) {
+                    window.AlertUtils.success('Changes saved successfully!');
+                }
+            }, 2000);
+        });
+    }
+    
+    // Cancel button confirmation
+    const cancelButton = document.getElementById('cancel-action');
+    if (cancelButton) {
+        cancelButton.addEventListener('click', function() {
+            if (confirm('Are you sure you want to cancel? Any unsaved changes will be lost.')) {
+                window.history.back();
+            }
+        });
+    }
+}
+
+// Intersection Observer for fade-in animations
+const fadeObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('animate-fade-in');
+        }
+    });
+}, { threshold: 0.1 });
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.content-card, .sidebar-content').forEach(el => {
+        fadeObserver.observe(el);
+    });
+});
+</script>
+{% endblock extra_js %}

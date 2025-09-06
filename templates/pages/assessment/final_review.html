@@ -1,0 +1,943 @@
+{% extends "base/base.html" %}
+{% set page_title = "Final Review - " + metadata.organization_name if metadata else "Final Review" %}
+
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', filename='dist/css/assessment.css') if url_for else '/static/dist/css/assessment.css' }}">
+<style>
+.final-review-container {
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    min-height: 100vh;
+    padding: 0;
+}
+
+.review-card {
+    background: white;
+    border-radius: 0;
+    box-shadow: none;
+    overflow: hidden;
+    min-height: 100vh;
+}
+
+.review-header {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    color: white;
+    padding: 2rem;
+    text-align: center;
+}
+
+.step-indicator {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.step {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 0.5rem;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.step.completed {
+    background: #48bb78;
+    color: white;
+}
+
+.step.active {
+    background: white;
+    color: #059669;
+}
+
+.step-connector {
+    width: 60px;
+    height: 2px;
+    background: rgba(255,255,255,0.3);
+    margin-top: 19px;
+}
+
+.summary-section {
+    padding: 2rem 3rem;
+}
+
+.completion-stats {
+    background: #f0f9f5;
+    border: 1px solid #d1fae5;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #059669;
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    color: #6b7280;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.section-summary {
+    margin-bottom: 2rem;
+}
+
+.section-item {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    overflow: hidden;
+}
+
+.section-header-item {
+    background: #f9fafb;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.section-title {
+    font-weight: 600;
+    color: #374151;
+}
+
+.section-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.875rem;
+}
+
+.section-progress-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+.progress-circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    font-weight: 700;
+    min-width: 50px;
+}
+
+.progress-circle.completed {
+    background: #10b981;
+    color: white;
+}
+
+.progress-circle.partial {
+    background: #f59e0b;
+    color: white;
+}
+
+.area-details {
+    padding: 1.5rem;
+}
+
+.area-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.area-item {
+    background: #fafafa;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    padding: 1rem;
+}
+
+.area-name {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #374151;
+}
+
+.area-questions {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-bottom: 0.5rem;
+}
+
+.area-level {
+    font-size: 0.875rem;
+    color: #374151;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.area-level strong {
+    color: #059669;
+}
+
+.area-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.status-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.status-indicator.complete {
+    background: #10b981;
+}
+
+.status-indicator.partial {
+    background: #f59e0b;
+}
+
+.status-indicator.empty {
+    background: #e5e7eb;
+}
+
+.candidate-summary {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.report-actions {
+    background: #f8fafc;
+    padding: 2rem;
+    border-top: 1px solid #e2e8f0;
+    text-align: center;
+}
+
+.btn-generate-report {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    border: none;
+    padding: 1rem 2.5rem;
+    border-radius: 0.5rem;
+    color: white;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+}
+
+.btn-generate-report:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(5, 150, 105, 0.3);
+    color: white;
+}
+
+.btn-generate-report:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.completion-warning {
+    background: #fef3c7;
+    border: 1px solid #f59e0b;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.completion-requirement {
+    background: #ecfdf5;
+    border: 1px solid #10b981;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .summary-section {
+        padding: 1.5rem;
+    }
+    
+    .stat-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+    
+    .area-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .section-header-item {
+        flex-direction: row;
+        justify-content: space-between;
+        gap: 1rem;
+        text-align: left;
+    }
+    
+    .progress-circle {
+        width: 45px;
+        height: 45px;
+        font-size: 0.75rem;
+        min-width: 45px;
+    }
+    
+    .section-progress-indicator {
+        margin-left: auto;
+        flex-shrink: 0;
+    }
+}
+
+/* Modal open state - prevent background scrolling */
+body.modal-open {
+    overflow: hidden;
+}
+
+/* Modern Confirmation Modal */
+.confirmation-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.confirmation-modal.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 20px;
+    padding: 2.5rem;
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    transform: translateY(20px) scale(0.95);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.confirmation-modal.show .modal-content {
+    transform: translateY(0) scale(1);
+}
+
+.modal-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-size: 2rem;
+    color: white;
+    animation: pulse-icon 2s infinite;
+}
+
+@keyframes pulse-icon {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.modal-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1f2937;
+    text-align: center;
+    margin-bottom: 1rem;
+    line-height: 1.4;
+}
+
+.modal-description {
+    color: #6b7280;
+    text-align: center;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+    font-size: 1rem;
+}
+
+.modal-features {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.feature-item {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.feature-item:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+}
+
+.feature-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.feature-text {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #475569;
+    line-height: 1.3;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.modal-btn {
+    padding: 0.75rem 2rem;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 120px;
+}
+
+.modal-btn-cancel {
+    background: #f3f4f6;
+    color: #374151;
+    border: 1px solid #d1d5db;
+}
+
+.modal-btn-cancel:hover {
+    background: #e5e7eb;
+    color: #1f2937;
+}
+
+.modal-btn-confirm {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.modal-btn-confirm:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 25px rgba(5, 150, 105, 0.3);
+}
+
+.modal-btn-confirm:active {
+    transform: translateY(0);
+}
+
+.modal-btn-confirm.loading {
+    color: transparent;
+}
+
+.modal-btn-confirm .loading-spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    opacity: 0;
+}
+
+.modal-btn-confirm.loading .loading-spinner {
+    opacity: 1;
+}
+
+@keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+@media (max-width: 600px) {
+    .modal-content {
+        padding: 2rem 1.5rem;
+        border-radius: 16px;
+    }
+    
+    .modal-features {
+        grid-template-columns: 1fr;
+    }
+    
+    .modal-actions {
+        flex-direction: column;
+    }
+    
+    .modal-btn {
+        width: 100%;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="final-review-container">
+    <div class="review-card">
+        <!-- Header -->
+        <div class="review-header">
+            <!-- Step Indicator -->
+            <div class="step-indicator">
+                <div class="step completed">
+                    <i class="bi bi-check"></i>
+                </div>
+                <div class="step-connector"></div>
+                <div class="step completed">
+                    <i class="bi bi-check"></i>
+                </div>
+                <div class="step-connector"></div>
+                <div class="step completed">
+                    <i class="bi bi-check"></i>
+                </div>
+                <div class="step-connector"></div>
+                <div class="step active">4</div>
+            </div>
+            
+            <h1 class="mb-3">
+                <i class="bi bi-clipboard-check me-2"></i>
+                Final Review
+            </h1>
+            <p class="mb-0 opacity-75">
+                Review your responses before generating your maturity assessment report
+            </p>
+        </div>
+        
+        <!-- Summary Section -->
+        <div class="summary-section">
+            <div class="container-fluid">
+                <!-- Candidate Summary -->
+                {% if metadata %}
+                <div class="candidate-summary">
+                    <h5 class="mb-3">
+                        <i class="bi bi-person-check me-2"></i>
+                        Assessment Details
+                    </h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>Candidate:</strong> {{ metadata.first_name }} {{ metadata.last_name }}<br>
+                            <strong>Organization:</strong> {{ metadata.organization_name }}<br>
+                            {% if metadata.account_name and metadata.account_name != metadata.organization_name %}
+                            <strong>Account:</strong> {{ metadata.account_name }}<br>
+                            {% endif %}
+                            <strong>Industry:</strong> {{ format_industry(metadata.industry) }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Email:</strong> {{ metadata.email }}<br>
+                            <strong>Started:</strong> {{ metadata.created_at[:19] if metadata.created_at else 'N/A' }}<br>
+                            <strong>Assessment ID:</strong> {{ assessment.id }}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Completion Statistics -->
+                <div class="completion-stats">
+                    <h5 class="mb-3">
+                        <i class="bi bi-bar-chart me-2"></i>
+                        Completion Summary
+                    </h5>
+                    <div class="stat-grid">
+                        <div class="stat-item">
+                            <div class="stat-value">{{ answered_questions }}</div>
+                            <div class="stat-label">Questions Answered</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">{{ total_questions }}</div>
+                            <div class="stat-label">Total Questions</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">{{ "%.0f"|format(completion_percentage) }}%</div>
+                            <div class="stat-label">Completion Rate</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">{{ sections|length }}</div>
+                            <div class="stat-label">Sections Covered</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Completion Status -->
+                {% if completion_percentage < 80 %}
+                <div class="completion-warning">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        <strong>Incomplete Assessment</strong>
+                    </div>
+                    <p class="mb-0 mt-2">
+                        You've completed {{ "%.0f"|format(completion_percentage) }}% of the assessment. 
+                        We recommend answering at least 80% of questions for accurate results. 
+                        You can go back to any section to add more responses.
+                    </p>
+                </div>
+                {% else %}
+                <div class="completion-requirement">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-check-circle me-2"></i>
+                        <strong>Assessment Complete</strong>
+                    </div>
+                    <p class="mb-0 mt-2">
+                        Excellent! You've completed {{ "%.0f"|format(completion_percentage) }}% of the assessment. 
+                        Your responses provide a comprehensive view of your organization's AI-first maturity.
+                    </p>
+                </div>
+                {% endif %}
+                
+                <!-- Section Summary -->
+                <div class="section-summary">
+                    <h5 class="mb-3">
+                        <i class="bi bi-list-ul me-2"></i>
+                        Section Summary
+                    </h5>
+                    
+                    {% for section in sections %}
+                    <div class="section-item">
+                        <div class="section-header-item">
+                            <div class="d-flex align-items-center">
+                                <div class="section-icon me-3" style="background: {{ section.color or '#667eea' }};">
+                                    <i class="{{ section.icon or 'bi bi-gear' }}"></i>
+                                </div>
+                                <div>
+                                    <div class="section-title">{{ section.name }}</div>
+                                    <small class="text-muted">{{ section.areas|length }} assessment areas</small>
+                                </div>
+                            </div>
+                            
+                            <div class="section-progress-indicator">
+                                {% set section_questions = [] %}
+                                {% set section_answered = [] %}
+                                {% for area in section.areas %}
+                                    {% for question in area.questions %}
+                                        {% set _ = section_questions.append(question.id) %}
+                                        {% if responses.get(question.id) %}
+                                            {% set _ = section_answered.append(question.id) %}
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endfor %}
+                                
+                                {% set section_completion = (section_answered|length / section_questions|length * 100) if section_questions else 0 %}
+                                
+                                <div class="progress-circle {{ 'completed' if section_completion == 100 else 'partial' if section_completion > 0 else '' }}">
+                                    {{ "%.0f"|format(section_completion) }}%
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="area-details">
+                            <div class="area-grid">
+                                {% for area in section.areas %}
+                                <div class="area-item">
+                                    <div class="area-name">{{ area.name }}</div>
+                                    
+                                    {% set area_responses = [] %}
+                                    {% set area_levels = [] %}
+                                    {% for question in area.questions %}
+                                        {% if responses.get(question.id) %}
+                                            {% set _ = area_responses.append(responses.get(question.id)) %}
+                                            {% set _ = area_levels.append(responses.get(question.id).score) %}
+                                        {% endif %}
+                                    {% endfor %}
+                                    
+                                    {% if area_levels %}
+                                        {% set avg_level = (area_levels|sum / area_levels|length)|round %}
+                                        <div class="area-level">
+                                            <strong>Level {{ avg_level }}</strong>
+                                            {% if avg_level == 1 %}
+                                                <span class="text-muted">- Basic</span>
+                                            {% elif avg_level == 2 %}
+                                                <span class="text-muted">- Evolving</span>
+                                            {% elif avg_level == 3 %}
+                                                <span class="text-muted">- Advanced</span>
+                                            {% elif avg_level == 4 %}
+                                                <span class="text-muted">- Optimized</span>
+                                            {% endif %}
+                                        </div>
+                                    {% else %}
+                                        <div class="area-level text-muted">
+                                            <em>Not assessed</em>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    <div class="area-status">
+                                        <div class="status-indicator {{ 'complete' if area_responses|length == area.questions|length else 'partial' if area_responses|length > 0 else 'empty' }}"></div>
+                                        <span class="small text-muted">
+                                            {% if area_responses|length == area.questions|length %}
+                                                Complete
+                                            {% elif area_responses|length > 0 %}
+                                                Partial
+                                            {% else %}
+                                                Not started
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Actions -->
+        <div class="report-actions">
+            <div class="d-flex gap-3 justify-content-center">
+                <a href="{{ url_for('assessment.section_questions', assessment_id=assessment.id, section_id=sections[-1].id) if url_for and sections else '#' }}" 
+                   class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>
+                    Back to Last Section
+                </a>
+                
+                <form method="POST" 
+                      action="{{ url_for('assessment.generate_report', assessment_id=assessment.id) if url_for else '/assessment/' + assessment.id|string + '/generate-report' }}" 
+                      class="d-inline">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token else '' }}"/>
+                    <button type="submit" 
+                            class="btn btn-generate-report" 
+                            id="generateReportBtn"
+                            {{ 'disabled' if not can_generate_report else '' }}>
+                        <i class="bi bi-file-earmark-text me-2"></i>
+                        Generate Assessment Report
+                    </button>
+                </form>
+            </div>
+            
+            {% if not can_generate_report %}
+            <div class="mt-3 text-center">
+                <small class="text-muted">
+                    <i class="bi bi-info-circle me-1"></i>
+                    Complete at least 80% of the assessment to generate your report
+                </small>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Modern Confirmation Modal -->
+<div id="confirmationModal" class="confirmation-modal">
+    <div class="modal-content">
+        <div class="modal-icon">
+            <i class="bi bi-file-earmark-text"></i>
+        </div>
+        
+        <h2 class="modal-title">Generate your AI-First Software Engineering Maturity Assessment Report?</h2>
+        
+        <p class="modal-description">
+            This will complete your assessment and create a comprehensive report with your results, recommendations, and next steps.
+        </p>
+        
+        <div class="modal-features">
+            <div class="feature-item">
+                <span class="feature-icon text-primary">📊</span>
+                <div class="feature-text">Maturity Scores<br>Detailed scoring by section</div>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon text-success">🎯</span>
+                <div class="feature-text">Recommendations<br>Actionable next steps</div>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon text-warning">📈</span>
+                <div class="feature-text">Benchmarking<br>Industry comparisons</div>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon text-info">🗺️</span>
+                <div class="feature-text">Roadmap<br>Transformation timeline</div>
+            </div>
+        </div>
+        
+        <div class="modal-actions">
+            <button type="button" class="modal-btn modal-btn-cancel" id="modalCancel">
+                Cancel
+            </button>
+            <button type="button" class="modal-btn modal-btn-confirm" id="modalConfirm">
+                <span class="loading-spinner"></span>
+                Generate Report
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const generateBtn = document.getElementById('generateReportBtn');
+    const form = generateBtn.closest('form');
+    
+    // Form submission handling
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            if (generateBtn.disabled) {
+                e.preventDefault();
+                return false;
+            }
+            
+            // Show loading state
+            generateBtn.disabled = true;
+            generateBtn.innerHTML = `
+                <span class="spinner-border spinner-border-sm me-2"></span>
+                Generating Report...
+            `;
+            
+            // Show progress message
+            const progressAlert = document.createElement('div');
+            progressAlert.className = 'alert alert-info mt-3';
+            progressAlert.innerHTML = `
+                <div class="d-flex align-items-center">
+                    <div class="spinner-border spinner-border-sm me-3"></div>
+                    <div>
+                        <strong>Generating your assessment report...</strong><br>
+                        <small>This may take a few moments while we analyze your responses and calculate your maturity scores.</small>
+                    </div>
+                </div>
+            `;
+            form.parentNode.insertBefore(progressAlert, form.nextSibling);
+        });
+    }
+    
+    // Animate section items on scroll
+    const sectionItems = document.querySelectorAll('.section-item');
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, observerOptions);
+    
+    // Initially hide items and observe them
+    sectionItems.forEach((item, index) => {
+        item.style.opacity = '0';
+        item.style.transform = 'translateY(20px)';
+        item.style.transition = `opacity 0.6s ease ${index * 0.1}s, transform 0.6s ease ${index * 0.1}s`;
+        observer.observe(item);
+    });
+    
+    // Trigger entrance animation
+    setTimeout(() => {
+        sectionItems.forEach(item => {
+            item.style.opacity = '1';
+            item.style.transform = 'translateY(0)';
+        });
+    }, 300);
+    
+    // Modern confirmation modal functionality
+    const modal = document.getElementById('confirmationModal');
+    const modalConfirm = document.getElementById('modalConfirm');
+    const modalCancel = document.getElementById('modalCancel');
+    
+    // Show modal when generate report button is clicked
+    if (generateBtn && !generateBtn.disabled) {
+        generateBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            modal.classList.add('show');
+            document.body.classList.add('modal-open');
+        });
+    }
+    
+    // Hide modal when cancel is clicked
+    modalCancel.addEventListener('click', function() {
+        hideModal();
+    });
+    
+    // Close modal when clicking outside
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            hideModal();
+        }
+    });
+    
+    // Close modal with escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal.classList.contains('show')) {
+            hideModal();
+        }
+    });
+    
+    // Handle confirm action
+    modalConfirm.addEventListener('click', function() {
+        // Show loading state
+        modalConfirm.classList.add('loading');
+        modalConfirm.disabled = true;
+        modalCancel.disabled = true;
+        
+        // Submit the form
+        if (form) {
+            form.submit();
+        }
+    });
+    
+    function hideModal() {
+        modal.classList.remove('show');
+        document.body.classList.remove('modal-open');
+        
+        // Reset loading state
+        modalConfirm.classList.remove('loading');
+        modalConfirm.disabled = false;
+        modalCancel.disabled = false;
+    }
+});
+</script>
+{% endblock %}

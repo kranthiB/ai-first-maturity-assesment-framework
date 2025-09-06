@@ -1,0 +1,110 @@
+{% extends "base/layout.html" %}
+{% set page_title = "Complete Assessment" %}
+{% set show_breadcrumbs = true %}
+{% set breadcrumbs = [
+    {"name": "Home", "url": url_for('main.index') if url_for else '/'},
+    {"name": "Assessments", "url": url_for('assessment.index') if url_for else '/assessment'},
+    {"name": assessment.name if assessment else "Assessment", "url": url_for('assessment.detail', assessment_id=assessment.id) if assessment and url_for else '#'},
+    {"name": "Complete", "url": "#", "active": true}
+] %}
+
+{% block content %}
+<div class="container">
+    {% if assessment %}
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="card-title mb-0">
+                        <i class="bi bi-check-circle me-2"></i>Complete Assessment
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <h5 class="fw-bold">{{ assessment.name }}</h5>
+                    
+                    {% if progress %}
+                    <div class="progress-summary mb-4">
+                        <h6 class="text-muted mb-3">Assessment Progress</h6>
+                        <div class="progress mb-2" style="height: 12px;">
+                            <div class="progress-bar bg-success" 
+                                 style="width: {{ progress.progress_percentage }}%"></div>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <small class="text-muted">
+                                {{ progress.responded_questions }} of {{ progress.total_questions }} questions completed
+                            </small>
+                            <small class="fw-bold text-success">{{ "%.1f"|format(progress.progress_percentage) }}%</small>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if can_complete %}
+                    <div class="alert alert-success">
+                        <i class="bi bi-check-circle me-2"></i>
+                        <strong>Ready to Complete!</strong> 
+                        You've answered enough questions to generate meaningful results.
+                    </div>
+                    
+                    <p class="mb-4">
+                        Completing this assessment will calculate your AFS score, determine your AI maturity level, 
+                        and generate personalized recommendations for improvement.
+                    </p>
+                    
+                    <form method="POST" action="{{ url_for('assessment.finalize', assessment_id=assessment.id) if url_for else '/assessment/' + assessment.id|string + '/finalize' }}">
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('assessment.detail', assessment_id=assessment.id) if url_for else '/assessment/' + assessment.id|string }}" 
+                               class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>Back to Assessment
+                            </a>
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="bi bi-check-circle me-2"></i>Complete Assessment
+                            </button>
+                        </div>
+                    </form>
+                    
+                    {% else %}
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        <strong>More Questions Needed</strong> 
+                        Complete at least 80% of questions to generate reliable results.
+                    </div>
+                    
+                    <p class="mb-4">
+                        You can still complete the assessment with current progress, but results may be less accurate.
+                    </p>
+                    
+                    <form method="POST" action="{{ url_for('assessment.finalize', assessment_id=assessment.id) if url_for else '/assessment/' + assessment.id|string + '/finalize' }}">
+                        <input type="hidden" name="force_complete" value="true">
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-between">
+                            <div>
+                                <a href="{{ url_for('assessment.question', assessment_id=assessment.id) if url_for else '/assessment/' + assessment.id|string + '/question' }}" 
+                                   class="btn btn-primary">
+                                    <i class="bi bi-play-circle me-2"></i>Continue Questions
+                                </a>
+                            </div>
+                            <div>
+                                <a href="{{ url_for('assessment.detail', assessment_id=assessment.id) if url_for else '/assessment/' + assessment.id|string }}" 
+                                   class="btn btn-outline-secondary me-2">
+                                    <i class="bi bi-arrow-left me-2"></i>Back
+                                </a>
+                                <button type="submit" class="btn btn-warning">
+                                    <i class="bi bi-exclamation-triangle me-2"></i>Complete Anyway
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <h3>Assessment Not Found</h3>
+        <p class="text-muted">The requested assessment could not be found.</p>
+        <a href="{{ url_for('assessment.index') if url_for else '/assessment' }}" 
+           class="btn btn-primary">Back to Assessments</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

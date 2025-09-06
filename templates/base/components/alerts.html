@@ -1,0 +1,976 @@
+<!-- Modern Premium Alert System -->
+<div id="alertContainer" class="alert-container">
+    <!-- Dynamic alerts will be inserted here -->
+</div>
+
+<!-- Flash Messages Display -->
+{% if get_flashed_messages %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages-container">
+                {% for category, message in messages %}
+                    <div class="alert-modern alert-{{ category }}" role="alert" data-alert-type="{{ category }}">
+                        <div class="alert-content">
+                            <div class="alert-icon">
+                                {% if category == 'success' %}
+                                    <i class="bi bi-check-circle-fill"></i>
+                                {% elif category == 'error' or category == 'danger' %}
+                                    <i class="bi bi-exclamation-triangle-fill"></i>
+                                {% elif category == 'warning' %}
+                                    <i class="bi bi-exclamation-circle-fill"></i>
+                                {% elif category == 'info' %}
+                                    <i class="bi bi-info-circle-fill"></i>
+                                {% else %}
+                                    <i class="bi bi-bell-fill"></i>
+                                {% endif %}
+                            </div>
+                            <div class="alert-text">
+                                <div class="alert-title">
+                                    {% if category == 'success' %}
+                                        Success
+                                    {% elif category == 'error' or category == 'danger' %}
+                                        Error
+                                    {% elif category == 'warning' %}
+                                        Warning
+                                    {% elif category == 'info' %}
+                                        Information
+                                    {% else %}
+                                        Notice
+                                    {% endif %}
+                                </div>
+                                <div class="alert-message">{{ message }}</div>
+                            </div>
+                            <button type="button" class="alert-close" aria-label="Close alert">
+                                <i class="bi bi-x"></i>
+                            </button>
+                        </div>
+                        <div class="alert-progress"></div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+{% endif %}
+
+<!-- Notification Toast Container -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1100;">
+    <!-- Toast notifications will be dynamically added here -->
+</div>
+
+<!-- Modern Alert Styles -->
+<style>
+/* ============================================================================
+   Modern Premium Alert System - Human-Centric Design
+   ============================================================================ */
+
+:root {
+    --alert-success-bg: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    --alert-success-border: #28a745;
+    --alert-success-color: #155724;
+    --alert-success-icon: #28a745;
+    
+    --alert-error-bg: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    --alert-error-border: #dc3545;
+    --alert-error-color: #721c24;
+    --alert-error-icon: #dc3545;
+    
+    --alert-warning-bg: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    --alert-warning-border: #ffc107;
+    --alert-warning-color: #856404;
+    --alert-warning-icon: #f39c12;
+    
+    --alert-info-bg: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+    --alert-info-border: #17a2b8;
+    --alert-info-color: #0c5460;
+    --alert-info-icon: #17a2b8;
+    
+    --alert-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    --alert-border-radius: 16px;
+}
+
+/* Alert Container */
+.alert-container {
+    position: fixed;
+    top: 80px;
+    right: 24px;
+    z-index: 1050;
+    max-width: 400px;
+    width: 100%;
+}
+
+.flash-messages-container {
+    position: relative;
+    margin-bottom: 24px;
+}
+
+/* Modern Alert Base */
+.alert-modern {
+    background: white;
+    border: 1px solid transparent;
+    border-radius: var(--alert-border-radius);
+    box-shadow: var(--alert-shadow);
+    margin-bottom: 16px;
+    overflow: hidden;
+    position: relative;
+    animation: slideInRight 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+.alert-modern::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: inherit;
+    opacity: 0.9;
+    z-index: -1;
+}
+
+/* Alert Content */
+.alert-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 20px 24px 16px;
+    position: relative;
+    z-index: 1;
+}
+
+.alert-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.alert-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.alert-title {
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 4px;
+    letter-spacing: -0.025em;
+}
+
+.alert-message {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    opacity: 0.9;
+}
+
+.alert-close {
+    background: none;
+    border: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: inherit;
+    opacity: 0.6;
+    margin-top: -2px;
+    flex-shrink: 0;
+}
+
+.alert-close:hover {
+    opacity: 1;
+    background: rgba(0, 0, 0, 0.1);
+    transform: scale(1.1);
+}
+
+/* Progress Bar */
+.alert-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: currentColor;
+    opacity: 0.6;
+    animation: alertProgress 5s linear forwards;
+    border-radius: 0 0 var(--alert-border-radius) var(--alert-border-radius);
+}
+
+/* Alert Type Styles */
+.alert-success {
+    background: var(--alert-success-bg);
+    border-color: var(--alert-success-border);
+    color: var(--alert-success-color);
+}
+
+.alert-success .alert-icon {
+    color: var(--alert-success-icon);
+}
+
+.alert-success .alert-progress {
+    background: var(--alert-success-border);
+}
+
+.alert-error, .alert-danger {
+    background: var(--alert-error-bg);
+    border-color: var(--alert-error-border);
+    color: var(--alert-error-color);
+}
+
+.alert-error .alert-icon, .alert-danger .alert-icon {
+    color: var(--alert-error-icon);
+}
+
+.alert-error .alert-progress, .alert-danger .alert-progress {
+    background: var(--alert-error-border);
+}
+
+.alert-warning {
+    background: var(--alert-warning-bg);
+    border-color: var(--alert-warning-border);
+    color: var(--alert-warning-color);
+}
+
+.alert-warning .alert-icon {
+    color: var(--alert-warning-icon);
+}
+
+.alert-warning .alert-progress {
+    background: var(--alert-warning-border);
+}
+
+.alert-info {
+    background: var(--alert-info-bg);
+    border-color: var(--alert-info-border);
+    color: var(--alert-info-color);
+}
+
+.alert-info .alert-icon {
+    color: var(--alert-info-icon);
+}
+
+.alert-info .alert-progress {
+    background: var(--alert-info-border);
+}
+
+/* Dark Theme Adjustments */
+[data-bs-theme="dark"] .alert-modern {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+[data-bs-theme="dark"] .alert-modern::before {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+[data-bs-theme="dark"] .alert-success {
+    background: rgba(40, 167, 69, 0.15);
+    border-color: rgba(40, 167, 69, 0.3);
+    color: #7dcea0;
+}
+
+[data-bs-theme="dark"] .alert-error,
+[data-bs-theme="dark"] .alert-danger {
+    background: rgba(220, 53, 69, 0.15);
+    border-color: rgba(220, 53, 69, 0.3);
+    color: #f1948a;
+}
+
+[data-bs-theme="dark"] .alert-warning {
+    background: rgba(255, 193, 7, 0.15);
+    border-color: rgba(255, 193, 7, 0.3);
+    color: #f7dc6f;
+}
+
+[data-bs-theme="dark"] .alert-info {
+    background: rgba(23, 162, 184, 0.15);
+    border-color: rgba(23, 162, 184, 0.3);
+    color: #85c1e9;
+}
+
+[data-bs-theme="dark"] .alert-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Toast Styles */
+.toast {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    max-width: 350px;
+    margin-bottom: 16px;
+}
+
+[data-bs-theme="dark"] .toast {
+    background: rgba(33, 37, 41, 0.95);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.toast-header {
+    background: transparent;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 12px 16px;
+}
+
+[data-bs-theme="dark"] .toast-header {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+.toast-body {
+    padding: 12px 16px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+/* Animations */
+@keyframes slideInRight {
+    0% {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutRight {
+    0% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+@keyframes alertProgress {
+    0% {
+        width: 100%;
+    }
+    100% {
+        width: 0%;
+    }
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes bounceIn {
+    0% {
+        transform: scale(0.3);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    70% {
+        transform: scale(0.9);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Interactive States */
+.alert-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15);
+}
+
+.alert-modern.removing {
+    animation: slideOutRight 0.3s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
+/* Responsive Design */
+@media (max-width: 767.98px) {
+    .alert-container {
+        top: 70px;
+        right: 16px;
+        left: 16px;
+        max-width: none;
+    }
+    
+    .alert-content {
+        padding: 16px 20px 12px;
+        gap: 12px;
+    }
+    
+    .alert-icon {
+        width: 20px;
+        height: 20px;
+        font-size: 16px;
+    }
+    
+    .alert-title {
+        font-size: 0.9rem;
+    }
+    
+    .alert-message {
+        font-size: 0.85rem;
+    }
+    
+    .toast-container {
+        right: 16px !important;
+        left: 16px !important;
+    }
+    
+    .toast {
+        max-width: none;
+    }
+}
+
+/* Accessibility Enhancements */
+.alert-modern:focus-within {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+}
+
+.alert-close:focus {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    .alert-modern {
+        animation: fadeIn 0.2s ease;
+    }
+    
+    .alert-modern.removing {
+        animation: fadeIn 0.2s ease reverse;
+    }
+    
+    .alert-progress {
+        animation: none;
+    }
+    
+    .alert-modern:hover {
+        transform: none;
+    }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+    .alert-modern {
+        border-width: 2px;
+        box-shadow: none;
+    }
+    
+    .alert-close {
+        border: 1px solid currentColor;
+    }
+}
+</style>
+
+<!-- Alert JavaScript -->
+<script>
+// Modern Alert System with Human-Centric Design
+class AlertSystem {
+    constructor() {
+        this.container = document.getElementById('alertContainer');
+        this.toastContainer = document.querySelector('.toast-container');
+        this.alertCount = 0;
+        this.init();
+    }
+    
+    init() {
+        // Auto-dismiss flash messages
+        this.setupFlashMessages();
+        
+        // Initialize existing alerts
+        this.initExistingAlerts();
+    }
+    
+    setupFlashMessages() {
+        const flashMessages = document.querySelectorAll('.alert-modern');
+        flashMessages.forEach(alert => {
+            this.setupAlert(alert);
+        });
+    }
+    
+    initExistingAlerts() {
+        const existingAlerts = document.querySelectorAll('.alert-modern');
+        existingAlerts.forEach(alert => {
+            this.setupAlert(alert);
+        });
+    }
+    
+    setupAlert(alertElement) {
+        const closeBtn = alertElement.querySelector('.alert-close');
+        const progressBar = alertElement.querySelector('.alert-progress');
+        
+        // Close button functionality
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                this.dismissAlert(alertElement);
+            });
+        }
+        
+        // Auto-dismiss after 5 seconds (unless it's an error)
+        const alertType = alertElement.dataset.alertType || alertElement.className.match(/alert-(\w+)/)?.[1];
+        if (alertType !== 'error' && alertType !== 'danger') {
+            setTimeout(() => {
+                if (alertElement.parentNode) {
+                    this.dismissAlert(alertElement);
+                }
+            }, 5000);
+        }
+        
+        // Pause progress on hover
+        alertElement.addEventListener('mouseenter', () => {
+            if (progressBar) {
+                progressBar.style.animationPlayState = 'paused';
+            }
+        });
+        
+        alertElement.addEventListener('mouseleave', () => {
+            if (progressBar) {
+                progressBar.style.animationPlayState = 'running';
+            }
+        });
+    }
+    
+    dismissAlert(alertElement) {
+        alertElement.classList.add('removing');
+        
+        // Remove after animation completes
+        setTimeout(() => {
+            if (alertElement.parentNode) {
+                alertElement.parentNode.removeChild(alertElement);
+            }
+        }, 300);
+    }
+    
+    // Public API for creating alerts
+    show(type, title, message, options = {}) {
+        const alertId = `alert-${++this.alertCount}`;
+        const alert = this.createAlert(alertId, type, title, message, options);
+        
+        if (options.toast) {
+            this.showToast(alert);
+        } else {
+            this.showAlert(alert);
+        }
+        
+        return alertId;
+    }
+    
+    createAlert(id, type, title, message, options) {
+        const iconMap = {
+            success: 'bi-check-circle-fill',
+            error: 'bi-exclamation-triangle-fill',
+            danger: 'bi-exclamation-triangle-fill',
+            warning: 'bi-exclamation-circle-fill',
+            info: 'bi-info-circle-fill'
+        };
+        
+        const alert = document.createElement('div');
+        alert.id = id;
+        alert.className = `alert-modern alert-${type}`;
+        alert.setAttribute('role', 'alert');
+        alert.setAttribute('data-alert-type', type);
+        
+        alert.innerHTML = `
+            <div class="alert-content">
+                <div class="alert-icon">
+                    <i class="bi ${iconMap[type] || 'bi-bell-fill'}"></i>
+                </div>
+                <div class="alert-text">
+                    <div class="alert-title">${title}</div>
+                    <div class="alert-message">${message}</div>
+                </div>
+                ${!options.persistent ? `
+                    <button type="button" class="alert-close" aria-label="Close alert">
+                        <i class="bi bi-x"></i>
+                    </button>
+                ` : ''}
+            </div>
+            ${!options.persistent && type !== 'error' && type !== 'danger' ? '<div class="alert-progress"></div>' : ''}
+        `;
+        
+        return alert;
+    }
+    
+    showAlert(alert) {
+        this.container.appendChild(alert);
+        this.setupAlert(alert);
+        
+        // Trigger entrance animation
+        requestAnimationFrame(() => {
+            alert.style.opacity = '1';
+            alert.style.transform = 'translateX(0)';
+        });
+    }
+    
+    showToast(alert) {
+        // Convert alert to toast format
+        const toast = document.createElement('div');
+        toast.className = 'toast show';
+        toast.setAttribute('role', 'alert');
+        
+        const alertType = alert.dataset.alertType;
+        const title = alert.querySelector('.alert-title').textContent;
+        const message = alert.querySelector('.alert-message').textContent;
+        const icon = alert.querySelector('.alert-icon i').className;
+        
+        toast.innerHTML = `
+            <div class="toast-header">
+                <i class="${icon} me-2"></i>
+                <strong class="me-auto">${title}</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                ${message}
+            </div>
+        `;
+        
+        this.toastContainer.appendChild(toast);
+        
+        // Auto-remove after delay
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        }, 4000);
+    }
+    
+    // Convenience methods
+    success(title, message, options = {}) {
+        return this.show('success', title, message, options);
+    }
+    
+    error(title, message, options = {}) {
+        return this.show('error', title, message, { ...options, persistent: true });
+    }
+    
+    warning(title, message, options = {}) {
+        return this.show('warning', title, message, options);
+    }
+    
+    info(title, message, options = {}) {
+        return this.show('info', title, message, options);
+    }
+    
+    dismiss(alertId) {
+        const alert = document.getElementById(alertId);
+        if (alert) {
+            this.dismissAlert(alert);
+        }
+    }
+    
+    clear() {
+        const alerts = this.container.querySelectorAll('.alert-modern');
+        alerts.forEach(alert => this.dismissAlert(alert));
+    }
+}
+
+// Initialize Alert System
+document.addEventListener('DOMContentLoaded', function() {
+    window.AlertSystem = new AlertSystem();
+    
+    // Expose utility functions globally
+    window.AlertUtils = {
+        success: (message, title = 'Success') => window.AlertSystem.success(title, message),
+        error: (message, title = 'Error') => window.AlertSystem.error(title, message),
+        warning: (message, title = 'Warning') => window.AlertSystem.warning(title, message),
+        info: (message, title = 'Information') => window.AlertSystem.info(title, message),
+        toast: {
+            success: (message, title = 'Success') => window.AlertSystem.success(title, message, { toast: true }),
+            error: (message, title = 'Error') => window.AlertSystem.error(title, message, { toast: true }),
+            warning: (message, title = 'Warning') => window.AlertSystem.warning(title, message, { toast: true }),
+            info: (message, title = 'Information') => window.AlertSystem.info(title, message, { toast: true })
+        },
+        clear: () => window.AlertSystem.clear(),
+        dismiss: (id) => window.AlertSystem.dismiss(id)
+    };
+    
+    // Handle any existing alerts with enhanced functionality
+    const existingAlerts = document.querySelectorAll('.alert-modern');
+    existingAlerts.forEach(alert => {
+        // Add enhanced interactions
+        alert.addEventListener('click', function(e) {
+            if (!e.target.closest('.alert-close')) {
+                // Allow interaction with alert content
+                e.stopPropagation();
+            }
+        });
+        
+        // Add keyboard support
+        alert.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                window.AlertSystem.dismissAlert(this);
+            }
+        });
+    });
+    
+    // Global error handler for uncaught errors
+    window.addEventListener('error', function(e) {
+        console.error('Uncaught error:', e.error);
+        // Optionally show user-friendly error message
+        // window.AlertUtils.error('An unexpected error occurred. Please try again or contact support if the problem persists.');
+    });
+    
+    // Global promise rejection handler
+    window.addEventListener('unhandledrejection', function(e) {
+        console.error('Unhandled promise rejection:', e.reason);
+        // Optionally show user-friendly error message
+        // window.AlertUtils.error('A network or processing error occurred. Please check your connection and try again.');
+    });
+});
+
+// Export for module systems
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = AlertSystem;
+}
+</script>
+
+<!-- JavaScript-based alerts container -->
+<div id="js-alerts-container"></div>
+
+<!-- Alert Templates for JavaScript usage -->
+<template id="alert-template">
+    <div class="alert alert-dismissible fade show" role="alert">
+        <i class="alert-icon me-2"></i>
+        <strong class="alert-title"></strong>
+        <span class="alert-message"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+</template>
+
+<!-- Custom CSS for alerts -->
+<style>
+    .alert-container {
+        position: fixed;
+        top: 80px; /* Account for navbar height */
+        right: 20px;
+        z-index: 1050;
+        max-width: 400px;
+        width: 100%;
+    }
+    
+    .alert {
+        margin-bottom: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border: none;
+        border-radius: 8px;
+    }
+    
+    .alert-success {
+        background-color: var(--bs-success-bg-subtle);
+        border-left: 4px solid var(--bs-success);
+        color: var(--bs-success-text-emphasis);
+    }
+    
+    .alert-danger {
+        background-color: var(--bs-danger-bg-subtle);
+        border-left: 4px solid var(--bs-danger);
+        color: var(--bs-danger-text-emphasis);
+    }
+    
+    .alert-warning {
+        background-color: var(--bs-warning-bg-subtle);
+        border-left: 4px solid var(--bs-warning);
+        color: var(--bs-warning-text-emphasis);
+    }
+    
+    .alert-info {
+        background-color: var(--bs-info-bg-subtle);
+        border-left: 4px solid var(--bs-info);
+        color: var(--bs-info-text-emphasis);
+    }
+    
+    @media (max-width: 768px) {
+        .alert-container {
+            top: 60px;
+            right: 10px;
+            left: 10px;
+            max-width: none;
+        }
+    }
+</style>
+
+<!-- JavaScript for dynamic alerts -->
+<script>
+    // Alert utility functions
+    window.AlertUtils = {
+        /**
+         * Show an alert message
+         * @param {string} message - The alert message
+         * @param {string} type - The alert type (success, error, warning, info)
+         * @param {number} duration - Auto-dismiss duration in milliseconds (0 = no auto-dismiss)
+         * @param {boolean} permanent - Whether the alert should not auto-dismiss
+         */
+        show: function(message, type = 'info', duration = 5000, permanent = false) {
+            const container = document.getElementById('js-alerts-container');
+            const template = document.getElementById('alert-template');
+            
+            if (!container || !template) {
+                console.error('Alert container or template not found');
+                return;
+            }
+            
+            // Clone template
+            const alertElement = template.content.cloneNode(true);
+            const alert = alertElement.querySelector('.alert');
+            const icon = alertElement.querySelector('.alert-icon');
+            const title = alertElement.querySelector('.alert-title');
+            const messageSpan = alertElement.querySelector('.alert-message');
+            
+            // Set alert type and styling
+            const typeConfig = {
+                success: {
+                    class: 'alert-success',
+                    icon: 'bi-check-circle-fill',
+                    title: 'Success!'
+                },
+                error: {
+                    class: 'alert-danger',
+                    icon: 'bi-exclamation-triangle-fill',
+                    title: 'Error!'
+                },
+                warning: {
+                    class: 'alert-warning',
+                    icon: 'bi-exclamation-circle-fill',
+                    title: 'Warning!'
+                },
+                info: {
+                    class: 'alert-info',
+                    icon: 'bi-info-circle-fill',
+                    title: 'Info:'
+                }
+            };
+            
+            const config = typeConfig[type] || typeConfig.info;
+            
+            alert.classList.add(config.class);
+            if (!permanent) alert.classList.add('alert-permanent');
+            icon.classList.add('bi', config.icon);
+            title.textContent = config.title;
+            messageSpan.textContent = message;
+            
+            // Add to container
+            container.appendChild(alertElement);
+            
+            // Auto-dismiss after duration (if not permanent)
+            if (!permanent && duration > 0) {
+                setTimeout(() => {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                }, duration);
+            }
+            
+            return alert;
+        },
+        
+        /**
+         * Show a success alert
+         */
+        success: function(message, duration = 5000) {
+            return this.show(message, 'success', duration);
+        },
+        
+        /**
+         * Show an error alert
+         */
+        error: function(message, duration = 0) {
+            return this.show(message, 'error', duration, true);
+        },
+        
+        /**
+         * Show a warning alert
+         */
+        warning: function(message, duration = 7000) {
+            return this.show(message, 'warning', duration);
+        },
+        
+        /**
+         * Show an info alert
+         */
+        info: function(message, duration = 5000) {
+            return this.show(message, 'info', duration);
+        },
+        
+        /**
+         * Clear all alerts
+         */
+        clear: function() {
+            const container = document.getElementById('js-alerts-container');
+            if (container) {
+                container.innerHTML = '';
+            }
+        },
+        
+        /**
+         * Show loading alert
+         */
+        loading: function(message = 'Loading...') {
+            const alert = this.show(message, 'info', 0, true);
+            
+            // Add spinner
+            const icon = alert.querySelector('.alert-icon');
+            icon.classList.remove('bi-info-circle-fill');
+            icon.classList.add('spinner-border', 'spinner-border-sm');
+            icon.style.marginRight = '8px';
+            
+            return alert;
+        }
+    };
+    
+    // Initialize tooltips for alert buttons
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize Bootstrap tooltips
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function(tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+        
+        // Auto-hide non-permanent alerts
+        const alerts = document.querySelectorAll('.alert:not(.alert-permanent)');
+        alerts.forEach(function(alert) {
+            setTimeout(function() {
+                if (alert.parentNode) {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                }
+            }, 5000);
+        });
+    });
+    
+    // Global error handler
+    window.addEventListener('error', function(event) {
+        if (window.AlertUtils) {
+            window.AlertUtils.error('An unexpected error occurred. Please try again.');
+        }
+    });
+    
+    // Handle unhandled promise rejections
+    window.addEventListener('unhandledrejection', function(event) {
+        if (window.AlertUtils) {
+            window.AlertUtils.error('A network or processing error occurred. Please check your connection and try again.');
+        }
+    });
+</script>

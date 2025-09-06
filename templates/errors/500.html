@@ -1,0 +1,251 @@
+{% extends "base/layout.html" %}
+{% set page_title = "Server Error" %}
+{% set hide_breadcrumbs = true %}
+
+{% block head_extra %}
+<style>
+.error-container {
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.error-code {
+    font-size: 8rem;
+    font-weight: bold;
+    color: #dc3545;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 0;
+}
+
+.error-message {
+    font-size: 1.5rem;
+    color: #6c757d;
+    margin-bottom: 2rem;
+}
+
+.error-illustration {
+    color: #dc3545;
+    font-size: 3rem;
+    margin-bottom: 2rem;
+    opacity: 0.7;
+}
+
+.error-actions .btn {
+    margin: 0.5rem;
+}
+
+.error-details {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin: 2rem 0;
+}
+
+@media (max-width: 768px) {
+    .error-code {
+        font-size: 5rem;
+    }
+    
+    .error-message {
+        font-size: 1.2rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="error-container">
+        <div class="text-center">
+            <div class="error-illustration">
+                <i class="bi bi-exclamation-triangle"></i>
+            </div>
+            <h1 class="error-code">500</h1>
+            <p class="error-message">
+                Something went wrong on our end.
+            </p>
+            <p class="text-muted mb-4">
+                We're experiencing some technical difficulties. Our team has been notified and is working to fix this issue.
+            </p>
+            
+            <div class="error-details">
+                <h5 class="text-muted mb-3">What you can do:</h5>
+                <div class="row justify-content-center">
+                    <div class="col-md-8">
+                        <ul class="list-unstyled text-start">
+                            <li class="mb-2">
+                                <i class="bi bi-arrow-clockwise text-primary me-2"></i>
+                                <strong>Refresh the page</strong> - This might be a temporary issue
+                            </li>
+                            <li class="mb-2">
+                                <i class="bi bi-clock text-warning me-2"></i>
+                                <strong>Wait a few minutes</strong> - We might be performing maintenance
+                            </li>
+                            <li class="mb-2">
+                                <i class="bi bi-house text-success me-2"></i>
+                                <strong>Go back to home</strong> - Try navigating from the main page
+                            </li>
+                            <li class="mb-2">
+                                <i class="bi bi-envelope text-info me-2"></i>
+                                <strong>Contact support</strong> - If the problem persists
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="error-actions">
+                <button onclick="location.reload()" class="btn btn-primary btn-lg">
+                    <i class="bi bi-arrow-clockwise me-2"></i>Refresh Page
+                </button>
+                <a href="{{ url_for('main.index') if url_for else '/' }}" 
+                   class="btn btn-success btn-lg">
+                    <i class="bi bi-house me-2"></i>Go Home
+                </a>
+                <button onclick="history.back()" class="btn btn-outline-secondary btn-lg">
+                    <i class="bi bi-arrow-left me-2"></i>Go Back
+                </button>
+            </div>
+            
+            <div class="mt-5">
+                <p class="text-muted">
+                    Error ID: <code id="errorId">{{ error_id or 'N/A' }}</code>
+                    <br>
+                    Time: <code>{{ timestamp or moment().format('YYYY-MM-DD HH:mm:ss') }}</code>
+                </p>
+                <p class="text-muted">
+                    Still having trouble? 
+                    <a href="mailto:support@afs-framework.com" class="text-decoration-none">
+                        Contact our support team
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- System Status -->
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-activity me-2"></i>System Status
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-4">
+                            <div class="status-indicator" id="apiStatus">
+                                <i class="bi bi-circle-fill text-warning"></i>
+                                <div class="mt-2">
+                                    <strong>API</strong>
+                                    <br>
+                                    <small class="text-muted">Checking...</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="status-indicator" id="databaseStatus">
+                                <i class="bi bi-circle-fill text-warning"></i>
+                                <div class="mt-2">
+                                    <strong>Database</strong>
+                                    <br>
+                                    <small class="text-muted">Checking...</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="status-indicator" id="servicesStatus">
+                                <i class="bi bi-circle-fill text-warning"></i>
+                                <div class="mt-2">
+                                    <strong>Services</strong>
+                                    <br>
+                                    <small class="text-muted">Checking...</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Generate error ID if not provided
+    if (!document.getElementById('errorId').textContent || document.getElementById('errorId').textContent === 'N/A') {
+        const errorId = 'ERR-' + Date.now().toString(36).toUpperCase();
+        document.getElementById('errorId').textContent = errorId;
+    }
+    
+    // Check system status
+    checkSystemStatus();
+    
+    // Track 500 events for analytics
+    if (typeof gtag !== 'undefined') {
+        gtag('event', 'exception', {
+            'description': '500 Internal Server Error',
+            'fatal': false,
+            'custom_map': {'dimension1': '500_error'}
+        });
+    }
+});
+
+async function checkSystemStatus() {
+    const endpoints = [
+        { id: 'apiStatus', url: '/health', name: 'API' },
+        { id: 'databaseStatus', url: '/api/stats', name: 'Database' },
+        { id: 'servicesStatus', url: '/dashboard/api/stats', name: 'Services' }
+    ];
+    
+    for (const endpoint of endpoints) {
+        try {
+            const response = await fetch(endpoint.url, { 
+                method: 'GET',
+                timeout: 5000 
+            });
+            
+            const element = document.getElementById(endpoint.id);
+            const icon = element.querySelector('i');
+            const text = element.querySelector('small');
+            
+            if (response.ok) {
+                icon.className = 'bi bi-circle-fill text-success';
+                text.textContent = 'Operational';
+            } else {
+                icon.className = 'bi bi-circle-fill text-danger';
+                text.textContent = 'Issues detected';
+            }
+        } catch (error) {
+            const element = document.getElementById(endpoint.id);
+            const icon = element.querySelector('i');
+            const text = element.querySelector('small');
+            
+            icon.className = 'bi bi-circle-fill text-danger';
+            text.textContent = 'Not responding';
+        }
+    }
+}
+
+// Auto-refresh after 30 seconds
+setTimeout(() => {
+    const refreshButton = document.querySelector('button[onclick="location.reload()"]');
+    if (refreshButton) {
+        refreshButton.innerHTML = '<i class="bi bi-arrow-clockwise me-2"></i>Auto-refreshing...';
+        refreshButton.disabled = true;
+        
+        setTimeout(() => {
+            location.reload();
+        }, 2000);
+    }
+}, 30000);
+</script>
+{% endblock %}

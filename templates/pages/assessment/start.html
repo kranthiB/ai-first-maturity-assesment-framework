@@ -1,0 +1,73 @@
+{% extends "base/base.html" %}
+{% set page_title = "Start Assessment" %}
+
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', filename='dist/css/assessment.css') if url_for else '/static/dist/css/assessment.css' }}">
+{% endblock %}
+
+{% block content %}
+<div class="assessment-start-simple">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8">
+                <!-- Quick Start Card -->
+                <div class="card shadow-lg border-0 mt-5">
+                    <div class="card-header bg-primary text-white text-center py-4">
+                        <h2 class="mb-2">
+                            <i class="bi bi-clipboard-check me-2"></i>
+                            Start Assessment
+                        </h2>
+                        <p class="mb-0 opacity-75">AI-First Software Engineering Maturity</p>
+                    </div>
+                    <div class="card-body p-4">
+                        <!-- Assessment Form -->
+                        <form method="GET" action="{{ url_for('assessment.create') if url_for else '/assessment/create' }}">
+                            {{ csrf_token() if csrf_token }}
+                            
+                            <!-- Hidden field for full assessment -->
+                            <input type="hidden" name="assessment_type" value="full">
+                            <input type="hidden" name="save_results" value="true">
+                            
+                            <!-- Remove organization name input from start page -->
+                            <!-- This will redirect to the new step-by-step flow -->
+                            
+                            <button type="submit" class="btn btn-primary btn-lg w-100 py-3">
+                                <i class="bi bi-arrow-right me-2"></i>
+                                Begin Assessment Setup
+                            </button>
+                        </form>
+                    </div>
+                    <div class="card-footer text-center text-muted bg-light">
+                        <small>
+                            <i class="bi bi-clock me-1"></i>24 questions • 4 comprehensive sections • Takes 20-25 minutes
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form validation
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(e) {
+        const organizationName = document.getElementById('organizationName').value.trim();
+        
+        if (!organizationName) {
+            e.preventDefault();
+            alert('Please enter your organization name.');
+            return false;
+        }
+        
+        // Add loading state to button
+        const submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Starting Assessment...';
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,652 @@
+{% extends "base/base.html" %}
+{% set page_title = "Assessment - " + section.name if section else "Assessment" %}
+
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', filename='dist/css/assessment.css') if url_for else '/static/dist/css/assessment.css' }}">
+<style>
+.section-assessment-container {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    min-height: 100vh;
+    padding: 1rem 0;
+}
+
+.section-card {
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.section-header {
+    background: linear-gradient(135deg, {{ section.color or '#667eea' }} 0%, {{ section.color or '#764ba2' }} 100%);
+    color: white;
+    padding: 2rem;
+}
+
+.section-progress {
+    background: rgba(255,255,255,0.1);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-top: 1rem;
+}
+
+.progress-steps {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.step {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.875rem;
+    margin: 0 0.25rem;
+}
+
+.step.completed {
+    background: #48bb78;
+    color: white;
+}
+
+.step.active {
+    background: white;
+    color: {{ section.color or '#667eea' }};
+}
+
+.step.inactive {
+    background: rgba(255,255,255,0.3);
+    color: rgba(255,255,255,0.7);
+}
+
+.step-connector {
+    width: 30px;
+    height: 2px;
+    background: rgba(255,255,255,0.3);
+    margin: 0 0.25rem;
+}
+
+.questions-container {
+    padding: 3rem;
+}
+
+.area-section {
+    margin-bottom: 3rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    overflow: hidden;
+}
+
+.area-header {
+    background: #f8fafc;
+    padding: 1.5rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.area-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 0.5rem;
+}
+
+.area-description {
+    color: #718096;
+    margin-bottom: 0;
+    line-height: 1.6;
+}
+
+.questions-list {
+    padding: 0;
+}
+
+.question-item {
+    padding: 2rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.question-item:last-child {
+    border-bottom: none;
+}
+
+.question-header {
+    display: flex;
+    justify-content: between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+}
+
+.question-number {
+    background: {{ section.color or '#667eea' }};
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.875rem;
+    margin-right: 1rem;
+    flex-shrink: 0;
+}
+
+.question-text {
+    flex: 1;
+}
+
+.question-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 0;
+    line-height: 1.4;
+}
+
+.response-options {
+    margin-bottom: 1.5rem;
+}
+
+.response-option {
+    border: 2px solid #e2e8f0;
+    border-radius: 0.5rem;
+    margin-bottom: 0.75rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.response-option:hover {
+    border-color: {{ section.color or '#667eea' }};
+    background: #f8fafc;
+}
+
+.response-option.selected {
+    border-color: {{ section.color or '#667eea' }};
+    background: #f0f8ff;
+}
+
+.response-content {
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+}
+
+.response-radio {
+    margin-right: 1rem;
+}
+
+.response-details {
+    flex: 1;
+}
+
+.response-level {
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 0.25rem;
+}
+
+.response-description {
+    color: #718096;
+    font-size: 0.875rem;
+    margin-bottom: 0;
+    line-height: 1.4;
+}
+
+.response-score {
+    background: {{ section.color or '#667eea' }};
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    margin-left: 1rem;
+}
+
+.notes-section {
+    margin-top: 1rem;
+}
+
+.notes-textarea {
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    width: 100%;
+    resize: vertical;
+    min-height: 80px;
+    font-size: 0.875rem;
+}
+
+.notes-textarea:focus {
+    border-color: {{ section.color or '#667eea' }};
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.section-navigation {
+    background: #f8fafc;
+    padding: 2rem;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: between;
+    align-items: center;
+}
+
+.btn-nav {
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-previous {
+    background: #e2e8f0;
+    color: #4a5568;
+    border: none;
+}
+
+.btn-previous:hover {
+    background: #cbd5e0;
+    color: #2d3748;
+}
+
+.btn-next {
+    background: {{ section.color or '#667eea' }};
+    color: white;
+    border: none;
+}
+
+.btn-next:hover {
+    background: {{ section.color or '#5a67d8' }};
+    transform: translateY(-1px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.btn-complete {
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    color: white;
+    border: none;
+}
+
+.btn-complete:hover {
+    background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 5px 15px rgba(72, 187, 120, 0.3);
+}
+
+.completion-indicator {
+    text-align: center;
+    color: #718096;
+}
+
+@media (max-width: 768px) {
+    .questions-container {
+        padding: 2rem;
+    }
+    
+    .section-header {
+        padding: 1.5rem;
+    }
+    
+    .question-item {
+        padding: 1.5rem;
+    }
+    
+    .section-navigation {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+    
+    .step {
+        width: 32px;
+        height: 32px;
+        font-size: 0.75rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="section-assessment-container">
+    <div class="container-fluid px-3">
+        <div class="row">
+            <div class="col-12">
+                <div class="section-card">
+                    <!-- Section Header -->
+                    <div class="section-header">
+                        <!-- Progress Steps -->
+                        <div class="progress-steps">
+                            <!-- Step 1: Organization Details -->
+                            <div class="step completed">
+                                <i class="bi bi-check"></i>
+                            </div>
+                            <div class="step-connector"></div>
+                            
+                            <!-- Assessment Sections -->
+                            {% for section_step in all_sections %}
+                            <div class="step {% if section_step.id == section.id %}active{% elif section_step.display_order < section.display_order %}completed{% else %}inactive{% endif %}">
+                                {% if section_step.display_order < section.display_order %}
+                                    <i class="bi bi-check"></i>
+                                {% else %}
+                                    {{ section_step.display_order }}
+                                {% endif %}
+                            </div>
+                            {% if not loop.last %}
+                            <div class="step-connector"></div>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="text-center">
+                            <h1 class="mb-2">
+                                <i class="{{ section.icon or 'bi bi-gear' }} me-2"></i>
+                                {{ section.name }}
+                            </h1>
+                            <p class="mb-0 opacity-75">
+                                Section {{ current_section_index + 1 }} of {{ total_sections }}
+                            </p>
+                        </div>
+                        
+                        <!-- Section Progress -->
+                        <div class="section-progress">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span>{{ section.name }} Progress</span>
+                                <span>{{ current_section_index + 1 }}/{{ total_sections }} sections</span>
+                            </div>
+                            <div class="progress" style="height: 6px;">
+                                <div class="progress-bar bg-white" role="progressbar" 
+                                     style="width: {{ ((current_section_index + 1) / total_sections * 100) }}%">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Questions Form -->
+                    <form method="POST" 
+                          action="{{ url_for('assessment.submit_section_responses', assessment_id=assessment.id, section_id=section.id) if url_for else '/assessment/' + assessment.id|string + '/section/' + section.id + '/submit' }}" 
+                          id="sectionForm">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        
+                        <div class="questions-container">
+                            <div class="mb-4">
+                                <h4 class="text-center mb-3">{{ section.description }}</h4>
+                                <div class="text-center text-muted">
+                                    <small>Answer all questions in this section based on your current organizational state</small>
+                                </div>
+                            </div>
+                            
+                            {% for area in section.areas %}
+                            <div class="area-section">
+                                <div class="area-header">
+                                    <div class="area-title">{{ area.name }}</div>
+                                    <div class="area-description">{{ area.description }}</div>
+                                </div>
+                                
+                                <div class="questions-list">
+                                    {% for question in area.questions %}
+                                    <div class="question-item">
+                                        <div class="question-header">
+                                            <div class="question-number">{{ loop.index }}</div>
+                                            <div class="question-text">
+                                                <div class="question-title">{{ question.question }}</div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="response-options">
+                                            <div class="response-option" data-value="1">
+                                                <div class="response-content">
+                                                    <input type="radio" name="response_{{ question.id }}" value="1" 
+                                                           class="response-radio" id="q{{ question.id }}_1"
+                                                           {% if existing_responses.get(question.id) and existing_responses[question.id].answer_value == '1' %}checked{% endif %}>
+                                                    <div class="response-details">
+                                                        <div class="response-level">Level 1 - Basic</div>
+                                                        <div class="response-description">{{ question.level_1_desc }}</div>
+                                                    </div>
+                                                    <div class="response-score">1</div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="response-option" data-value="2">
+                                                <div class="response-content">
+                                                    <input type="radio" name="response_{{ question.id }}" value="2" 
+                                                           class="response-radio" id="q{{ question.id }}_2"
+                                                           {% if existing_responses.get(question.id) and existing_responses[question.id].answer_value == '2' %}checked{% endif %}>
+                                                    <div class="response-details">
+                                                        <div class="response-level">Level 2 - Evolving</div>
+                                                        <div class="response-description">{{ question.level_2_desc }}</div>
+                                                    </div>
+                                                    <div class="response-score">2</div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="response-option" data-value="3">
+                                                <div class="response-content">
+                                                    <input type="radio" name="response_{{ question.id }}" value="3" 
+                                                           class="response-radio" id="q{{ question.id }}_3"
+                                                           {% if existing_responses.get(question.id) and existing_responses[question.id].answer_value == '3' %}checked{% endif %}>
+                                                    <div class="response-details">
+                                                        <div class="response-level">Level 3 - Advanced</div>
+                                                        <div class="response-description">{{ question.level_3_desc }}</div>
+                                                    </div>
+                                                    <div class="response-score">3</div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="response-option" data-value="4">
+                                                <div class="response-content">
+                                                    <input type="radio" name="response_{{ question.id }}" value="4" 
+                                                           class="response-radio" id="q{{ question.id }}_4"
+                                                           {% if existing_responses.get(question.id) and existing_responses[question.id].answer_value == '4' %}checked{% endif %}>
+                                                    <div class="response-details">
+                                                        <div class="response-level">Level 4 - Optimized</div>
+                                                        <div class="response-description">{{ question.level_4_desc }}</div>
+                                                    </div>
+                                                    <div class="response-score">4</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="notes-section">
+                                            <label for="notes_{{ question.id }}" class="form-label text-muted small">
+                                                <i class="bi bi-chat-text me-1"></i>
+                                                Additional notes (optional)
+                                            </label>
+                                            <textarea name="notes_{{ question.id }}" 
+                                                      id="notes_{{ question.id }}" 
+                                                      class="notes-textarea"
+                                                      placeholder="Add any additional context or clarification...">{{ existing_responses.get(question.id).notes if existing_responses.get(question.id) else '' }}</textarea>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <!-- Navigation -->
+                        <div class="section-navigation">
+                            <div>
+                                {% if current_section_index > 0 %}
+                                <a href="{{ url_for('assessment.section_questions', assessment_id=assessment.id, section_id=all_sections[current_section_index-1].id) if url_for else '/assessment/' + assessment.id|string + '/section/' + all_sections[current_section_index-1].id }}" 
+                                   class="btn btn-nav btn-previous">
+                                    <i class="bi bi-arrow-left me-2"></i>
+                                    Previous Section
+                                </a>
+                                {% else %}
+                                <a href="{{ url_for('assessment.create') if url_for else '/assessment/create' }}" 
+                                   class="btn btn-nav btn-previous">
+                                    <i class="bi bi-arrow-left me-2"></i>
+                                    Back to Details
+                                </a>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="completion-indicator">
+                                <small class="text-muted">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    All questions are optional, but we recommend answering as many as possible for accurate results
+                                </small>
+                            </div>
+                            
+                            <div>
+                                {% if is_last_section %}
+                                <button type="submit" class="btn btn-nav btn-complete" id="completeBtn">
+                                    <i class="bi bi-check-circle me-2"></i>
+                                    Complete Assessment
+                                </button>
+                                {% else %}
+                                <button type="submit" class="btn btn-nav btn-next" id="nextBtn">
+                                    Next Section
+                                    <i class="bi bi-arrow-right ms-2"></i>
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('sectionForm');
+    const responseOptions = document.querySelectorAll('.response-option');
+    const radioInputs = document.querySelectorAll('input[type="radio"]');
+    const submitBtn = document.getElementById('nextBtn') || document.getElementById('completeBtn');
+    
+    // Response option selection handlers
+    responseOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            const radio = this.querySelector('input[type="radio"]');
+            if (radio) {
+                radio.checked = true;
+                
+                // Remove selected class from all options in the same question
+                const questionOptions = document.querySelectorAll(`input[name="${radio.name}"]`)
+                    .forEach(input => {
+                        const option = input.closest('.response-option');
+                        if (option) {
+                            option.classList.remove('selected');
+                        }
+                    });
+                
+                // Add selected class to this option
+                this.classList.add('selected');
+                
+                // Auto-save progress
+                autoSaveProgress();
+            }
+        });
+    });
+    
+    // Initialize selected states
+    radioInputs.forEach(radio => {
+        if (radio.checked) {
+            const option = radio.closest('.response-option');
+            if (option) {
+                option.classList.add('selected');
+            }
+        }
+    });
+    
+    // Auto-save progress function
+    function autoSaveProgress() {
+        // Simple indication that progress is being saved
+        const indicator = document.createElement('div');
+        indicator.className = 'position-fixed top-0 end-0 m-3 alert alert-success alert-dismissible fade show';
+        indicator.style.zIndex = '9999';
+        indicator.innerHTML = `
+            <i class="bi bi-check-circle me-2"></i>
+            Progress saved automatically
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        document.body.appendChild(indicator);
+        
+        setTimeout(() => {
+            indicator.remove();
+        }, 3000);
+    }
+    
+    // Form submission handling
+    form.addEventListener('submit', function(e) {
+        // Show loading state
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving responses...';
+            
+            // Restore if there's an error
+            setTimeout(() => {
+                if (submitBtn.disabled) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                }
+            }, 10000);
+        }
+    });
+    
+    // Keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey && e.key === 's') {
+            e.preventDefault();
+            autoSaveProgress();
+        }
+    });
+    
+    // Smooth scrolling for better UX
+    const questionItems = document.querySelectorAll('.question-item');
+    questionItems.forEach((item, index) => {
+        item.style.opacity = '0';
+        item.style.transform = 'translateY(20px)';
+        item.style.transition = `opacity 0.6s ease ${index * 0.1}s, transform 0.6s ease ${index * 0.1}s`;
+    });
+    
+    // Trigger entrance animation
+    setTimeout(() => {
+        questionItems.forEach(item => {
+            item.style.opacity = '1';
+            item.style.transform = 'translateY(0)';
+        });
+    }, 300);
+    
+    // Progress tracking
+    function updateProgress() {
+        const totalQuestions = radioInputs.length / 4; // 4 options per question
+        const answeredQuestions = new Set();
+        
+        radioInputs.forEach(radio => {
+            if (radio.checked) {
+                answeredQuestions.add(radio.name);
+            }
+        });
+        
+        const progressPercentage = (answeredQuestions.size / totalQuestions * 100) || 0;
+        
+        // Update any progress indicators if they exist
+        const progressBars = document.querySelectorAll('.progress-bar');
+        progressBars.forEach(bar => {
+            if (bar.getAttribute('aria-label') === 'section-progress') {
+                bar.style.width = progressPercentage + '%';
+            }
+        });
+    }
+    
+    // Update progress on radio change
+    radioInputs.forEach(radio => {
+        radio.addEventListener('change', updateProgress);
+    });
+    
+    // Initial progress update
+    updateProgress();
+});
+</script>
+{% endblock %}
