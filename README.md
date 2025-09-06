@@ -62,9 +62,8 @@ The **AI-First Software Engineering (AFS) Maturity Assessment Framework** is a c
 ## Technology Stack
 
 - **Backend**: Python 3.8+, Flask 2.3+, SQLAlchemy
-- **Database**: Multi-adapter support (H2, PostgreSQL, MySQL, SQLite)
+- **Database**: SQLite (default), with multi-adapter support
 - **Frontend**: Jinja2 templates, Bootstrap 5, Custom JavaScript
-- **Development**: Code formatting and validation
 
 ## Quick Start
 
@@ -102,12 +101,22 @@ The **AI-First Software Engineering (AFS) Maturity Assessment Framework** is a c
    - Populate with framework seed data (sections, areas, questions)
    - Verify the setup was successful
 
-6. **Run the application**
+5. **Start the application**
    ```bash
    python run.py
    ```
 
    The application will be available at `http://127.0.0.1:5000`
+
+## Configuration
+
+For custom configuration, copy `.env.example` to `.env` and modify as needed:
+
+```bash
+cp .env.example .env
+```
+
+The default configuration uses SQLite and is ready to run without additional setup.
 
 ## Database Structure
 
@@ -167,7 +176,10 @@ The assessment framework provides a streamlined workflow:
 ├── static/                # Static assets (CSS, JavaScript, images)
 ├── templates/             # Jinja2 templates
 ├── instance/              # Instance-specific files (databases, configs)
-└── tests/                 # Test suite
+├── logs/                  # Application logs  
+├── run.py                 # Application entry point
+├── requirements.txt       # Python dependencies
+└── .env.example           # Environment configuration template
 ```
 
 ## Contributing
