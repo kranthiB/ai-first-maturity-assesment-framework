@@ -95,6 +95,23 @@
     font-weight: 700;
     color: #2d3748;
     margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.area-number {
+    background: {{ section.color or '#667eea' }};
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.875rem;
+    margin-right: 1rem;
+    flex-shrink: 0;
 }
 
 .area-description {
@@ -121,21 +138,6 @@
     justify-content: space-between;
     align-items: flex-start;
     margin-bottom: 1.5rem;
-}
-
-.question-number {
-    background: {{ section.color or '#667eea' }};
-    color: white;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    font-size: 0.875rem;
-    margin-right: 1rem;
-    flex-shrink: 0;
 }
 
 .question-text {
@@ -410,7 +412,10 @@
                             {% for area in section.areas %}
                             <div class="area-section">
                                 <div class="area-header">
-                                    <div class="area-title">{{ area.name }}</div>
+                                    <div class="area-title">
+                                        <div class="area-number">{{ loop.index }}</div>
+                                        <span>{{ area.name }}</span>
+                                    </div>
                                     <div class="area-description">{{ area.description }}</div>
                                 </div>
                                 
@@ -418,7 +423,6 @@
                                     {% for question in area.questions %}
                                     <div class="question-item">
                                         <div class="question-header">
-                                            <div class="question-number">{{ loop.index }}</div>
                                             <div class="question-text">
                                                 <div class="question-title">{{ question.question }}</div>
                                             </div>
