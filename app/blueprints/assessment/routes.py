@@ -473,6 +473,17 @@ def section_questions(assessment_id, section_id):
             flash('Section not found', 'error')
             return redirect(url_for('assessment.create'))
         
+        # Get progression data for each area in the section
+        from app.models.progression import get_all_progressions_for_area
+        area_progressions = {}
+        for area in section.areas:
+            progressions = get_all_progressions_for_area(area.id)
+            # Convert MaturityProgression objects to dictionaries for JSON serialization
+            area_progressions[area.id] = {
+                level: progression.to_dict() 
+                for level, progression in progressions.items()
+            }
+        
         # Get all sections for navigation
         all_sections = db.session.query(Section).order_by(
             Section.display_order).all()
@@ -504,7 +515,8 @@ def section_questions(assessment_id, section_id):
             'current_section_index': current_section_index,
             'total_sections': len(all_sections),
             'existing_responses': existing_responses,
-            'is_last_section': current_section_index == len(all_sections) - 1
+            'is_last_section': current_section_index == len(all_sections) - 1,
+            'area_progressions': area_progressions
         }
         
         return render_template('pages/assessment/section_questions.html', 

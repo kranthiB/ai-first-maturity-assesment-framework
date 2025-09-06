@@ -57,6 +57,22 @@ CREATE TABLE questions (
     FOREIGN KEY (area_id) REFERENCES areas(id)
 );
 
+-- Maturity progression details table - Steps to achieve different levels
+CREATE TABLE maturity_progressions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    area_id TEXT NOT NULL,
+    target_level INTEGER NOT NULL CHECK (target_level >= 2 AND target_level <= 4),
+    prerequisites TEXT,
+    action_items TEXT,
+    success_metrics TEXT,
+    timeline TEXT,
+    common_pitfall TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (area_id) REFERENCES areas(id),
+    UNIQUE(area_id, target_level)
+);
+
 -- ========================================
 -- Assessment Tables
 -- ========================================
@@ -362,6 +378,10 @@ CREATE INDEX idx_analytics_summary_date ON analytics_summary(summary_date);
 CREATE INDEX idx_question_analytics_date ON question_analytics(analysis_date, question_id);
 CREATE INDEX idx_team_progress_team ON team_progress(team_name);
 CREATE INDEX idx_team_progress_improvement ON team_progress(latest_overall_score DESC);
+
+-- Maturity progression indexes
+CREATE INDEX idx_progressions_area ON maturity_progressions(area_id, target_level);
+CREATE INDEX idx_progressions_level ON maturity_progressions(target_level);
 
 -- ========================================
 -- End of Schema

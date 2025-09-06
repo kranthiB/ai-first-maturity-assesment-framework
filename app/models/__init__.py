@@ -9,6 +9,7 @@ from .base import Base, BaseModel, TimestampMixin, SoftDeleteMixin
 from .question import Section, Area, Question
 from .assessment import Assessment, AssessmentStatus
 from .response import Response
+from .progression import MaturityProgression
 
 # Import database utilities
 from .database import (
@@ -31,11 +32,12 @@ __all__ = [
     
     # Core models
     'Section',
-    'Area', 
+    'Area',
     'Question',
     'Assessment',
     'AssessmentStatus',
     'Response',
+    'MaturityProgression',
     
     # Database adapters
     'DatabaseAdapter',

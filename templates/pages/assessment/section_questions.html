@@ -192,6 +192,10 @@
     font-weight: 600;
     color: #2d3748;
     margin-bottom: 0.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
 }
 
 .response-description {
@@ -199,16 +203,6 @@
     font-size: 0.875rem;
     margin-bottom: 0;
     line-height: 1.4;
-}
-
-.response-score {
-    background: {{ section.color or '#667eea' }};
-    color: white;
-    padding: 0.25rem 0.5rem;
-    border-radius: 0.25rem;
-    font-weight: 600;
-    font-size: 0.875rem;
-    margin-left: 1rem;
 }
 
 .notes-section {
@@ -337,6 +331,26 @@
         font-size: 0.75rem;
     }
 }
+
+/* Progression Tooltip Styles */
+.response-option {
+    position: relative;
+}
+
+.response-option[data-has-progression="true"] .progression-indicator {
+    display: block;
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    color: #6366f1;
+    font-size: 14px;
+    cursor: help;
+    z-index: 10;
+}
+
+.progression-indicator {
+    display: none;
+}
 </style>
 {% endblock %}
 
@@ -438,7 +452,6 @@
                                                         <div class="response-level">Level 1 - Basic</div>
                                                         <div class="response-description">{{ question.level_1_desc }}</div>
                                                     </div>
-                                                    <div class="response-score">1</div>
                                                 </div>
                                             </div>
                                             
@@ -448,10 +461,20 @@
                                                            class="response-radio" id="q{{ question.id }}_2"
                                                            {% if existing_responses.get(question.id) and existing_responses[question.id].answer_value == '2' %}checked{% endif %}>
                                                     <div class="response-details">
-                                                        <div class="response-level">Level 2 - Evolving</div>
+                                                        <div class="response-level">
+                                                            <span class="level-text">Level 2 - Evolving</span>
+                                                            {% if area_progressions[area.id] and 2 in area_progressions[area.id] %}
+                                                            <button type="button" class="help-btn" 
+                                                                    data-area-id="{{ area.id }}" 
+                                                                    data-level="2" 
+                                                                    data-level-name="Evolving"
+                                                                    title="View progression steps">
+                                                                <i class="bi bi-question-circle"></i>
+                                                            </button>
+                                                            {% endif %}
+                                                        </div>
                                                         <div class="response-description">{{ question.level_2_desc }}</div>
                                                     </div>
-                                                    <div class="response-score">2</div>
                                                 </div>
                                             </div>
                                             
@@ -461,23 +484,41 @@
                                                            class="response-radio" id="q{{ question.id }}_3"
                                                            {% if existing_responses.get(question.id) and existing_responses[question.id].answer_value == '3' %}checked{% endif %}>
                                                     <div class="response-details">
-                                                        <div class="response-level">Level 3 - Advanced</div>
+                                                        <div class="response-level">
+                                                            <span class="level-text">Level 3 - Advanced</span>
+                                                            {% if area_progressions[area.id] and 3 in area_progressions[area.id] %}
+                                                            <button type="button" class="help-btn" 
+                                                                    data-area-id="{{ area.id }}" 
+                                                                    data-level="3" 
+                                                                    data-level-name="Advanced"
+                                                                    title="View progression steps">
+                                                                <i class="bi bi-question-circle"></i>
+                                                            </button>
+                                                            {% endif %}
+                                                        </div>
                                                         <div class="response-description">{{ question.level_3_desc }}</div>
                                                     </div>
-                                                    <div class="response-score">3</div>
                                                 </div>
-                                            </div>
-                                            
-                                            <div class="response-option" data-value="4">
+                                            </div>                                            <div class="response-option" data-value="4">
                                                 <div class="response-content">
                                                     <input type="radio" name="response_{{ question.id }}" value="4" 
                                                            class="response-radio" id="q{{ question.id }}_4"
                                                            {% if existing_responses.get(question.id) and existing_responses[question.id].answer_value == '4' %}checked{% endif %}>
                                                     <div class="response-details">
-                                                        <div class="response-level">Level 4 - Optimized</div>
+                                                        <div class="response-level">
+                                                            <span class="level-text">Level 4 - Optimized</span>
+                                                            {% if area_progressions[area.id] and 4 in area_progressions[area.id] %}
+                                                            <button type="button" class="help-btn" 
+                                                                    data-area-id="{{ area.id }}" 
+                                                                    data-level="4" 
+                                                                    data-level-name="Optimized"
+                                                                    title="View progression steps">
+                                                                <i class="bi bi-question-circle"></i>
+                                                            </button>
+                                                            {% endif %}
+                                                        </div>
                                                         <div class="response-description">{{ question.level_4_desc }}</div>
                                                     </div>
-                                                    <div class="response-score">4</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -544,9 +585,338 @@
         </div>
     </div>
 </div>
+
+<!-- Progression Modal -->
+<div class="modal fade" id="progressionModal" tabindex="-1" aria-labelledby="progressionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-2">
+                <h5 class="modal-title" id="progressionModalLabel">
+                    <i class="bi bi-bullseye text-primary me-2"></i>
+                    Steps to Achieve <span id="levelName"></span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="progression-summary mb-4">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="timeline-info">
+                            <span class="timeline-badge">
+                                <i class="bi bi-clock"></i> <span id="timelineText"></span>
+                            </span>
+                        </div>
+                        <div class="level-badge">
+                            <span id="levelBadge" class="badge"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="progression-tabs">
+                    <ul class="nav nav-pills mb-3" id="progressionTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="prereq-tab" data-bs-toggle="pill" data-bs-target="#prereq-pane" type="button" role="tab">
+                                <i class="bi bi-check-circle me-1"></i>Prerequisites
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="actions-tab" data-bs-toggle="pill" data-bs-target="#actions-pane" type="button" role="tab">
+                                <i class="bi bi-list-task me-1"></i>Actions
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="metrics-tab" data-bs-toggle="pill" data-bs-target="#metrics-pane" type="button" role="tab">
+                                <i class="bi bi-trophy me-1"></i>Metrics
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="tips-tab" data-bs-toggle="pill" data-bs-target="#tips-pane" type="button" role="tab">
+                                <i class="bi bi-lightbulb me-1"></i>Tips
+                            </button>
+                        </li>
+                    </ul>
+                    
+                    <div class="tab-content" id="progressionTabContent">
+                        <div class="tab-pane fade show active" id="prereq-pane" role="tabpanel">
+                            <div class="prerequisites-content">
+                                <h6 class="text-muted mb-3">
+                                    <i class="bi bi-check-circle-fill text-success me-1"></i>
+                                    Complete these prerequisites first:
+                                </h6>
+                                <div id="prerequisitesList" class="content-grid"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="tab-pane fade" id="actions-pane" role="tabpanel">
+                            <div class="actions-content">
+                                <h6 class="text-muted mb-3">
+                                    <i class="bi bi-play-circle-fill text-primary me-1"></i>
+                                    Action items to implement:
+                                </h6>
+                                <div id="actionsList" class="actions-compact"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="tab-pane fade" id="metrics-pane" role="tabpanel">
+                            <div class="metrics-content">
+                                <h6 class="text-muted mb-3">
+                                    <i class="bi bi-graph-up text-success me-1"></i>
+                                    Success metrics to track:
+                                </h6>
+                                <div id="metricsList" class="metrics-grid"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="tab-pane fade" id="tips-pane" role="tabpanel">
+                            <div class="tips-content">
+                                <h6 class="text-muted mb-3">
+                                    <i class="bi bi-exclamation-triangle-fill text-warning me-1"></i>
+                                    Common pitfall to avoid:
+                                </h6>
+                                <div id="pitfallContent" class="pitfall-warning"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-1"></i>Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block scripts %}
+<style>
+/* Help button styling */
+.level-text {
+    flex-grow: 1;
+}
+
+.help-btn {
+    background: none;
+    border: none;
+    color: #6c757d;
+    font-size: 0.875rem;
+    padding: 0;
+    margin-left: 0.5rem;
+    transition: all 0.2s ease;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.help-btn:hover {
+    color: #0d6efd;
+    background-color: rgba(13, 110, 253, 0.1);
+    transform: scale(1.1);
+}
+
+.help-btn:focus {
+    outline: 2px solid rgba(13, 110, 253, 0.25);
+    outline-offset: 2px;
+}
+
+/* Modal enhancements */
+.modal-content {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #f8f9ff 0%, #e3f2fd 100%);
+    border-radius: 12px 12px 0 0;
+}
+
+.modal-title {
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.timeline-badge {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    color: white;
+    padding: 0.375rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.level-badge .badge {
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+/* Tab styling */
+.nav-pills .nav-link {
+    border-radius: 8px;
+    margin-right: 0.5rem;
+    color: #64748b;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.nav-pills .nav-link:hover {
+    background-color: rgba(99, 102, 241, 0.1);
+    color: #4f46e5;
+    border-color: rgba(99, 102, 241, 0.2);
+}
+
+.nav-pills .nav-link.active {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    border-color: #4f46e5;
+}
+
+/* Content styling */
+.content-grid {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: 1fr;
+}
+
+.grid-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: #f8fafc;
+    border-radius: 8px;
+    border-left: 3px solid #10b981;
+}
+
+.grid-item i {
+    color: #10b981;
+    margin-top: 0.125rem;
+    flex-shrink: 0;
+}
+
+.actions-compact .action-group {
+    margin-bottom: 1.5rem;
+}
+
+.actions-compact .action-group h8 {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #4f46e5;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.action-items-grid {
+    display: grid;
+    gap: 0.5rem;
+    grid-template-columns: 1fr;
+}
+
+.action-item {
+    padding: 0.75rem;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    position: relative;
+    padding-left: 2rem;
+}
+
+.action-item::before {
+    content: "•";
+    color: #6366f1;
+    font-weight: bold;
+    position: absolute;
+    left: 0.75rem;
+}
+
+.metrics-grid {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: 1fr;
+}
+
+.metric-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+    border-radius: 8px;
+    border-left: 3px solid #f59e0b;
+}
+
+.metric-item i {
+    color: #f59e0b;
+    margin-top: 0.125rem;
+    flex-shrink: 0;
+}
+
+.pitfall-warning {
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    padding: 1.25rem;
+    border-left: 4px solid #ef4444;
+}
+
+.pitfall-warning i {
+    color: #ef4444;
+    font-size: 1.25rem;
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+}
+
+.pitfall-warning strong {
+    color: #dc2626;
+    font-weight: 600;
+}
+
+.pitfall-warning p {
+    margin: 0.5rem 0 0 0;
+    color: #7f1d1d;
+    line-height: 1.5;
+}
+
+/* Responsive adjustments */
+@media (min-width: 768px) {
+    .content-grid {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+    
+    .action-items-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+    
+    .metrics-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+}
+
+@media (max-width: 767px) {
+    .modal-dialog {
+        margin: 1rem;
+    }
+    
+    .nav-pills .nav-link {
+        font-size: 0.875rem;
+        padding: 0.5rem 0.75rem;
+        margin-right: 0.25rem;
+        margin-bottom: 0.25rem;
+    }
+}
+</style>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('sectionForm');
@@ -554,9 +924,26 @@ document.addEventListener('DOMContentLoaded', function() {
     const radioInputs = document.querySelectorAll('input[type="radio"]');
     const submitBtn = document.getElementById('nextBtn') || document.getElementById('completeBtn');
     
+    // Modal instance
+    let progressionModal;
+    
+    // Initialize modal
+    const modalElement = document.getElementById('progressionModal');
+    if (modalElement) {
+        progressionModal = new bootstrap.Modal(modalElement);
+    }
+    
+    // Area progressions data (passed from template)
+    const areaProgressions = {{ area_progressions | tojson | safe }};
+    
     // Response option selection handlers
     responseOptions.forEach(option => {
-        option.addEventListener('click', function() {
+        option.addEventListener('click', function(e) {
+            // Prevent radio selection if clicking on help button
+            if (e.target.closest('.help-btn')) {
+                return;
+            }
+            
             const radio = this.querySelector('input[type="radio"]');
             if (radio) {
                 radio.checked = true;
@@ -578,6 +965,160 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+    
+    // Handle help button clicks
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.help-btn')) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const helpBtn = e.target.closest('.help-btn');
+            const areaId = helpBtn.dataset.areaId;
+            const level = parseInt(helpBtn.dataset.level);
+            const levelName = helpBtn.dataset.levelName;
+            
+            showProgressionModal(areaId, level, levelName);
+        }
+    });
+    
+    function showProgressionModal(areaId, level, levelName) {
+        if (!areaProgressions[areaId] || !areaProgressions[areaId][level]) {
+            console.warn('No progression data found for area', areaId, 'level', level);
+            return;
+        }
+        
+        const progression = areaProgressions[areaId][level];
+        
+        // Update modal title and level info
+        document.getElementById('levelName').textContent = `Level ${level} - ${levelName}`;
+        document.getElementById('timelineText').textContent = progression.timeline || 'Timeline not specified';
+        
+        // Update level badge
+        const levelBadge = document.getElementById('levelBadge');
+        levelBadge.textContent = `Level ${level}`;
+        levelBadge.className = `badge bg-${getLevelColor(level)}`;
+        
+        // Populate prerequisites
+        populatePrerequisites(progression.prerequisites);
+        
+        // Populate actions
+        populateActions(progression.action_items);
+        
+        // Populate metrics
+        populateMetrics(progression.success_metrics);
+        
+        // Populate pitfall
+        populatePitfall(progression.common_pitfall);
+        
+        // Reset to first tab
+        resetModalTabs();
+        
+        // Show modal
+        progressionModal.show();
+    }
+    
+    function getLevelColor(level) {
+        const colors = {
+            2: 'info',
+            3: 'warning', 
+            4: 'success'
+        };
+        return colors[level] || 'primary';
+    }
+    
+    function populatePrerequisites(prerequisites) {
+        const container = document.getElementById('prerequisitesList');
+        container.innerHTML = '';
+        
+        if (!prerequisites) return;
+        
+        const prereqList = prerequisites.split('|').filter(p => p.trim());
+        prereqList.forEach(prereq => {
+            const item = document.createElement('div');
+            item.className = 'grid-item';
+            item.innerHTML = `
+                <i class="bi bi-check-circle"></i>
+                <span>${prereq.trim()}</span>
+            `;
+            container.appendChild(item);
+        });
+    }
+    
+    function populateActions(actionItems) {
+        const container = document.getElementById('actionsList');
+        container.innerHTML = '';
+        
+        if (!actionItems) return;
+        console.log('Action Items:', actionItems);
+        const actionGroups = actionItems.split('|').filter(a => a.trim());
+        console.log('Action Groups:', actionGroups);
+        actionGroups.forEach(actionGroup => {
+            if (actionGroup.includes(':')) {
+                const [category, items] = actionGroup.split(':', 2);
+                const groupDiv = document.createElement('div');
+                groupDiv.className = 'action-group';
+                
+                groupDiv.innerHTML = `
+                    <h8>${category.trim()}</h8>
+                    <div class="action-items-grid">
+                        ${items.split(',').map(item => 
+                            `<div class="action-item">${item.trim()}</div>`
+                        ).join('')}
+                    </div>
+                `;
+                container.appendChild(groupDiv);
+            }
+        });
+    }
+    
+    function populateMetrics(metrics) {
+        const container = document.getElementById('metricsList');
+        container.innerHTML = '';
+        
+        if (!metrics) return;
+        
+        const metricList = metrics.split('|').filter(m => m.trim());
+        metricList.forEach(metric => {
+            const item = document.createElement('div');
+            item.className = 'metric-item';
+            item.innerHTML = `
+                <i class="bi bi-trophy"></i>
+                <span>${metric.trim()}</span>
+            `;
+            container.appendChild(item);
+        });
+    }
+    
+    function populatePitfall(pitfall) {
+        const container = document.getElementById('pitfallContent');
+        container.innerHTML = `
+            <div class="d-flex align-items-start">
+                <i class="bi bi-exclamation-triangle"></i>
+                <div>
+                    <strong>Common Pitfall:</strong>
+                    <p>${pitfall || 'No specific pitfall identified for this level.'}</p>
+                </div>
+            </div>
+        `;
+    }
+    
+    function resetModalTabs() {
+        // Reset tab states
+        document.querySelectorAll('#progressionTabs .nav-link').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        document.querySelectorAll('#progressionTabContent .tab-pane').forEach(pane => {
+            pane.classList.remove('show', 'active');
+        });
+        
+        // Activate first tab
+        const firstTab = document.querySelector('#prereq-tab');
+        const firstPane = document.querySelector('#prereq-pane');
+        if (firstTab && firstPane) {
+            firstTab.classList.add('active');
+            firstPane.classList.add('show', 'active');
+        }
+    }
     
     // Initialize selected states
     radioInputs.forEach(radio => {
