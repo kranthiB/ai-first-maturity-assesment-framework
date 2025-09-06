@@ -342,8 +342,11 @@ class MaturityAssessmentApp {
     }
 
     handleNavigation(e) {
-        // Add loading state for navigation
-        if (!e.target.dataset.noLoading) {
+        // Add loading state for navigation only for actual page changes
+        if (!e.target.dataset.noLoading && (e.target.href || e.target.form)) {
+            // Clear any existing loading overlays first
+            this.safeUtils('hideLoading', document.body);
+            // Add new loading overlay
             this.safeUtils('showLoading', document.body, 'Loading page...');
         }
     }
@@ -631,6 +634,10 @@ class MaturityAssessmentApp {
 
 // Auto-initialize application
 document.addEventListener('DOMContentLoaded', function() {
+    // Clear any existing loading overlays that might be left over
+    const existingOverlays = document.querySelectorAll('.loading-overlay');
+    existingOverlays.forEach(overlay => overlay.remove());
+    
     // Initialize application
     window.app = new MaturityAssessmentApp();
     
@@ -654,6 +661,17 @@ window.addEventListener('beforeunload', function() {
             window.app.safeUtils('autoSaveForm', form);
         });
     }
+});
+
+// Handle page load completion - clean up any remaining loading overlays
+window.addEventListener('load', function() {
+    // Give a small delay to ensure all scripts have executed
+    setTimeout(() => {
+        const remainingOverlays = document.querySelectorAll('.loading-overlay');
+        remainingOverlays.forEach(overlay => {
+            overlay.remove();
+        });
+    }, 100);
 });
 
 // Export for module systems

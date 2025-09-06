@@ -493,8 +493,20 @@ class Utils {
     showLoading(element, text = 'Loading...') {
         if (!element) return;
 
+        // Clear any existing loading overlays first to prevent duplicates
+        this.hideLoading(element);
+
         const spinner = document.createElement('div');
         spinner.className = 'loading-overlay d-flex align-items-center justify-content-center';
+        spinner.style.cssText = `
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.8);
+            z-index: 9999;
+        `;
         spinner.innerHTML = `
             <div class="text-center">
                 <div class="spinner-border text-primary mb-2" role="status">
@@ -515,9 +527,16 @@ class Utils {
         if (!element) return;
         
         const container = element.querySelector('.loading-container') || element;
-        const overlay = container.querySelector('.loading-overlay');
-        if (overlay) {
-            overlay.remove();
+        const overlays = container.querySelectorAll('.loading-overlay');
+        
+        if (overlays.length > 0) {
+            overlays.forEach(overlay => overlay.remove());
+        }
+        
+        // Also remove any orphaned loading overlays from the entire document if element is body
+        if (element === document.body) {
+            const orphanedOverlays = document.querySelectorAll('.loading-overlay');
+            orphanedOverlays.forEach(overlay => overlay.remove());
         }
     }
 
