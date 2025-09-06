@@ -171,7 +171,11 @@ class MaturityAssessmentApp {
 
         // Handle navigation
         document.addEventListener('click', (e) => {
-            if (e.target.matches('.nav-link, .btn-nav')) {
+            // Exclude dropdown toggles and other non-navigation elements
+            if (e.target.matches('.nav-link, .btn-nav') && 
+                !e.target.matches('[data-bs-toggle="dropdown"]') &&
+                !e.target.closest('[data-bs-toggle="dropdown"]') &&
+                !e.target.matches('.dropdown-toggle')) {
                 this.handleNavigation(e);
             }
         });
