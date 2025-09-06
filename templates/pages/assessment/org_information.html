@@ -53,41 +53,6 @@
     top: 2rem;
 }
 
-.form-step-indicator {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 2rem;
-}
-
-.step {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 0.5rem;
-    font-weight: bold;
-    transition: all 0.3s ease;
-}
-
-.step.active {
-    background: #667eea;
-    color: white;
-}
-
-.step.inactive {
-    background: #e9ecef;
-    color: #6c757d;
-}
-
-.step-connector {
-    width: 60px;
-    height: 2px;
-    background: #e9ecef;
-    margin-top: 19px;
-}
-
 .form-group-enhanced {
     margin-bottom: 1.5rem;
 }
@@ -283,17 +248,6 @@
                     
                     <!-- Form Body -->
                     <div class="form-body">
-                        <!-- Step Indicator -->
-                        <div class="form-step-indicator">
-                            <div class="step active">1</div>
-                            <div class="step-connector"></div>
-                            <div class="step inactive">2</div>
-                            <div class="step-connector"></div>
-                            <div class="step inactive">3</div>
-                            <div class="step-connector"></div>
-                            <div class="step inactive">4</div>
-                        </div>
-                        
                         <!-- Two Column Layout -->
                         <div class="form-content">
                             <!-- Main Form Content -->
@@ -366,6 +320,42 @@
                                                placeholder="your.email@company.com" 
                                                required maxlength="200">
                                         <div class="form-text">We'll use this to send you your assessment results</div>
+                                    </div>
+                                    
+                                    <!-- Assessor Information -->
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <h6 class="mt-4 mb-3 text-muted">
+                                                <i class="bi bi-person-check me-2"></i>
+                                                Assessor Information
+                                            </h6>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Assessor Name -->
+                                    <div class="form-group-enhanced">
+                                        <label for="assessorName" class="form-label-enhanced">
+                                            <i class="bi bi-person-badge me-2"></i>
+                                            Assessor Name
+                                        </label>
+                                        <input type="text" class="form-control form-control-enhanced" 
+                                               id="assessorName" name="assessor_name" 
+                                               placeholder="Name of the person conducting this assessment" 
+                                               maxlength="200">
+                                        <div class="form-text">The person responsible for conducting this assessment</div>
+                                    </div>
+                                    
+                                    <!-- Assessor Email -->
+                                    <div class="form-group-enhanced">
+                                        <label for="assessorEmail" class="form-label-enhanced">
+                                            <i class="bi bi-envelope-check me-2"></i>
+                                            Assessor Email
+                                        </label>
+                                        <input type="email" class="form-control form-control-enhanced" 
+                                               id="assessorEmail" name="assessor_email" 
+                                               placeholder="assessor.email@company.com" 
+                                               maxlength="200">
+                                        <div class="form-text">Email address of the assessor</div>
                                     </div>
                                     
                                     <!-- Industry Selector -->
@@ -609,6 +599,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Email validation
     const emailField = document.getElementById('email');
+    const assessorEmailField = document.getElementById('assessorEmail');
+    
     emailField.addEventListener('blur', function() {
         const email = this.value.trim();
         if (email && !isValidEmail(email)) {
@@ -616,6 +608,16 @@ document.addEventListener('DOMContentLoaded', function() {
             setTimeout(() => this.classList.remove('is-invalid'), 3000);
         }
     });
+    
+    if (assessorEmailField) {
+        assessorEmailField.addEventListener('blur', function() {
+            const email = this.value.trim();
+            if (email && !isValidEmail(email)) {
+                this.classList.add('is-invalid');
+                setTimeout(() => this.classList.remove('is-invalid'), 3000);
+            }
+        });
+    }
     
     function isValidEmail(email) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

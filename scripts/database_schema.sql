@@ -1,7 +1,6 @@
 -- ========================================
 -- AI-First Software Engineering Maturity Assessment Framework
 -- Database Schema (DDL Script)
--- Generated from archive/app_dev.db on 2025-09-06
 -- ========================================
 
 -- Migration tracking table
@@ -66,6 +65,14 @@ CREATE TABLE questions (
 CREATE TABLE assessments (
     id INTEGER NOT NULL PRIMARY KEY,
     team_name VARCHAR(200),
+    organization_name VARCHAR(200),
+    account_name VARCHAR(200),
+    first_name VARCHAR(100),
+    last_name VARCHAR(100),
+    email VARCHAR(200),
+    industry VARCHAR(100),
+    assessor_name VARCHAR(200),
+    assessor_email VARCHAR(200),
     overall_score FLOAT,
     deviq_classification VARCHAR(50),
     completion_date DATETIME,
@@ -208,6 +215,14 @@ CREATE VIEW v_assessment_overview AS
 SELECT 
     a.id,
     a.team_name,
+    a.organization_name,
+    a.account_name,
+    a.first_name,
+    a.last_name,
+    a.email,
+    a.industry,
+    a.assessor_name,
+    a.assessor_email,
     a.overall_score,
     a.deviq_classification,
     a.completion_date,
@@ -221,8 +236,10 @@ SELECT
 FROM assessments a 
 LEFT JOIN responses r ON a.id = r.assessment_id 
 WHERE a.status = 'COMPLETED' 
-GROUP BY a.id, a.team_name, a.overall_score, a.deviq_classification, a.completion_date, 
-         a.foundational_score, a.transformation_score, a.enterprise_score, a.governance_score;
+GROUP BY a.id, a.team_name, a.organization_name, a.account_name, a.first_name, a.last_name, 
+         a.email, a.industry, a.assessor_name, a.assessor_email, a.overall_score, 
+         a.deviq_classification, a.completion_date, a.foundational_score, 
+         a.transformation_score, a.enterprise_score, a.governance_score;
 
 -- Section performance view - Performance metrics by section
 CREATE VIEW v_section_performance AS 
@@ -315,9 +332,12 @@ CREATE INDEX idx_questions_active ON questions(is_active, display_order);
 -- Assessment indexes
 CREATE INDEX idx_assessments_status ON assessments(status, created_at);
 CREATE INDEX idx_assessments_team ON assessments(team_name, created_at);
+CREATE INDEX idx_assessments_organization ON assessments(organization_name, created_at);
+CREATE INDEX idx_assessments_assessor ON assessments(assessor_name, created_at);
 CREATE INDEX idx_assessments_completion ON assessments(completion_date DESC);
 CREATE INDEX idx_assessments_score ON assessments(overall_score, deviq_classification);
 CREATE INDEX idx_assessments_team_score ON assessments(team_name, overall_score, completion_date);
+CREATE INDEX idx_assessments_industry ON assessments(industry, overall_score);
 
 -- Response indexes
 CREATE INDEX idx_responses_assessment ON responses(assessment_id, question_id);

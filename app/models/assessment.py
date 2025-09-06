@@ -39,6 +39,18 @@ class Assessment(BaseModel):
     # Basic fields - matching existing database schema
     team_name = Column(String(200), nullable=True)
     
+    # Organization and candidate information
+    organization_name = Column(String(200), nullable=True)
+    account_name = Column(String(200), nullable=True)
+    first_name = Column(String(100), nullable=True)
+    last_name = Column(String(100), nullable=True)
+    email = Column(String(200), nullable=True)
+    industry = Column(String(100), nullable=True)
+    
+    # Assessor information
+    assessor_name = Column(String(200), nullable=True)
+    assessor_email = Column(String(200), nullable=True)
+    
     # Scoring and results - matching existing schema
     overall_score = Column(Float, nullable=True)
     deviq_classification = Column(String(50), nullable=True)

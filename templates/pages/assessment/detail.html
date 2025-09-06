@@ -230,16 +230,16 @@
                         <dt class="col-sm-5">Updated:</dt>
                         <dd class="col-sm-7">{{ assessment.updated_at.strftime('%m/%d/%Y') if assessment.updated_at else 'N/A' }}</dd>
                         
-                        {% if assessment.completed_at %}
+                        {% if assessment.completion_date %}
                         <dt class="col-sm-5">Completed:</dt>
-                        <dd class="col-sm-7">{{ assessment.completed_at.strftime('%m/%d/%Y') }}</dd>
+                        <dd class="col-sm-7">{{ assessment.completion_date.strftime('%m/%d/%Y') }}</dd>
                         {% endif %}
                         
                         <dt class="col-sm-5">Assessor:</dt>
-                        <dd class="col-sm-7">N/A</dd>
+                        <dd class="col-sm-7">{{ assessment.assessor_name or 'N/A' }}</dd>
                         
                         <dt class="col-sm-5">Email:</dt>
-                        <dd class="col-sm-7">N/A</dd>
+                        <dd class="col-sm-7">{{ assessment.assessor_email or 'N/A' }}</dd>
                     </dl>
                 </div>
             </div>

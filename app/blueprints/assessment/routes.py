@@ -270,7 +270,7 @@ def create():
     """
     if request.method == 'GET':
         # Show the organization and candidate information form
-        return render_template('pages/assessment/create_step1.html')
+        return render_template('pages/assessment/org_information.html')
     
     # POST method - from form submission
     try:
@@ -282,26 +282,30 @@ def create():
         email = request.form.get('email', '').strip()
         industry = request.form.get('industry', '').strip()
         
+        # Get optional assessor information
+        assessor_name = request.form.get('assessor_name', '').strip()
+        assessor_email = request.form.get('assessor_email', '').strip()
+        
         # Validate required fields
         if not organization_name:
             flash('Organization name is required', 'error')
-            return render_template('pages/assessment/create_step1.html')
+            return render_template('pages/assessment/org_information.html')
         
         if not account_name:
             flash('Account name is required', 'error')
-            return render_template('pages/assessment/create_step1.html')
+            return render_template('pages/assessment/org_information.html')
         
         if not first_name or not last_name:
             flash('First name and last name are required', 'error')
-            return render_template('pages/assessment/create_step1.html')
+            return render_template('pages/assessment/org_information.html')
         
         if not email:
             flash('Email address is required', 'error')
-            return render_template('pages/assessment/create_step1.html')
+            return render_template('pages/assessment/org_information.html')
         
         if not industry:
             flash('Please select an industry', 'error')
-            return render_template('pages/assessment/create_step1.html')
+            return render_template('pages/assessment/org_information.html')
         
         # Create assessment using the existing database schema
         from app.extensions import db
@@ -312,10 +316,18 @@ def create():
         first_section = db.session.query(Section).order_by(Section.display_order).first()
         if not first_section:
             flash('No assessment sections found. Please contact support.', 'error')
-            return render_template('pages/assessment/create_step1.html')
+            return render_template('pages/assessment/org_information.html')
         
         assessment = Assessment()
         assessment.team_name = account_name
+        assessment.organization_name = organization_name
+        assessment.account_name = account_name
+        assessment.first_name = first_name
+        assessment.last_name = last_name
+        assessment.email = email
+        assessment.industry = industry
+        assessment.assessor_name = assessor_name if assessor_name else None
+        assessment.assessor_email = assessor_email if assessor_email else None
         assessment.status = 'IN_PROGRESS'
         assessment.created_at = datetime.utcnow()
         assessment.updated_at = datetime.utcnow()
@@ -338,6 +350,8 @@ def create():
             'last_name': last_name,
             'email': email,
             'industry': industry,
+            'assessor_name': assessor_name,
+            'assessor_email': assessor_email,
             'created_at': datetime.utcnow().isoformat(),
             'current_section_index': 0,
             'assessment_id': assessment_id  # Store ID in session for reliability
@@ -361,15 +375,15 @@ def create():
     except ValidationError as e:
         flash(f'Validation error: {str(e)}', 'error')
         logger.warning(f"Assessment validation error: {str(e)}")
-        return render_template('pages/assessment/create_step1.html')
+        return render_template('pages/assessment/org_information.html')
     except AssessmentError as e:
         flash(f'Assessment error: {str(e)}', 'error')
         logger.error(f"Assessment creation error: {str(e)}")
-        return render_template('pages/assessment/create_step1.html')
+        return render_template('pages/assessment/org_information.html')
     except Exception as e:
         flash('An unexpected error occurred while creating the assessment. Please try again.', 'error')
         logger.error(f"Unexpected error in assessment creation: {str(e)}")
-        return render_template('pages/assessment/create_step1.html')
+        return render_template('pages/assessment/org_information.html')
 
 
 @assessment_bp.route('/<int:assessment_id>/section-overview')
