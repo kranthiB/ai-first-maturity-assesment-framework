@@ -11,10 +11,10 @@ The **AI-First Software Engineering (AFS) Maturity Assessment Framework** is a c
 ## Features
 
 - **Comprehensive Assessment**: 23 detailed areas across 4 major dimensions
+- **24 Targeted Questions**: Focused evaluation covering all critical aspects
 - **Maturity Scoring**: 4-level maturity classification (Traditional → AI-Assisted → AI-Augmented → AI-First)
 - **Visual Reports**: Assessment results with detailed scoring breakdowns and recommendations
-- **Enterprise Ready**: Multi-database support, Docker deployment, and scalable architecture
-- **Core Assessment Engine**: Streamlined assessment workflow and recommendation system
+- **Streamlined Workflow**: Simplified assessment process and user interface
 
 
 ## Assessment Framework
