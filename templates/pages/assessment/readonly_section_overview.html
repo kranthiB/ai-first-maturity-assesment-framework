@@ -1,0 +1,564 @@
+{% extends "base/base.html" %}
+{% set page_title = "Assessment Sections - " + assessment.team_name if assessment and assessment.team_name else "Assessment Sections" %}
+
+{% block head_extra %}
+<style>
+.readonly-overview-container {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+    padding: 2rem 0;
+}
+
+.readonly-overview-card {
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.readonly-overview-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.5rem 2rem;
+    position: relative;
+}
+
+.assessment-info-compact {
+    background: rgba(255,255,255,0.1);
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    margin-top: 1rem;
+}
+
+.assessment-meta {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.assessment-details {
+    min-width: 0;
+}
+
+.assessment-stats {
+    display: flex;
+    gap: 2rem;
+    text-align: center;
+}
+
+.stat-item {
+    min-width: 80px;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    opacity: 0.9;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.section-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    padding: 1.5rem 2rem 2rem 2rem;
+    max-width: none;
+}
+
+.section-card {
+    border: 2px solid #e9ecef;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    background: white;
+    position: relative;
+}
+
+.section-card:hover {
+    border-color: #667eea;
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.15);
+}
+
+.section-card.completed {
+    border-color: #28a745;
+    background: #f8fff9;
+}
+
+.section-card.in-progress {
+    border-color: #ffc107;
+    background: #fffef8;
+}
+
+.section-completion-badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.section-completion-badge.completed {
+    background: #28a745;
+    color: white;
+}
+
+.section-completion-badge.in-progress {
+    background: #ffc107;
+    color: #212529;
+}
+
+.section-completion-badge.pending {
+    background: #6c757d;
+    color: white;
+}
+
+.section-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+    color: white;
+}
+
+.section-icon-pending {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+    background: #f8f9fa;
+    border: 2px dashed #dee2e6;
+    color: #6c757d;
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: #2d3748;
+}
+
+.section-description {
+    color: #718096;
+    margin-bottom: 1rem;
+    line-height: 1.6;
+}
+
+.section-areas {
+    margin-bottom: 1rem;
+}
+
+.area-tag {
+    display: inline-block;
+    background: #f7fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    margin: 0.125rem;
+    color: #4a5568;
+}
+
+.section-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1rem;
+    border-top: 1px solid #e2e8f0;
+    font-size: 0.875rem;
+    color: #718096;
+}
+
+.progress-overview {
+    background: white;
+    border-radius: 0.75rem;
+    padding: 2rem;
+    margin: 1.5rem 2rem;
+    border: 1px solid #e2e8f0;
+}
+
+.navigation-section {
+    background: #f8f9ff;
+    padding: 2rem;
+    text-align: center;
+    border-top: 1px solid #e2e8f0;
+}
+
+.btn-nav {
+    padding: 0.875rem 2rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    margin: 0 0.5rem;
+}
+
+.btn-primary-nav {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+}
+
+.btn-primary-nav:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+    color: white;
+}
+
+.btn-secondary-nav {
+    background: white;
+    color: #667eea;
+    border: 2px solid #667eea;
+}
+
+.btn-secondary-nav:hover {
+    background: #667eea;
+    color: white;
+}
+
+.progress-bar-custom {
+    height: 8px;
+    border-radius: 4px;
+    background: #e9ecef;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.progress-fill-custom {
+    height: 100%;
+    background: linear-gradient(90deg, #0d6efd, #6f42c1);
+    transition: width 0.3s ease;
+}
+
+@media (max-width: 576px) {
+    .section-grid {
+        grid-template-columns: 1fr;
+        padding: 1rem;
+        gap: 1rem;
+    }
+    
+    .readonly-overview-header {
+        padding: 1.5rem;
+    }
+    
+    .navigation-section {
+        padding: 1.5rem;
+    }
+    
+    .btn-nav {
+        display: block;
+        margin: 0.5rem 0;
+        text-align: center;
+    }
+}
+
+@media (min-width: 577px) and (max-width: 991px) {
+    .section-grid {
+        grid-template-columns: repeat(2, 1fr);
+        padding: 1.5rem;
+        gap: 1.25rem;
+    }
+}
+
+@media (min-width: 992px) and (max-width: 1399px) {
+    .section-grid {
+        grid-template-columns: repeat(2, 1fr);
+        padding: 1.5rem 2rem;
+        gap: 1.5rem;
+    }
+}
+
+@media (min-width: 1400px) {
+    .section-grid {
+        grid-template-columns: repeat(4, 1fr);
+        padding: 2rem 3rem;
+        gap: 2rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="readonly-overview-container">
+    <div class="container-fluid px-4">
+        <div class="row justify-content-center">
+            <div class="col-12 col-xxl-11">
+                <div class="readonly-overview-card">
+                    <!-- Header -->
+                    <div class="readonly-overview-header">
+                        <div class="readonly-badge">
+                            <i class="bi bi-eye me-1"></i> Read-Only View
+                        </div>
+                        
+                        <div class="row align-items-center">
+                            <div class="col-lg-8">
+                                <h1 class="mb-2">
+                                    <i class="bi bi-clipboard-data me-2"></i>
+                                    Assessment Sections
+                                </h1>
+                                <p class="mb-0 opacity-75">
+                                    AI-First Software Engineering Maturity Assessment
+                                </p>
+                            </div>
+                            <div class="col-lg-4 text-lg-end">
+                                {% if progress %}
+                                <div class="assessment-stats">
+                                    <div class="stat-item">
+                                        <div class="stat-value">{{ sections|length }}</div>
+                                        <div class="stat-label">Sections</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-value">{{ "{:.0f}".format(progress.progress_percentage) }}%</div>
+                                        <div class="stat-label">Complete</div>
+                                    </div>
+                                    {% if assessment.overall_score %}
+                                    <div class="stat-item">
+                                        <div class="stat-value">{{ "{:.1f}".format(assessment.overall_score) }}</div>
+                                        <div class="stat-label">Score</div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Compact Assessment Information -->
+                        <div class="assessment-info-compact">
+                            <div class="assessment-meta">
+                                <div class="assessment-details">
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <i class="bi bi-person-circle"></i>
+                                        <strong>{{ assessment.first_name }} {{ assessment.last_name }}</strong>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2 opacity-90">
+                                        <i class="bi bi-building"></i>
+                                        <span>{{ assessment.organization_name }}</span>
+                                        {% if assessment.account_name and assessment.account_name != assessment.organization_name %}
+                                        <span>• {{ assessment.account_name }}</span>
+                                        {% endif %}
+                                        {% if assessment.industry %}
+                                        {% set industry_names = {
+                                            'automotive': 'Automotive',
+                                            'bfsi': 'BFSI',
+                                            'energy_utilities': 'Energy & Utilities',
+                                            'government': 'Government',
+                                            'travel_transport_tourism': 'Travel & Tourism',
+                                            'healthcare': 'Healthcare',
+                                            'media_communications': 'Media & Communications',
+                                            'retail_commerce': 'Retail & Commerce',
+                                            'technology': 'Technology',
+                                            'other': 'Other'
+                                        } %}
+                                        <span>• {{ industry_names.get(assessment.industry, assessment.industry.title()) }}</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="contact-info">
+                                    <div class="text-end opacity-90">
+                                        <div class="mb-1">
+                                            <i class="bi bi-envelope me-1"></i>
+                                            <small>{{ assessment.email }}</small>
+                                        </div>
+                                        <div>
+                                            <i class="bi bi-calendar me-1"></i>
+                                            <small>{{ assessment.created_at.strftime('%Y-%m-%d') if assessment.created_at else 'Unknown' }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% if progress %}
+                                <div class="progress-info">
+                                    <div class="text-center">
+                                        <div class="h6 mb-1">{{ progress.responded_questions }}/{{ progress.total_questions }}</div>
+                                        <small class="opacity-90">Questions</small>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    
+                    
+                    <!-- Sections Grid -->
+                    <div class="section-grid">
+                        {% for section in sections %}
+                        {% set section_progress = progress.section_progress.get(section.name, {}) if progress and progress.section_progress else {} %}
+                        {% set section_percentage = section_progress.get('progress_percentage', 0) %}
+                        {% set completion_status = 'completed' if section_percentage == 100 else ('in-progress' if section_percentage > 0 else 'pending') %}
+                        
+                        <div class="section-card {{ completion_status }}" 
+                             onclick="window.location.href='{{ url_for('assessment.view_readonly_section', assessment_id=assessment.id, section_id=section.id) }}';">
+                            
+                            <!-- Completion Badge -->
+                            <div class="section-completion-badge {{ completion_status }}">
+                                {% if completion_status == 'completed' %}
+                                    <i class="bi bi-check-circle me-1"></i>Complete
+                                {% elif completion_status == 'in-progress' %}
+                                    <i class="bi bi-clock me-1"></i>{{ "{:.0f}".format(section_percentage) }}&#37;
+                                {% else %}
+                                    <i class="bi bi-circle me-1"></i>Pending
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Section Icon - Dynamic based on status -->
+                            {% if completion_status == 'pending' %}
+                            <div class="section-icon-pending">
+                                <i class="{{ section.icon or 'bi bi-gear' }}"></i>
+                            </div>
+                            {% elif completion_status == 'in-progress' %}
+                            <div class="section-icon" style="background: #ffc107;">
+                                <i class="{{ section.icon or 'bi bi-gear' }}"></i>
+                            </div>
+                            {% else %}
+                            <div class="section-icon" style="background: #28a745;">
+                                <i class="{{ section.icon or 'bi bi-gear' }}"></i>
+                            </div>
+                            {% endif %}
+                            
+                            <div class="section-title">{{ section.name }}</div>
+                            <div class="section-description">{{ section.description }}</div>
+                            
+                            <div class="section-areas">
+                                {% for area in section.areas %}
+                                <span class="area-tag">{{ area.name }}</span>
+                                {% endfor %}
+                            </div>
+                            
+                            <div class="section-meta">
+                                <span>
+                                    <i class="bi bi-question-circle me-1"></i>
+                                    {{ section.areas|length }} assessment areas
+                                </span>
+                                {% if section_progress %}
+                                <span>
+                                    {{ section_progress.get('responded_questions', 0) }}/{{ section_progress.get('total_questions', 0) }} answered
+                                </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Navigation -->
+                    <div class="navigation-section">
+                        <h4 class="mb-3">Navigation</h4>
+                        <p class="text-muted mb-4">
+                            Explore the assessment sections and view responses. Click on any section above to view detailed responses.
+                        </p>
+                        
+                        <div class="d-flex gap-3 justify-content-center flex-wrap">
+                            <a href="{{ url_for('assessment.view_readonly', assessment_id=assessment.id) }}" 
+                               class="btn-nav btn-secondary-nav">
+                                <i class="bi bi-arrow-left me-2"></i>
+                                Organization Info
+                            </a>
+                            
+                            {% if assessment.status == 'COMPLETED' %}
+                            <a href="{{ url_for('assessment.results', assessment_id=assessment.id) }}" 
+                               class="btn-nav btn-primary-nav">
+                                <i class="bi bi-graph-up me-2"></i>
+                                View Results
+                            </a>
+                            {% endif %}
+                            
+                            <a href="{{ url_for('assessment.index') }}" 
+                               class="btn-nav btn-secondary-nav">
+                                <i class="bi bi-list me-2"></i>
+                                All Assessments
+                            </a>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <small class="text-muted">
+                                <i class="bi bi-info-circle me-1"></i>
+                                This is a read-only view of the assessment responses
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Animate progress bars
+    document.querySelectorAll('.progress-fill-custom').forEach(bar => {
+        const width = bar.getAttribute('data-width');
+        if (width) {
+            bar.style.width = '0%';
+            setTimeout(() => {
+                bar.style.width = width + '%';
+            }, 100);
+        }
+    });
+    
+    // Section card hover effects
+    const sectionCards = document.querySelectorAll('.section-card');
+    sectionCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-8px)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(-5px)';
+        });
+    });
+    
+    // Auto-scroll animation for section cards
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, observerOptions);
+    
+    // Initially hide cards and observe them
+    sectionCards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(30px)';
+        card.style.transition = `opacity 0.6s ease ${index * 0.1}s, transform 0.6s ease ${index * 0.1}s`;
+        observer.observe(card);
+    });
+    
+    // Trigger entrance animation
+    setTimeout(() => {
+        sectionCards.forEach(card => {
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        });
+    }, 300);
+});
+</script>
+{% endblock %}

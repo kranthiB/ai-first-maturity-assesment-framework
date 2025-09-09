@@ -15,6 +15,7 @@ from app.services.assessment_service import AssessmentService
 from app.services.scoring_service import ScoringService
 from app.services.recommendation_service import RecommendationService
 from app.utils.exceptions import AssessmentError, ValidationError
+from app.utils.helpers import get_maturity_level, format_score_display
 from app.core.logging import get_logger
 
 logger = get_logger(__name__)
@@ -38,6 +39,23 @@ def get_recommendation_service():
     """Get recommendation service instance with current database session"""
     from app.extensions import db
     return RecommendationService(db.session)
+
+
+def format_industry(industry_code):
+    """Format industry code to human readable name"""
+    industry_mapping = {
+        'automotive': 'Automotive',
+        'bfsi': 'Banking, Financial Services & Insurance',
+        'energy_utilities': 'Energy & Utilities',
+        'government': 'Government & Public Sector',
+        'travel_transport_tourism': 'Travel, Transport & Tourism',
+        'healthcare': 'Healthcare',
+        'media_communications': 'Media & Communications',
+        'retail_commerce': 'Retail & Commerce',
+        'technology': 'Technology',
+        'other': 'Other'
+    }
+    return industry_mapping.get(industry_code, industry_code.title())
 
 
 def manage_assessment_session(assessment_id):
@@ -178,6 +196,11 @@ def index():
             page=page, per_page=per_page, error_out=False
         )
         assessments = assessments_pagination.items
+        
+        # Add maturity levels to assessments
+        for assessment in assessments:
+            maturity = get_maturity_level(assessment.overall_score)
+            assessment.maturity_level = maturity
         
         # Get framework statistics
         total_questions = db.session.query(Question).count()
@@ -942,7 +965,33 @@ def generate_report(assessment_id):
 @assessment_bp.route('/<int:assessment_id>')
 def detail(assessment_id):
     """
-    Assessment detail and management page
+    Assessment detail view - redirects to read-only assessment view
+    """
+    try:
+        from app.extensions import db
+        assessment_service = AssessmentService(db.session)
+        
+        # Get assessment to verify it exists
+        assessment = assessment_service.get_assessment(assessment_id)
+        
+        if not assessment:
+            flash('Assessment not found', 'error')
+            return redirect(url_for('assessment.index'))
+        
+        # Redirect to read-only organization information view
+        return redirect(url_for('assessment.view_readonly',
+                                assessment_id=assessment_id))
+        
+    except Exception as e:
+        logger.error(f"Error loading assessment detail: {e}")
+        flash('Error loading assessment', 'error')
+        return redirect(url_for('assessment.index'))
+
+
+@assessment_bp.route('/<int:assessment_id>/view')
+def view_readonly(assessment_id):
+    """
+    Read-only view of assessment - organization information page
     """
     try:
         from app.extensions import db
@@ -960,23 +1009,128 @@ def detail(assessment_id):
         # Get progress information
         progress = assessment_service.get_assessment_progress(assessment_id)
         
-        # Get next question if assessment is not complete
-        next_question = None
-        if assessment.status != 'COMPLETED':
-            next_question = assessment_service.get_next_question(assessment_id)
-        
         context = {
             'assessment': assessment,
             'progress': progress,
-            'next_question': next_question
+            'readonly': True
         }
         
-        return render_template('pages/assessment/detail.html', **context)
+        return render_template('pages/assessment/readonly_org_info.html',
+                               **context)
         
     except Exception as e:
-        logger.error(f"Error loading assessment detail: {e}")
+        logger.error(f"Error loading assessment readonly view: {e}")
         flash('Error loading assessment', 'error')
         return redirect(url_for('assessment.index'))
+
+
+@assessment_bp.route('/<int:assessment_id>/view/sections')
+def view_readonly_sections(assessment_id):
+    """
+    Read-only view of assessment - sections overview
+    """
+    try:
+        from app.extensions import db
+        
+        # Get assessment
+        assessment = db.session.query(Assessment).get(assessment_id)
+        if not assessment:
+            flash('Assessment not found', 'error')
+            return redirect(url_for('assessment.index'))
+        
+        # Get all sections with their areas
+        sections = db.session.query(Section).options(
+            joinedload(Section.areas)
+        ).order_by(Section.display_order).all()
+        
+        # Get progress information
+        assessment_service = AssessmentService(db.session)
+        progress = assessment_service.get_assessment_progress(assessment_id)
+        
+        context = {
+            'assessment': assessment,
+            'sections': sections,
+            'progress': progress,
+            'readonly': True,
+            'total_questions': sum(len(section.areas) for section in sections)
+        }
+        
+        return render_template(
+            'pages/assessment/readonly_section_overview.html',
+            **context)
+        
+    except Exception as e:
+        logger.error(f"Error loading readonly sections overview: {e}")
+        flash('Error loading assessment', 'error')
+        return redirect(url_for('assessment.index'))
+
+
+@assessment_bp.route('/<int:assessment_id>/view/section/<section_id>')
+def view_readonly_section(assessment_id, section_id):
+    """
+    Read-only view of assessment - specific section with responses
+    """
+    try:
+        from app.extensions import db
+        
+        # Get assessment
+        assessment = db.session.query(Assessment).get(assessment_id)
+        if not assessment:
+            flash('Assessment not found', 'error')
+            return redirect(url_for('assessment.index'))
+        
+        # Get section with areas and questions
+        section = db.session.query(Section).options(
+            joinedload(Section.areas).joinedload(Area.questions)
+        ).filter(Section.id == section_id).first()
+        
+        if not section:
+            flash('Section not found', 'error')
+            return redirect(url_for('assessment.view_readonly_sections',
+                                    assessment_id=assessment_id))
+        
+        # Get all responses for this assessment
+        responses = db.session.query(Response).filter(
+            Response.assessment_id == assessment_id
+        ).all()
+        
+        # Create responses dictionary for easy lookup
+        responses_dict = {resp.question_id: resp for resp in responses}
+        
+        # Get all sections for navigation
+        all_sections = db.session.query(Section).order_by(
+            Section.display_order).all()
+        
+        # Find current section index
+        current_section_index = 0
+        for i, s in enumerate(all_sections):
+            if s.id == section.id:
+                current_section_index = i
+                break
+        
+        # Get progress information
+        assessment_service = AssessmentService(db.session)
+        progress = assessment_service.get_assessment_progress(assessment_id)
+        
+        context = {
+            'assessment': assessment,
+            'section': section,
+            'responses': responses_dict,
+            'all_sections': all_sections,
+            'current_section_index': current_section_index,
+            'progress': progress,
+            'readonly': True
+        }
+        
+        return render_template(
+            'pages/assessment/readonly_section_questions.html',
+            **context)
+        
+    except Exception as e:
+        logger.error(f"Error loading readonly section view: {e}")
+        flash('Error loading section', 'error')
+        return redirect(url_for('assessment.view_readonly_sections',
+                                assessment_id=assessment_id))
 
 
 @assessment_bp.route('/<int:assessment_id>/question')

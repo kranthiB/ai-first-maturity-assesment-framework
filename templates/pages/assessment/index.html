@@ -137,16 +137,24 @@
     display: flex;
     gap: 0.75rem;
     flex-wrap: wrap;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid #f1f5f9;
 }
 
 .btn-action {
     flex: 1;
     min-width: 0;
-    padding: 0.5rem 1rem;
+    padding: 0.625rem 1rem;
     border-radius: 8px;
     font-size: 0.875rem;
     font-weight: 500;
     transition: all 0.2s ease;
+    text-align: center;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn-view {
@@ -270,6 +278,90 @@
     background: #e5e7eb;
 }
 
+.maturity-badge {
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-align: center;
+    margin-top: 1.25rem;
+    border: 2px solid;
+    display: block;
+    width: 100%;
+}
+
+.maturity-badge .fw-bold {
+    font-size: 0.85rem;
+    margin-bottom: 0.25rem;
+    display: block;
+}
+
+.maturity-danger {
+    background: #fef2f2;
+    color: #dc2626;
+    border-color: #dc2626;
+}
+
+.maturity-warning {
+    background: #fffbeb;
+    color: #d97706;
+    border-color: #d97706;
+}
+
+.maturity-info {
+    background: #eff6ff;
+    color: #2563eb;
+    border-color: #2563eb;
+}
+
+.maturity-success {
+    background: #f0fdf4;
+    color: #16a34a;
+    border-color: #16a34a;
+}
+
+.maturity-secondary {
+    background: #f8fafc;
+    color: #64748b;
+    border-color: #64748b;
+}
+
+.org-info {
+    margin: 1rem 0;
+    padding: 1.25rem;
+    background: #f8fafc;
+    border-radius: 8px;
+    border-left: 4px solid #3b82f6;
+}
+
+.org-detail {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+    font-size: 0.875rem;
+    line-height: 1.4;
+}
+
+.org-detail:last-child {
+    margin-bottom: 0;
+}
+
+.org-label {
+    font-weight: 500;
+    color: #374151;
+    flex-shrink: 0;
+    min-width: 90px;
+}
+
+.org-value {
+    color: #6b7280;
+    text-align: right;
+    flex: 1;
+    margin-left: 1rem;
+    word-wrap: break-word;
+}
+
 @media (max-width: 768px) {
     .assessment-grid {
         grid-template-columns: 1fr;
@@ -285,6 +377,21 @@
     
     .assessment-actions {
         flex-direction: column;
+    }
+    
+    .org-detail {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+    }
+    
+    .org-label {
+        min-width: auto;
+    }
+    
+    .org-value {
+        text-align: left;
+        margin-left: 0;
     }
     
     .pagination-wrapper {
@@ -423,7 +530,7 @@
                 {% if assessment.overall_score %}
                 <div class="meta-item">
                     <i class="bi bi-graph-up"></i>
-                    <span>Overall Score: {{ "%.1f"|format(assessment.overall_score) }}%</span>
+                    <span>Overall Score: {{ "%.1f"|format(assessment.overall_score) }}</span>
                 </div>
                 {% endif %}
                 
@@ -435,10 +542,73 @@
                 {% endif %}
             </div>
             
+            <!-- Organization Information -->
+            {% if assessment.organization_name or assessment.industry or assessment.email %}
+            <div class="org-info">
+                <h6 class="mb-2 text-primary">
+                    <i class="bi bi-building me-1"></i>Organization Details
+                </h6>
+                
+                {% if assessment.organization_name %}
+                <div class="org-detail">
+                    <span class="org-label">Organization:</span>
+                    <span class="org-value">{{ assessment.organization_name }}</span>
+                </div>
+                {% endif %}
+                
+                {% if assessment.industry %}
+                <div class="org-detail">
+                    <span class="org-label">Industry:</span>
+                    <span class="org-value">
+                        {% set industry_names = {
+                            'automotive': 'Automotive',
+                            'bfsi': 'BFSI',
+                            'energy_utilities': 'Energy & Utilities',
+                            'government': 'Government',
+                            'travel_transport_tourism': 'Travel & Tourism',
+                            'healthcare': 'Healthcare',
+                            'media_communications': 'Media & Communications',
+                            'retail_commerce': 'Retail & Commerce',
+                            'technology': 'Technology',
+                            'other': 'Other'
+                        } %}
+                        {{ industry_names.get(assessment.industry, assessment.industry.title()) }}
+                    </span>
+                </div>
+                {% endif %}
+                
+                {% if assessment.first_name or assessment.last_name %}
+                <div class="org-detail">
+                    <span class="org-label">Contact:</span>
+                    <span class="org-value">{{ assessment.first_name or '' }} {{ assessment.last_name or '' }}</span>
+                </div>
+                {% endif %}
+                
+                {% if assessment.email %}
+                <div class="org-detail">
+                    <span class="org-label">Email:</span>
+                    <span class="org-value">{{ assessment.email }}</span>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+            
+            <!-- Maturity Level -->
+            {% if assessment.maturity_level %}
+            <div class="maturity-badge maturity-{{ assessment.maturity_level.color }}">
+                <div class="fw-bold">{{ assessment.maturity_level.name }}</div>
+                <div style="font-size: 0.65rem; margin-top: 0.25rem;">{{ assessment.maturity_level.range }}</div>
+            </div>
+            {% endif %}
+            
             <div class="assessment-actions">
                 {% if assessment.status == 'completed' %}
-                    <a href="{{ url_for('assessment.results', assessment_id=assessment.id) if url_for else '/assessment/' + assessment.id|string + '/results' }}" 
+                    <a href="{{ url_for('assessment.view_readonly', assessment_id=assessment.id) if url_for else '/assessment/' + assessment.id|string + '/view' }}" 
                        class="btn btn-action btn-view">
+                        <i class="bi bi-info-circle me-1"></i>View Details
+                    </a>
+                    <a href="{{ url_for('assessment.results', assessment_id=assessment.id) if url_for else '/assessment/' + assessment.id|string + '/results' }}" 
+                       class="btn btn-action btn-continue">
                         <i class="bi bi-eye me-1"></i>View Results
                     </a>
                     <a href="{{ url_for('assessment.report', assessment_id=assessment.id) if url_for else '/assessment/' + assessment.id|string + '/report' }}" 
@@ -446,13 +616,13 @@
                         <i class="bi bi-download me-1"></i>Export Report
                     </a>
                 {% else %}
+                    <a href="{{ url_for('assessment.view_readonly', assessment_id=assessment.id) if url_for else '/assessment/' + assessment.id|string + '/view' }}" 
+                       class="btn btn-action btn-view">
+                        <i class="bi bi-info-circle me-1"></i>View Details
+                    </a>
                     <a href="{{ url_for('assessment.section_questions', assessment_id=assessment.id, section_id='FC') if url_for else '/assessment/' + assessment.id|string + '/section/FC' }}" 
                        class="btn btn-action btn-continue">
                         <i class="bi bi-play-circle me-1"></i>Continue Assessment
-                    </a>
-                    <a href="{{ url_for('assessment.detail', assessment_id=assessment.id) if url_for else '/assessment/' + assessment.id|string }}" 
-                       class="btn btn-action btn-view">
-                        <i class="bi bi-info-circle me-1"></i>View Details
                     </a>
                 {% endif %}
             </div>

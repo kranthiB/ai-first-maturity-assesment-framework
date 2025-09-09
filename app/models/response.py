@@ -106,10 +106,10 @@ class Response(Base):
             Score description
         """
         score_map = {
-            1: "Initial",
-            2: "Developing", 
-            3: "Defined",
-            4: "Optimizing"
+            1: "Basic",
+            2: "Evolving",
+            3: "Advanced",
+            4: "Optimized"
         }
         return score_map.get(self.score, "Unknown")
     
