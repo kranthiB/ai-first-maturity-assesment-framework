@@ -380,75 +380,6 @@ def create():
         return render_template('pages/assessment/org_information.html')
 
 
-@assessment_bp.route('/<int:assessment_id>/section-overview')
-def section_overview(assessment_id):
-    """
-    Step 2: Overview of assessment sections before starting questions
-    """
-    try:
-        from app.extensions import db
-        
-        # Get assessment
-        assessment = db.session.query(Assessment).get(assessment_id)
-        if not assessment:
-            flash('Assessment not found', 'error')
-            return redirect(url_for('assessment.index'))
-        
-        # Check if assessment is completed
-        if assessment.status == 'COMPLETED':
-            flash('This assessment has already been completed.', 'info')
-            return redirect(url_for('assessment.report', assessment_id=assessment_id))
-        
-        # Validate session consistency - but allow access for existing assessments
-        current_assessment = get_current_assessment()
-        if current_assessment and current_assessment != assessment_id:
-            # Only show warning but don't redirect for existing assessments
-            flash('Session mismatch detected. Continuing with current assessment.', 'warning')
-            # Update session to current assessment
-            session['current_assessment_id'] = assessment_id
-        
-        # Get all sections with their areas for overview
-        sections = db.session.query(Section).options(
-            joinedload(Section.areas)
-        ).order_by(Section.display_order).all()
-        
-        # Get metadata from session - recreate if missing
-        metadata = session.get('assessment_metadata', {})
-        if not metadata:
-            # Recreate complete session data for existing assessment
-            logger.info(f"Recreating session metadata for assessment {assessment_id}")
-            metadata = {
-                'assessment_id': assessment_id,
-                'organization_name': assessment.organization_name or assessment.team_name or 'Unknown Organization',
-                'account_name': assessment.account_name or '',
-                'first_name': assessment.first_name or '',
-                'last_name': assessment.last_name or '',
-                'email': assessment.email or '',
-                'industry': assessment.industry or '',
-                'assessor_name': assessment.assessor_name or '',
-                'assessor_email': assessment.assessor_email or '',
-                'created_at': assessment.created_at.isoformat() if assessment.created_at else datetime.utcnow().isoformat(),
-                'current_section_index': 0
-            }
-            session['assessment_metadata'] = metadata
-            session['assessment_responses'] = {}
-            session['current_assessment_id'] = assessment_id
-        
-        context = {
-            'assessment': assessment,
-            'sections': sections,
-            'metadata': metadata,
-            'total_questions': sum(len(section.areas) for section in sections)
-        }
-        
-        return render_template('pages/assessment/section_overview.html', **context)
-        
-    except Exception as e:
-        logger.error(f"Error loading section overview: {e}")
-        flash('Error loading assessment overview', 'error')
-        return redirect(url_for('assessment.index'))
-
-
 @assessment_bp.route('/<int:assessment_id>/section/<section_id>')
 def section_questions(assessment_id, section_id):
     """
@@ -570,7 +501,7 @@ def section_questions(assessment_id, section_id):
     except Exception as e:
         logger.error(f"Error loading section questions: {e}")
         flash('Error loading section questions', 'error')
-        return redirect(url_for('assessment.section_overview',
+        return redirect(url_for('assessment.detail',
                                 assessment_id=assessment_id))
 
 

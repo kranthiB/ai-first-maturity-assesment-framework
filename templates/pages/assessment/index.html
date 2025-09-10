@@ -222,12 +222,54 @@
     text-align: center;
     padding: 4rem 2rem;
     color: #6b7280;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
 }
 
 .empty-state-icon {
-    font-size: 4rem;
-    margin-bottom: 1rem;
-    opacity: 0.5;
+    font-size: 5rem;
+    margin-bottom: 1.5rem;
+    opacity: 0.4;
+    color: #9ca3af;
+    background: #f8fafc;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #e5e7eb;
+}
+
+.empty-state h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.75rem;
+}
+
+.empty-state p {
+    font-size: 1rem;
+    color: #6b7280;
+    max-width: 500px;
+    line-height: 1.6;
+    margin: 0 auto 2rem auto;
+}
+
+.empty-state .btn {
+    margin: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.empty-state .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .filter-section {
@@ -412,6 +454,37 @@
     .pagination-wrapper {
         flex-direction: column;
         gap: 1rem;
+    }
+    
+    .empty-state {
+        padding: 3rem 1rem;
+        min-height: 300px;
+    }
+    
+    .empty-state-icon {
+        width: 100px;
+        height: 100px;
+        font-size: 4rem;
+        margin-bottom: 1rem;
+    }
+    
+    .empty-state h3 {
+        font-size: 1.25rem;
+    }
+    
+    .empty-state p {
+        font-size: 0.9rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .dashboard-header {
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .dashboard-header .btn-lg {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
     }
 }
 </style>
@@ -713,30 +786,36 @@
     
     {% else %}
     <!-- Empty State -->
-    <div class="empty-state">
-        <div class="empty-state-icon">
-            <i class="bi bi-clipboard-data"></i>
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="bi bi-clipboard-data"></i>
+                </div>
+                <h3>No Assessments Found</h3>
+                <p>
+                    {% if search_query or status_filter or date_from or date_to %}
+                        No assessments match your current filters. Try adjusting your search criteria.
+                    {% else %}
+                        Get started by creating your first AI-First maturity assessment.
+                    {% endif %}
+                </p>
+                
+                <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center align-items-center">
+                    {% if search_query or status_filter or date_from or date_to %}
+                    <a href="{{ url_for('assessment.index') if url_for else '/assessment/' }}" 
+                       class="btn btn-outline-primary">
+                        <i class="bi bi-x-circle me-2"></i>Clear Filters
+                    </a>
+                    {% endif %}
+                    
+                    <a href="{{ url_for('assessment.create') if url_for else '/assessment/create' }}" 
+                       class="btn btn-primary">
+                        <i class="bi bi-plus-circle me-2"></i>Create New Assessment
+                    </a>
+                </div>
+            </div>
         </div>
-        <h3>No Assessments Found</h3>
-        <p class="mb-4">
-            {% if search_query or status_filter or date_from or date_to %}
-                No assessments match your current filters. Try adjusting your search criteria.
-            {% else %}
-                Get started by creating your first AI-First maturity assessment.
-            {% endif %}
-        </p>
-        
-        {% if search_query or status_filter or date_from or date_to %}
-        <a href="{{ url_for('assessment.index') if url_for else '/assessment/' }}" 
-           class="btn btn-outline-primary me-3">
-            <i class="bi bi-x-circle me-2"></i>Clear Filters
-        </a>
-        {% endif %}
-        
-        <a href="{{ url_for('assessment.create') if url_for else '/assessment/create' }}" 
-           class="btn btn-primary">
-            <i class="bi bi-plus-circle me-2"></i>Create New Assessment
-        </a>
     </div>
     {% endif %}
 </div>
