@@ -607,7 +607,8 @@
                        class="btn btn-action btn-view">
                         <i class="bi bi-info-circle me-1"></i>View Details
                     </a>
-                    <a href="#" class="btn btn-action btn-continue">
+                    <a href="{{ url_for('assessment.report', assessment_id=assessment.id) if url_for else '/assessment/' + assessment.id|string + '/report' }}" 
+                       class="btn btn-action btn-continue">
                         <i class="bi bi-file-earmark-text me-1"></i>View Report
                     </a>
                 {% elif assessment.status|lower == 'in_progress' %}
@@ -772,11 +773,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Add loading states to action buttons
-    const actionButtons = document.querySelectorAll('.btn-action');
+    // Add loading states to action buttons (except report links)
+    const actionButtons = document.querySelectorAll('.btn-action:not([href*="/report"])');
     actionButtons.forEach(button => {
         button.addEventListener('click', function() {
-            if (!this.classList.contains('btn-export')) {
+            if (!this.classList.contains('btn-export') && !this.href.includes('/report')) {
                 const originalText = this.innerHTML;
                 this.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Loading...';
                 this.disabled = true;
