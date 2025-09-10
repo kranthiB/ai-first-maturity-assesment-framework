@@ -23,95 +23,16 @@
     width: 100px;
 }
 
-.team-card {
+.feature-card {
     transition: all 0.3s ease;
     border: none;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.team-card:hover {
+.feature-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-}
-
-.principle-card {
-    border-left: 4px solid #0d6efd;
-    background: #f8f9fa;
-    transition: all 0.3s ease;
-}
-
-.principle-card:hover {
-    border-left-color: #0dcaf0;
-    background: #fff;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.methodology-step {
-    position: relative;
-    padding: 30px 0;
-}
-
-.methodology-step::before {
-    content: counter(step-counter);
-    counter-increment: step-counter;
-    position: absolute;
-    left: 0;
-    top: 30px;
-    width: 60px;
-    height: 60px;
-    background: linear-gradient(135deg, #0d6efd, #6f42c1);
-    color: white;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    font-size: 24px;
-}
-
-.methodology-steps {
-    counter-reset: step-counter;
-}
-
-.timeline {
-    position: relative;
-    padding-left: 30px;
-}
-
-.timeline::before {
-    content: '';
-    position: absolute;
-    left: 15px;
-    top: 0;
-    bottom: 0;
-    width: 2px;
-    background: linear-gradient(to bottom, #0d6efd, #6f42c1);
-}
-
-.timeline-item {
-    position: relative;
-    margin-bottom: 30px;
-}
-
-.timeline-item::before {
-    content: '';
-    position: absolute;
-    left: -23px;
-    top: 5px;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background: #0d6efd;
-    border: 3px solid #fff;
-    box-shadow: 0 0 0 3px #0d6efd;
-}
-
-.research-stat {
-    background: linear-gradient(45deg, #f8f9fa, #e9ecef);
-    border-radius: 15px;
-    padding: 30px;
-    text-align: center;
-    border: none;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.12);
+    border-color: #667eea;
 }
 </style>
 {% endblock %}
@@ -155,7 +76,7 @@
                 <div class="card h-100 border-0 bg-primary text-white">
                     <div class="card-body p-4">
                         <div class="text-center mb-3">
-                            <i class="bi bi-target" style="font-size: 3rem;"></i>
+                            <i class="bi bi-flag" style="font-size: 3rem;"></i>
                         </div>
                         <h4 class="text-center mb-3">Our Mission</h4>
                         <p class="text-center mb-0">
@@ -187,261 +108,82 @@
 
 <hr class="section-divider">
 
-<!-- Core Principles -->
+<!-- AFS Assessment Framework -->
 <section class="py-5">
     <div class="container">
         <div class="row">
-            <div class="col-lg-8 mx-auto text-center mb-5">
-                <h2 class="display-5 fw-bold mb-4">Our Core Principles</h2>
+            <div class="col-lg-10 mx-auto text-center mb-5">
+                <h2 class="display-5 fw-bold mb-4">AFS Assessment Framework</h2>
                 <p class="lead text-muted">
-                    The fundamental beliefs that guide our approach to AI maturity assessment.
+                    Comprehensive evaluation across 4 critical dimensions of AI-driven development maturity.
                 </p>
             </div>
         </div>
         <div class="row g-4">
-            <div class="col-lg-6">
-                <div class="principle-card p-4 h-100">
-                    <div class="d-flex align-items-start">
-                        <div class="principle-icon me-3">
-                            <i class="bi bi-shield-check text-primary" style="font-size: 2rem;"></i>
-                        </div>
-                        <div>
-                            <h5 class="fw-bold">Evidence-Based Assessment</h5>
-                            <p class="mb-0 text-muted">
-                                Our methodologies are grounded in rigorous research, industry best practices, 
-                                and real-world validation from hundreds of organizations.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="principle-card p-4 h-100">
-                    <div class="d-flex align-items-start">
-                        <div class="principle-icon me-3">
-                            <i class="bi bi-people-fill text-success" style="font-size: 2rem;"></i>
-                        </div>
-                        <div>
-                            <h5 class="fw-bold">Human-Centered AI</h5>
-                            <p class="mb-0 text-muted">
-                                We believe AI should augment human capabilities, not replace them. Our assessments 
-                                focus on the synergy between human expertise and artificial intelligence.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="principle-card p-4 h-100">
-                    <div class="d-flex align-items-start">
-                        <div class="principle-icon me-3">
-                            <i class="bi bi-graph-up-arrow text-info" style="font-size: 2rem;"></i>
-                        </div>
-                        <div>
-                            <h5 class="fw-bold">Continuous Improvement</h5>
-                            <p class="mb-0 text-muted">
-                                AI maturity is a journey, not a destination. Our platform supports ongoing 
-                                assessment, tracking, and iterative improvement of AI capabilities.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="principle-card p-4 h-100">
-                    <div class="d-flex align-items-start">
-                        <div class="principle-icon me-3">
-                            <i class="bi bi-globe text-warning" style="font-size: 2rem;"></i>
-                        </div>
-                        <div>
-                            <h5 class="fw-bold">Inclusive & Accessible</h5>
-                            <p class="mb-0 text-muted">
-                                Our tools are designed to be accessible to organizations of all sizes and 
-                                technical maturity levels, promoting democratic access to AI transformation.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="principle-card p-4 h-100">
-                    <div class="d-flex align-items-start">
-                        <div class="principle-icon me-3">
-                            <i class="bi bi-lock-fill text-danger" style="font-size: 2rem;"></i>
-                        </div>
-                        <div>
-                            <h5 class="fw-bold">Privacy & Security</h5>
-                            <p class="mb-0 text-muted">
-                                We prioritize data protection and privacy, ensuring that organizational 
-                                information is secure and used only for assessment and improvement purposes.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="principle-card p-4 h-100">
-                    <div class="d-flex align-items-start">
-                        <div class="principle-icon me-3">
-                            <i class="bi bi-heart-fill text-secondary" style="font-size: 2rem;"></i>
-                        </div>
-                        <div>
-                            <h5 class="fw-bold">Ethical AI Practices</h5>
-                            <p class="mb-0 text-muted">
-                                We advocate for responsible AI development and deployment, incorporating 
-                                ethical considerations throughout the assessment framework.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<hr class="section-divider">
-
-<!-- Research Foundation -->
-<section class="py-5 bg-light">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-8 mx-auto text-center mb-5">
-                <h2 class="display-5 fw-bold mb-4">Research Foundation</h2>
-                <p class="lead text-muted">
-                    Our assessment framework is built on extensive research and industry analysis.
-                </p>
-            </div>
-        </div>
-        <div class="row g-4 mb-5">
-            <div class="col-lg-3 col-md-6">
-                <div class="research-stat">
-                    <h2 class="text-primary fw-bold">500+</h2>
-                    <h6 class="text-muted">Research Papers Analyzed</h6>
-                    <p class="small mb-0">Academic and industry research on AI in software engineering</p>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6">
-                <div class="research-stat">
-                    <h2 class="text-success fw-bold">1,000+</h2>
-                    <h6 class="text-muted">Organizations Studied</h6>
-                    <p class="small mb-0">Real-world case studies and implementation patterns</p>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6">
-                <div class="research-stat">
-                    <h2 class="text-warning fw-bold">50+</h2>
-                    <h6 class="text-muted">Industry Experts</h6>
-                    <p class="small mb-0">Consultations with AI and software engineering leaders</p>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6">
-                <div class="research-stat">
-                    <h2 class="text-info fw-bold">3+</h2>
-                    <h6 class="text-muted">Years Development</h6>
-                    <p class="small mb-0">Continuous refinement and validation</p>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-lg-8 mx-auto">
-                <div class="card border-0 shadow">
+            <div class="col-lg-6 col-md-6">
+                <div class="card feature-card h-100">
                     <div class="card-body p-4">
-                        <h5 class="fw-bold mb-3">Key Research Sources</h5>
-                        <ul class="list-unstyled">
-                            <li class="mb-2">
-                                <i class="bi bi-check-circle text-success me-2"></i>
-                                IEEE and ACM publications on AI in software engineering
-                            </li>
-                            <li class="mb-2">
-                                <i class="bi bi-check-circle text-success me-2"></i>
-                                Industry reports from Gartner, McKinsey, and Deloitte
-                            </li>
-                            <li class="mb-2">
-                                <i class="bi bi-check-circle text-success me-2"></i>
-                                Open source project analysis and contribution patterns
-                            </li>
-                            <li class="mb-2">
-                                <i class="bi bi-check-circle text-success me-2"></i>
-                                Fortune 500 company AI transformation case studies
-                            </li>
-                            <li class="mb-2">
-                                <i class="bi bi-check-circle text-success me-2"></i>
-                                Startup and scale-up AI adoption methodologies
-                            </li>
-                            <li class="mb-0">
-                                <i class="bi bi-check-circle text-success me-2"></i>
-                                International standards and framework analysis (ISO, NIST, etc.)
-                            </li>
-                        </ul>
+                        <div class="feature-icon mb-3">
+                            <i class="bi bi-building text-primary" style="font-size: 2.2rem;"></i>
+                        </div>
+                        <h5 class="card-title fw-bold">Foundational Capabilities</h5>
+                        <p class="card-text text-muted">
+                            Core building blocks including AI infrastructure & tooling, team AI literacy & skills, 
+                            code generation & review, and documentation & knowledge management.
+                        </p>
+                        <div class="mt-3">
+                            <small class="fw-semibold text-muted">4 Capability Areas</small>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-</section>
-
-<!-- Methodology -->
-<section class="py-5">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-8 mx-auto text-center mb-5">
-                <h2 class="display-5 fw-bold mb-4">Our Methodology</h2>
-                <p class="lead text-muted">
-                    A systematic approach to evaluating and improving AI-first software engineering maturity.
-                </p>
+            <div class="col-lg-6 col-md-6">
+                <div class="card feature-card h-100">
+                    <div class="card-body p-4">
+                        <div class="feature-icon mb-3">
+                            <i class="bi bi-arrow-repeat text-primary" style="font-size: 2.2rem;"></i>
+                        </div>
+                        <h5 class="card-title fw-bold">Transformation Capabilities</h5>
+                        <p class="card-text text-muted">
+                            Advanced capabilities including intent-to-architecture translation, AI-driven testing, 
+                            intelligent CI/CD, monitoring & observability, and legacy system modernization.
+                        </p>
+                        <div class="mt-3">
+                            <small class="fw-semibold text-muted">5 Capability Areas</small>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-lg-8 mx-auto">
-                <div class="methodology-steps">
-                    <div class="methodology-step">
-                        <div class="ms-5">
-                            <h5 class="fw-bold">Multi-Dimensional Assessment</h5>
-                            <p class="text-muted">
-                                Evaluate six core dimensions: AI Strategy & Governance, Data & Analytics, 
-                                ML Engineering & MLOps, AI Ethics & Governance, Team Capabilities & Culture, 
-                                and Infrastructure & Tooling.
-                            </p>
+            <div class="col-lg-6 col-md-6">
+                <div class="card feature-card h-100">
+                    <div class="card-body p-4">
+                        <div class="feature-icon mb-3">
+                            <i class="bi bi-diagram-3 text-primary" style="font-size: 2.2rem;"></i>
+                        </div>
+                        <h5 class="card-title fw-bold">Enterprise Integration</h5>
+                        <p class="card-text text-muted">
+                            Enterprise-scale capabilities including data governance, vendor standardization, 
+                            system integration, cost management, performance & scalability, and business continuity.
+                        </p>
+                        <div class="mt-3">
+                            <small class="fw-semibold text-muted">6 Capability Areas</small>
                         </div>
                     </div>
-                    
-                    <div class="methodology-step">
-                        <div class="ms-5">
-                            <h5 class="fw-bold">Weighted Scoring Algorithm</h5>
-                            <p class="text-muted">
-                                Apply sophisticated algorithms that account for organizational context, 
-                                industry specifics, and interdependencies between different maturity dimensions.
-                            </p>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6">
+                <div class="card feature-card h-100">
+                    <div class="card-body p-4">
+                        <div class="feature-icon mb-3">
+                            <i class="bi bi-shield-check text-primary" style="font-size: 2.2rem;"></i>
                         </div>
-                    </div>
-                    
-                    <div class="methodology-step">
-                        <div class="ms-5">
-                            <h5 class="fw-bold">Benchmark Comparison</h5>
-                            <p class="text-muted">
-                                Compare results against industry peers, organization size cohorts, 
-                                and best-in-class performers to provide contextual insights.
-                            </p>
-                        </div>
-                    </div>
-                    
-                    <div class="methodology-step">
-                        <div class="ms-5">
-                            <h5 class="fw-bold">Personalized Recommendations</h5>
-                            <p class="text-muted">
-                                Generate tailored action plans based on current maturity level, 
-                                organizational goals, and available resources for maximum impact.
-                            </p>
-                        </div>
-                    </div>
-                    
-                    <div class="methodology-step">
-                        <div class="ms-5">
-                            <h5 class="fw-bold">Continuous Monitoring</h5>
-                            <p class="text-muted">
-                                Enable ongoing tracking of progress and regular reassessments to 
-                                ensure sustained improvement and adaptation to evolving AI landscape.
-                            </p>
+                        <h5 class="card-title fw-bold">Strategic Governance</h5>
+                        <p class="card-text text-muted">
+                            Leadership frameworks including AI ethics, regulatory compliance, IP management, 
+                            risk management, change management, performance measurement, collaboration, and innovation.
+                        </p>
+                        <div class="mt-3">
+                            <small class="fw-semibold text-muted">8 Capability Areas</small>
                         </div>
                     </div>
                 </div>
@@ -452,77 +194,95 @@
 
 <hr class="section-divider">
 
-<!-- Framework Evolution -->
+<!-- AFS Maturity Levels -->
 <section class="py-5 bg-light">
     <div class="container">
         <div class="row">
             <div class="col-lg-8 mx-auto text-center mb-5">
-                <h2 class="display-5 fw-bold mb-4">Framework Evolution</h2>
+                <h2 class="display-5 fw-bold mb-4">AFS Maturity Levels</h2>
                 <p class="lead text-muted">
-                    Our journey in developing the most comprehensive AI maturity assessment framework.
+                    Understand your organization's current position and roadmap for AI-first excellence.
                 </p>
             </div>
         </div>
         <div class="row">
-            <div class="col-lg-8 mx-auto">
-                <div class="timeline">
-                    <div class="timeline-item">
-                        <div class="timeline-content bg-white p-4 rounded shadow-sm">
-                            <h6 class="fw-bold">Q1 2021 - Initial Research</h6>
-                            <p class="mb-0">
-                                Began comprehensive literature review and industry analysis. 
-                                Identified gaps in existing maturity models for AI-first organizations.
-                            </p>
+            <div class="col-lg-10 mx-auto">
+                <div class="card mb-3 border-start border-danger border-3">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-2 text-center">
+                                <span class="badge bg-danger fs-6">Level 1</span>
+                            </div>
+                            <div class="col-md-3">
+                                <h5 class="fw-bold text-danger">Traditional Development</h5>
+                                <p class="mb-0 fw-semibold text-muted">AFS Score: 1.0-1.7</p>
+                            </div>
+                            <div class="col-md-7">
+                                <p class="mb-0 text-muted">
+                                    Minimal or no AI integration in development processes. Teams rely primarily on 
+                                    traditional manual methods with basic development tools and practices.
+                                </p>
+                            </div>
                         </div>
                     </div>
-                    
-                    <div class="timeline-item">
-                        <div class="timeline-content bg-white p-4 rounded shadow-sm">
-                            <h6 class="fw-bold">Q3 2021 - Framework Design</h6>
-                            <p class="mb-0">
-                                Developed initial six-dimensional framework structure. 
-                                Conducted expert interviews with 25+ industry leaders.
-                            </p>
+                </div>
+                
+                <div class="card mb-3 border-start border-warning border-3">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-2 text-center">
+                                <span class="badge bg-warning fs-6">Level 2</span>
+                            </div>
+                            <div class="col-md-3">
+                                <h5 class="fw-bold text-warning">AI-Assisted Development</h5>
+                                <p class="mb-0 fw-semibold text-muted">AFS Score: 1.8-2.4</p>
+                            </div>
+                            <div class="col-md-7">
+                                <p class="mb-0 text-muted">
+                                    Basic AI tool adoption with individual usage patterns. Teams begin incorporating 
+                                    AI assistance for specific tasks like code completion and basic documentation.
+                                </p>
+                            </div>
                         </div>
                     </div>
-                    
-                    <div class="timeline-item">
-                        <div class="timeline-content bg-white p-4 rounded shadow-sm">
-                            <h6 class="fw-bold">Q1 2022 - Pilot Testing</h6>
-                            <p class="mb-0">
-                                Tested framework with 50 organizations across various industries. 
-                                Refined scoring algorithms and question sets based on feedback.
-                            </p>
+                </div>
+                
+                <div class="card mb-3 border-start border-info border-3">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-2 text-center">
+                                <span class="badge bg-info fs-6">Level 3</span>
+                            </div>
+                            <div class="col-md-3">
+                                <h5 class="fw-bold text-info">AI-Augmented Development</h5>
+                                <p class="mb-0 fw-semibold text-muted">AFS Score: 2.5-3.2</p>
+                            </div>
+                            <div class="col-md-7">
+                                <p class="mb-0 text-muted">
+                                    Systematic AI integration across development workflows. Teams have standardized 
+                                    AI practices with coordinated usage and measurable productivity improvements.
+                                </p>
+                            </div>
                         </div>
                     </div>
-                    
-                    <div class="timeline-item">
-                        <div class="timeline-content bg-white p-4 rounded shadow-sm">
-                            <h6 class="fw-bold">Q3 2022 - Platform Development</h6>
-                            <p class="mb-0">
-                                Built comprehensive digital platform with advanced analytics, 
-                                reporting, and comparison capabilities.
-                            </p>
-                        </div>
-                    </div>
-                    
-                    <div class="timeline-item">
-                        <div class="timeline-content bg-white p-4 rounded shadow-sm">
-                            <h6 class="fw-bold">Q1 2023 - Public Launch</h6>
-                            <p class="mb-0">
-                                Launched platform to public with validated framework. 
-                                Achieved 500+ assessments in first 6 months.
-                            </p>
-                        </div>
-                    </div>
-                    
-                    <div class="timeline-item">
-                        <div class="timeline-content bg-white p-4 rounded shadow-sm">
-                            <h6 class="fw-bold">Q1 2024 - AI Enhancement</h6>
-                            <p class="mb-0">
-                                Integrated AI-powered insights and automated recommendation generation. 
-                                Added predictive analytics and trend forecasting.
-                            </p>
+                </div>
+                
+                <div class="card mb-0 border-start border-success border-3">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-2 text-center">
+                                <span class="badge bg-success fs-6">Level 4</span>
+                            </div>
+                            <div class="col-md-3">
+                                <h5 class="fw-bold text-success">AI-First Development</h5>
+                                <p class="mb-0 fw-semibold text-muted">AFS Score: 3.3-4.0</p>
+                            </div>
+                            <div class="col-md-7">
+                                <p class="mb-0 text-muted">
+                                    Advanced AI-native development with autonomous capabilities. Teams leverage 
+                                    intelligent systems for most development activities with predictive and self-improving processes.
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -531,104 +291,58 @@
     </div>
 </section>
 
-<!-- Team Section -->
+<hr class="section-divider">
+
+<!-- Assessment Benefits -->
 <section class="py-5">
     <div class="container">
         <div class="row">
-            <div class="col-lg-8 mx-auto text-center mb-5">
-                <h2 class="display-5 fw-bold mb-4">Our Team</h2>
+            <div class="col-lg-10 mx-auto text-center mb-5">
+                <h2 class="display-5 fw-bold mb-4">Assessment Benefits</h2>
                 <p class="lead text-muted">
-                    Meet the experts behind the AI-First Maturity Assessment Framework.
+                    Transform software engineering practices with comprehensive AI-first maturity insights.
                 </p>
             </div>
         </div>
         <div class="row g-4">
             <div class="col-lg-4 col-md-6">
-                <div class="card team-card h-100">
-                    <div class="card-body text-center p-4">
-                        <div class="team-avatar mb-3">
-                            <i class="bi bi-person-circle text-primary" style="font-size: 4rem;"></i>
+                <div class="card feature-card text-center h-100">
+                    <div class="card-body p-4">
+                        <div class="feature-icon mb-3">
+                            <i class="bi bi-speedometer2 text-primary" style="font-size: 2.2rem;"></i>
                         </div>
-                        <h5 class="fw-bold">Dr. Sarah Chen</h5>
-                        <p class="text-muted mb-2">Chief Research Officer</p>
-                        <p class="small mb-0">
-                            15+ years in AI research and software engineering. 
-                            Published 50+ papers on AI in development practices.
+                        <h5 class="fw-bold">AFS Score</h5>
+                        <p class="text-muted">
+                            Get your comprehensive AI-First Software Engineering score across all capability areas 
+                            with detailed breakdown and benchmarking.
                         </p>
                     </div>
                 </div>
             </div>
             <div class="col-lg-4 col-md-6">
-                <div class="card team-card h-100">
-                    <div class="card-body text-center p-4">
-                        <div class="team-avatar mb-3">
-                            <i class="bi bi-person-circle text-success" style="font-size: 4rem;"></i>
+                <div class="card feature-card text-center h-100">
+                    <div class="card-body p-4">
+                        <div class="feature-icon mb-3">
+                            <i class="bi bi-map text-primary" style="font-size: 2.2rem;"></i>
                         </div>
-                        <h5 class="fw-bold">Michael Rodriguez</h5>
-                        <p class="text-muted mb-2">Principal Architect</p>
-                        <p class="small mb-0">
-                            Former CTO at three AI-first startups. 
-                            Expert in MLOps and AI infrastructure at scale.
+                        <h5 class="fw-bold">Roadmap</h5>
+                        <p class="text-muted">
+                            Receive a customized roadmap with prioritized recommendations for advancing 
+                            to the next maturity level.
                         </p>
                     </div>
                 </div>
             </div>
             <div class="col-lg-4 col-md-6">
-                <div class="card team-card h-100">
-                    <div class="card-body text-center p-4">
-                        <div class="team-avatar mb-3">
-                            <i class="bi bi-person-circle text-info" style="font-size: 4rem;"></i>
+                <div class="card feature-card text-center h-100">
+                    <div class="card-body p-4">
+                        <div class="feature-icon mb-3">
+                            <i class="bi bi-graph-up-arrow text-primary" style="font-size: 2.2rem;"></i>
                         </div>
-                        <h5 class="fw-bold">Dr. Priya Patel</h5>
-                        <p class="text-muted mb-2">Data Science Lead</p>
-                        <p class="small mb-0">
-                            PhD in Machine Learning. Specialized in predictive analytics 
-                            and organizational behavior modeling.
-                        </p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6">
-                <div class="card team-card h-100">
-                    <div class="card-body text-center p-4">
-                        <div class="team-avatar mb-3">
-                            <i class="bi bi-person-circle text-warning" style="font-size: 4rem;"></i>
-                        </div>
-                        <h5 class="fw-bold">James Thompson</h5>
-                        <p class="text-muted mb-2">Industry Relations Director</p>
-                        <p class="small mb-0">
-                            20+ years in enterprise software consulting. 
-                            Led AI transformations at Fortune 100 companies.
-                        </p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6">
-                <div class="card team-card h-100">
-                    <div class="card-body text-center p-4">
-                        <div class="team-avatar mb-3">
-                            <i class="bi bi-person-circle text-danger" style="font-size: 4rem;"></i>
-                        </div>
-                        <h5 class="fw-bold">Dr. Elena Kowalski</h5>
-                        <p class="text-muted mb-2">Ethics & Governance Advisor</p>
-                        <p class="small mb-0">
-                            Leading researcher in AI ethics and responsible AI deployment. 
-                            Advisory board member at IEEE AI Standards.
-                        </p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6">
-                <div class="card team-card h-100">
-                    <div class="card-body text-center p-4">
-                        <div class="team-avatar mb-3">
-                            <i class="bi bi-person-circle text-secondary" style="font-size: 4rem;"></i>
-                        </div>
-                        <h5 class="fw-bold">David Kim</h5>
-                        <p class="text-muted mb-2">Platform Engineering Lead</p>
-                        <p class="small mb-0">
-                            Full-stack engineer with expertise in scalable web applications 
-                            and real-time analytics platforms.
+                        <h5 class="fw-bold">Benchmarks</h5>
+                        <p class="text-muted">
+                            Compare your results against industry standards and identify areas 
+                            for competitive advantage.
                         </p>
                     </div>
                 </div>
@@ -636,22 +350,24 @@
         </div>
     </div>
 </section>
+
+<hr class="section-divider">
 
 <!-- Call to Action -->
 <section class="py-5 bg-primary text-white">
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-8">
-                <h2 class="fw-bold mb-3">Ready to Assess Your AI Maturity?</h2>
+                <h2 class="fw-bold mb-3">Ready to Assess Your AI-First Maturity?</h2>
                 <p class="lead mb-0">
-                    Join thousands of organizations who have transformed their software engineering 
-                    practices with our comprehensive AI maturity assessment.
+                    Evaluate your organization's AI-driven development capabilities across foundational, 
+                    transformation, enterprise, and governance dimensions. Get your AFS Score and actionable roadmap.
                 </p>
             </div>
             <div class="col-lg-4 text-lg-end">
-                <a href="{{ url_for('assessment.start') if url_for else '/assessment/start' }}" 
+                <a href="{{ url_for('assessment.create') if url_for else '/assessment/create' }}" 
                    class="btn btn-light btn-lg">
-                    <i class="bi bi-rocket-takeoff me-2"></i>Start Assessment
+                    <i class="bi bi-play-circle me-2"></i>Start Assessment Now
                 </a>
             </div>
         </div>
@@ -677,8 +393,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }, observerOptions);
     
-    // Initially hide elements
-    document.querySelectorAll('.team-card, .principle-card, .timeline-item').forEach(el => {
+    // Initially hide elements and observe for animation
+    document.querySelectorAll('.feature-card').forEach(el => {
         el.style.opacity = '0';
         el.style.transform = 'translateY(20px)';
         el.style.transition = 'all 0.6s ease';
