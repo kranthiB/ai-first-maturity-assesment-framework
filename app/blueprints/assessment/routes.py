@@ -1753,19 +1753,15 @@ def _calculate_assessment_duration(assessment):
 @assessment_bp.route('/<int:assessment_id>/report')
 def report(assessment_id):
     """
-    Comprehensive assessment report page
+    Modern, interactive assessment report with charts and roadmap
     """
     try:
         from app.extensions import db
-        assessment_service = AssessmentService(db.session)
-        scoring_service = ScoringService(db.session)
-        recommendation_service = RecommendationService(db.session)
+        from sqlalchemy.orm import joinedload
+        from app.models.progression import get_all_progressions_for_area
         
-        # Get assessment with full details
-        assessment = assessment_service.get_assessment(
-            assessment_id, include_responses=True
-        )
-        
+        # Get assessment
+        assessment = db.session.query(Assessment).get(assessment_id)
         if not assessment:
             flash('Assessment not found', 'error')
             return redirect(url_for('assessment.index'))
@@ -1775,28 +1771,157 @@ def report(assessment_id):
             return redirect(url_for('assessment.detail',
                                     assessment_id=assessment_id))
         
-        # Get comprehensive scoring data
-        scores = scoring_service.calculate_assessment_score(assessment_id)
-        detailed_scores = scoring_service.get_detailed_section_scores(
-            assessment_id
-        )
+        # Get all sections with areas and questions
+        sections = db.session.query(Section).options(
+            joinedload(Section.areas).joinedload(Area.questions)
+        ).order_by(Section.display_order).all()
         
-        # Get comprehensive recommendations
-        recommendations = (
-            recommendation_service.generate_assessment_recommendations(
-                assessment_id
-            )
-        )
+        # Get all responses for this assessment
+        responses = db.session.query(Response).filter(
+            Response.assessment_id == assessment_id
+        ).all()
+        responses_dict = {r.question_id: r for r in responses}
         
-        # Get benchmarking data
-        benchmarks = scoring_service.get_benchmark_comparison(assessment_id)
+        # Calculate detailed scores
+        section_scores = []
+        area_scores = {}
+        all_scores = []
+        
+        for section in sections:
+            section_responses = []
+            section_areas = []
+            
+            for area in section.areas:
+                area_responses = []
+                for question in area.questions:
+                    if question.id in responses_dict:
+                        response_score = responses_dict[question.id].score
+                        area_responses.append(response_score)
+                
+                if area_responses:
+                    area_score = sum(area_responses) / len(area_responses)
+                    area_scores[area.id] = {
+                        'score': area_score,
+                        'name': area.name,
+                        'responses_count': len(area_responses),
+                        'max_possible': len(area.questions) * 4
+                    }
+                    section_responses.extend(area_responses)
+                    section_areas.append({
+                        'id': area.id,
+                        'name': area.name,
+                        'score': area_score,
+                        'level': _get_maturity_level_from_score(area_score),
+                        'responses_count': len(area_responses)
+                    })
+            
+            if section_responses:
+                section_score = sum(section_responses) / len(section_responses)
+                all_scores.extend(section_responses)
+                
+                section_scores.append({
+                    'id': section.id,
+                    'name': section.name,
+                    'score': section_score,
+                    'level': _get_maturity_level_from_score(section_score),
+                    'color': _get_section_color(section.id),
+                    'areas': section_areas,
+                    'responses_count': len(section_responses),
+                    'percentage': round((section_score / 4.0) * 100, 1)
+                })
+        
+        # Calculate overall metrics
+        overall_score = sum(all_scores) / len(all_scores) if all_scores else 0
+        overall_level = _get_maturity_level_from_score(overall_score)
+        
+        # Generate roadmap data for each answered question
+        roadmap_data = {}
+        for question_id, response in responses_dict.items():
+            question = db.session.query(Question).get(question_id)
+            if question and question.area:
+                area_id = question.area.id
+                current_level = response.score
+                
+                # Get progression data for next levels
+                progressions = get_all_progressions_for_area(area_id)
+                next_levels = []
+                
+                # Up to level 4
+                for target_level in range(current_level + 1, 5):
+                    if target_level in progressions:
+                        prog = progressions[target_level]
+                        next_levels.append({
+                            'level': target_level,
+                            'prerequisites': _parse_progression_text(
+                                prog.prerequisites
+                            ),
+                            'action_items': _parse_progression_text(
+                                prog.action_items
+                            ),
+                            'success_metrics': _parse_progression_text(
+                                prog.success_metrics
+                            ),
+                            'timeline': prog.timeline,
+                            'common_pitfalls': _parse_progression_text(
+                                prog.common_pitfall
+                            )
+                        })
+                
+                if next_levels:
+                    roadmap_data[question_id] = {
+                        'question': question.question,
+                        'area_name': question.area.name,
+                        'current_level': current_level,
+                        'current_description': _get_level_description(
+                            question, current_level
+                        ),
+                        'next_levels': next_levels
+                    }
+        
+        # Prepare chart data
+        chart_data = {
+            'section_scores': [
+                {'name': s['name'], 'score': s['score'], 'color': s['color']}
+                for s in section_scores
+            ],
+            'maturity_distribution': _calculate_maturity_distribution(
+                section_scores
+            ),
+            'area_comparison': [
+                {
+                    'name': area['name'],
+                    'score': area['score'],
+                    'section': section['name']
+                }
+                for section in section_scores
+                for area in section['areas']
+            ]
+        }
+        
+        # Generate insights and recommendations
+        insights = _generate_insights(section_scores, overall_score)
+        priority_areas = _identify_priority_areas(section_scores)
         
         context = {
             'assessment': assessment,
-            'scores': scores,
-            'detailed_scores': detailed_scores,
-            'recommendations': recommendations,
-            'benchmarks': benchmarks
+            'overall_score': overall_score,
+            'overall_level': overall_level,
+            'section_scores': section_scores,
+            'area_scores': area_scores,
+            'chart_data': chart_data,
+            'roadmap_data': roadmap_data,
+            'insights': insights,
+            'priority_areas': priority_areas,
+            'responses_count': len(responses_dict),
+            'total_questions': sum(
+                len(area.questions)
+                for section in sections
+                for area in section.areas
+            ),
+            'completion_date': assessment.completion_date,
+            'organization_name': (
+                assessment.organization_name or assessment.team_name
+            )
         }
         
         return render_template('pages/assessment/report.html', **context)
@@ -1806,6 +1931,146 @@ def report(assessment_id):
         flash('Error loading report', 'error')
         return redirect(url_for('assessment.results',
                                 assessment_id=assessment_id))
+
+
+def _get_maturity_level_from_score(score):
+    """Convert numeric score to maturity level name"""
+    if score >= 3.5:
+        return 'AI-First'
+    elif score >= 2.5:
+        return 'AI-Augmented'
+    elif score >= 1.5:
+        return 'AI-Assisted'
+    else:
+        return 'Traditional'
+
+
+def _get_section_color(section_id):
+    """Get color for section based on ID"""
+    colors = {
+        'FC': '#3b82f6',  # Blue
+        'TC': '#10b981',  # Green
+        'EI': '#f59e0b',  # Yellow
+        'SG': '#ef4444'   # Red
+    }
+    return colors.get(section_id, '#6b7280')
+
+
+def _parse_progression_text(text):
+    """Parse progression text into list items"""
+    if not text:
+        return []
+    return [item.strip() for item in text.split('|') if item.strip()]
+
+
+def _get_level_description(question, level):
+    """Get description for specific level of a question"""
+    level_descriptions = {
+        1: question.level_1_desc,
+        2: question.level_2_desc,
+        3: question.level_3_desc,
+        4: question.level_4_desc
+    }
+    return level_descriptions.get(level, '')
+
+
+def _calculate_maturity_distribution(section_scores):
+    """Calculate distribution of maturity levels across sections"""
+    distribution = {
+        'Traditional': 0,
+        'AI-Assisted': 0,
+        'AI-Augmented': 0,
+        'AI-First': 0
+    }
+    
+    for section in section_scores:
+        level = section['level']
+        if level in distribution:
+            distribution[level] += 1
+    
+    return distribution
+
+
+def _generate_insights(section_scores, overall_score):
+    """Generate key insights from the assessment results"""
+    insights = []
+    
+    if not section_scores:
+        return insights
+    
+    # Find strongest and weakest sections
+    strongest = max(section_scores, key=lambda x: x['score'])
+    weakest = min(section_scores, key=lambda x: x['score'])
+    
+    insights.append({
+        'type': 'strength',
+        'title': f"Strongest Area: {strongest['name']}",
+        'description': (
+            f"Your organization excels in {strongest['name']} "
+            f"with a score of {strongest['score']:.1f}"
+        ),
+        'icon': 'trophy'
+    })
+    
+    insights.append({
+        'type': 'improvement',
+        'title': f"Priority for Improvement: {weakest['name']}",
+        'description': (
+            f"{weakest['name']} scored {weakest['score']:.1f} and offers "
+            f"the greatest opportunity for advancement"
+        ),
+        'icon': 'target'
+    })
+    
+    # Score variance insight
+    scores = [s['score'] for s in section_scores]
+    variance = max(scores) - min(scores)
+    
+    if variance > 1.5:
+        insights.append({
+            'type': 'warning',
+            'title': 'Uneven Maturity Distribution',
+            'description': (
+                f'Large gap ({variance:.1f} points) between highest and '
+                f'lowest scoring areas suggests focused improvement needed'
+            ),
+            'icon': 'exclamation-triangle'
+        })
+    elif variance < 0.5:
+        insights.append({
+            'type': 'success',
+            'title': 'Consistent Maturity Levels',
+            'description': (
+                'Your organization shows consistent maturity across '
+                'all assessment areas'
+            ),
+            'icon': 'check-circle'
+        })
+    
+    return insights
+
+
+def _identify_priority_areas(section_scores):
+    """Identify priority areas for improvement"""
+    if not section_scores:
+        return []
+    
+    # Sort by score ascending to get lowest scores first
+    sorted_sections = sorted(section_scores, key=lambda x: x['score'])
+    
+    priority_areas = []
+    for i, section in enumerate(sorted_sections[:3]):  # Top 3 priority areas
+        priority_areas.append({
+            'rank': i + 1,
+            'name': section['name'],
+            'score': section['score'],
+            'level': section['level'],
+            'color': section['color'],
+            'areas': section['areas'][:2],  # Top 2 areas within section
+            'improvement_potential': round((4.0 - section['score']), 1)
+        })
+    
+    return priority_areas
 
 
 @assessment_bp.route('/<int:assessment_id>/progress')

@@ -31,7 +31,7 @@
     <title>{% block title %}AI-First Software Engineering Maturity Assessment{% endblock %}</title>
     
     <!-- Preload critical resources -->
-    <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" as="style">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" as="style" crossorigin="anonymous">
     
     <!-- Favicon and app icons -->
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='assets/images/favicon.ico') }}">
@@ -40,9 +40,9 @@
     <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='assets/images/logo/favicon-16x16.png') }}">
     <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
     
-    <!-- Bootstrap 5 CSS with SRI -->
+    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" 
-          integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+          crossorigin="anonymous">
     
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
@@ -56,8 +56,8 @@
     <!-- Note: Using Bootstrap for styling. Custom SCSS files available in src/scss/ if build system is added -->
     
     <!-- Chart.js for visualizations -->
-    <!-- Temporarily disabled to fix loading issues -->
-    <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.js" defer></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js" 
+            crossorigin="anonymous"></script>
     
     <!-- Additional CSS -->
     {% block head_extra %}{% endblock %}
@@ -152,15 +152,15 @@
         </div>
     </div>
     
-    <!-- Bootstrap 5 JavaScript Bundle with SRI -->
+    <!-- Bootstrap 5 JavaScript Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" 
-            integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+            crossorigin="anonymous"></script>
     
     <!-- Custom JavaScript -->
     <!-- Load utilities first -->
-    <script src="{{ url_for('static', filename='src/js/modules/utils.js') }}" defer></script>
+    <!-- <script src="{{ url_for('static', filename='src/js/modules/utils.js') }}" defer></script> -->
     <!-- Load main application -->
-    <script src="{{ url_for('static', filename='src/js/main.js') }}" defer></script>
+    <!-- <script src="{{ url_for('static', filename='src/js/main.js') }}" defer></script> -->
     
     <!-- Page-specific JavaScript -->
     {% block scripts %}{% endblock %}
@@ -280,23 +280,22 @@
             });
             
             // Also specifically target sections by content/title
-            const additionalSelectors = [
-                // Target sections by their heading content
-                'h2:contains("AFS Assessment Framework")',
-                'h2:contains("AFS Maturity Levels")', 
-                'h2:contains("Assessment Benefits")',
-                'h2:contains("Ready to Assess Your AI-First Maturity")'
+            const frameworkRelatedTexts = [
+                "AFS Assessment Framework",
+                "AFS Maturity Levels", 
+                "Assessment Benefits",
+                "Ready to Assess Your AI-First Maturity"
             ];
             
             // Find sections by their heading text and hide them
             const headings = document.querySelectorAll('h2');
             headings.forEach(function(heading) {
                 const text = heading.textContent.trim();
-                if (text.includes('AFS Assessment Framework') || 
-                    text.includes('AFS Maturity Levels') || 
-                    text.includes('Assessment Benefits') || 
-                    text.includes('Ready to Assess Your AI-First Maturity')) {
-                    
+                const matchesFrameworkContent = frameworkRelatedTexts.some(function(frameworkText) {
+                    return text.includes(frameworkText);
+                });
+                
+                if (matchesFrameworkContent) {
                     // Find the parent section and hide it
                     let parentSection = heading.closest('section');
                     if (parentSection && !sectionsToHide.includes(parentSection)) {

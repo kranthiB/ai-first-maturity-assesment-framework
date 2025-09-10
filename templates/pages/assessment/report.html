@@ -3,590 +3,577 @@
 {% set show_breadcrumbs = true %}
 {% set breadcrumbs = [
     {"name": "Home", "url": url_for('main.index') if url_for else '/'},
-    {"name": "Assessment", "url": url_for('assessment.start') if url_for else '/assessment/start'},
+    {"name": "Assessment", "url": url_for('assessment.index') if url_for else '/assessment/'},
     {"name": "Report", "url": "#", "active": true}
 ] %}
 
 {% block head_extra %}
-<!-- Assessment styles handled by Bootstrap -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css" rel="stylesheet">
 <style>
+.report-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 15px;
+    margin-bottom: 30px;
+}
+
+.score-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: 3px solid rgba(255, 255, 255, 0.3);
+}
+
+.roadmap-card {
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+}
+
+.roadmap-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.roadmap-level {
+    background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 15px;
+    border-left: 4px solid #007bff;
+}
+
+.roadmap-level.level-2 { border-left-color: #28a745; }
+.roadmap-level.level-3 { border-left-color: #ffc107; }
+.roadmap-level.level-4 { border-left-color: #dc3545; }
+
+.metric-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.metric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.insight-card {
+    border-radius: 12px;
+    border: none;
+    margin-bottom: 15px;
+    overflow: hidden;
+}
+
+.insight-card.strength { background: linear-gradient(45deg, #d4edda, #c3e6cb); }
+.insight-card.improvement { background: linear-gradient(45deg, #f8d7da, #f5c6cb); }
+.insight-card.warning { background: linear-gradient(45deg, #fff3cd, #ffeaa7); }
+.insight-card.success { background: linear-gradient(45deg, #d1ecf1, #bee5eb); }
+
+.chart-container {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.roadmap-header {
+    background: linear-gradient(45deg, #6c5ce7, #a29bfe);
+    color: white;
+    padding: 15px 20px;
+    border-radius: 12px 12px 0 0;
+    margin: -20px -20px 20px -20px;
+}
+
+.progress-indicator {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.progress-step {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    font-weight: bold;
+    color: white;
+}
+
+.progress-step.current { background: #007bff; }
+.progress-step.next { background: #28a745; }
+.progress-step.future { background: #6c757d; }
+
+.roadmap-section {
+    margin-bottom: 30px;
+}
+
+.action-item {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    border-left: 3px solid #007bff;
+}
+
+.metric-icon {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.maturity-breakdown-card {
+    background: #ffffff;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.maturity-breakdown-card:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+
+.fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.6s ease;
+}
+
+.fade-in.animate {
+    opacity: 1;
+    transform: translateY(0);
+}
+
 @media print {
+    .roadmap-card { break-inside: avoid; }
+    .chart-container { break-inside: avoid; }
     .no-print { display: none !important; }
-    .card { border: 1px solid #ddd !important; box-shadow: none !important; }
-    .page-break { page-break-before: always; }
 }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="assessment-report-container">
+<div class="container-fluid">
     <!-- Report Header -->
-    <div class="report-header bg-white border-bottom py-4 mb-4 no-print">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    <h1 class="h3 mb-2">
-                        <i class="bi bi-file-text me-2"></i>
-                        Comprehensive Assessment Report
-                    </h1>
-                    <p class="text-muted mb-0">{{ assessment.organization_name }} • {{ assessment.completion_date.strftime('%B %d, %Y') }}</p>
+    <div class="report-header p-5 fade-in">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="display-4 fw-bold mb-3">
+                    <i class="bi bi-graph-up-arrow me-3"></i>
+                    AI-First Maturity Assessment Report
+                </h1>
+                <h3 class="mb-3">{{ organization_name }}</h3>
+                <div class="d-flex flex-wrap gap-3 mb-3">
+                    <span class="badge bg-light text-dark fs-6 px-3 py-2">
+                        <i class="bi bi-calendar me-2"></i>
+                        Completed: {{ completion_date.strftime('%B %d, %Y') if completion_date else 'N/A' }}
+                    </span>
+                    <span class="badge bg-light text-dark fs-6 px-3 py-2">
+                        <i class="bi bi-check-circle me-2"></i>
+                        {{ responses_count }}/{{ total_questions }} Questions
+                    </span>
+                    <span class="badge bg-light text-dark fs-6 px-3 py-2">
+                        <i class="bi bi-building me-2"></i>
+                        Assessment ID: {{ assessment.id }}
+                    </span>
                 </div>
-                <div class="col-md-4 text-md-end">
-                    <div class="btn-group">
-                        <button class="btn btn-outline-primary" onclick="window.print()">
-                            <i class="bi bi-printer me-2"></i>Print Report
-                        </button>
-                        <div class="dropdown">
-                            <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                <i class="bi bi-download me-2"></i>Download
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <a class="dropdown-item" href="{{ url_for('api.export_assessment', assessment_id=assessment.id, format='pdf') if url_for else '/api/v1/export/assessment/' + assessment.id|string + '/pdf' }}">
-                                        <i class="bi bi-file-pdf me-2"></i>PDF Report
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="{{ url_for('api.export_assessment', assessment_id=assessment.id, format='excel') if url_for else '/api/v1/export/assessment/' + assessment.id|string + '/excel' }}">
-                                        <i class="bi bi-file-excel me-2"></i>Excel Data
-                                    </a>
-                                </li>
-                            </ul>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="score-circle mx-auto mb-3">
+                    <div class="text-center">
+                        <div class="fw-bold" style="font-size: 2.5rem;">{{ "%.1f"|format(overall_score) }}</div>
+                        <div class="fw-semibold">Overall Score</div>
+                    </div>
+                </div>
+                <h4 class="fw-bold">{{ overall_level }}</h4>
+                <p class="mb-0">Current Maturity Level</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Key Metrics Row -->
+    <div class="row mb-4 fade-in">
+        {% for section in section_scores %}
+        <div class="col-md-3 mb-3">
+            <div class="metric-card">
+                <div class="metric-icon" style="color: {{ section.color }};">
+                    <i class="bi bi-pie-chart"></i>
+                </div>
+                <h3 class="fw-bold mb-2" style="color: {{ section.color }};">
+                    {{ "%.1f"|format(section.score) }}
+                </h3>
+                <h6 class="text-muted mb-1">{{ section.name }}</h6>
+                <div class="progress mt-2" style="height: 6px;">
+                    <div class="progress-bar" 
+                         style="width: {{ section.percentage }}%; background-color: {{ section.color }};">
+                    </div>
+                </div>
+                <small class="text-muted">{{ section.percentage }}% of max</small>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Charts Row -->
+                <!-- Charts Section -->
+            <div class="row mt-5 mb-5">
+                <div class="col-md-6 mb-5">
+                    <div class="card shadow-sm fade-in">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">
+                                <i class="bi bi-pie-chart me-2"></i>
+                                Section Performance Overview
+                            </h5>
                         </div>
+                        <div class="card-body" style="height: 500px; position: relative; padding: 25px; margin-bottom: 20px;">
+                            <p class="text-muted small mb-3">
+                                <i class="bi bi-info-circle me-1"></i>
+                                This chart shows your organization's performance across the four key AI maturity sections. 
+                                Each section is scored from 0-4, with higher scores indicating greater maturity.
+                            </p>
+                            <div id="chartLoadingSection" class="text-center p-4">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading chart...</span>
+                                </div>
+                                <p class="mt-2">Loading section chart...</p>
+                            </div>
+                            <canvas id="sectionChart" style="display: none;"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-5">
+                    <div class="card shadow-sm fade-in">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">
+                                <i class="bi bi-bar-chart me-2"></i>
+                                Maturity Level Distribution
+                            </h5>
+                        </div>
+                        <div class="card-body" style="height: 500px; position: relative; padding: 25px; margin-bottom: 20px;">
+                            <p class="text-muted small mb-3">
+                                <i class="bi bi-info-circle me-1"></i>
+                                This chart displays how your responses are distributed across AI maturity levels. 
+                                Each bar represents the number of <strong>sections</strong> that achieved that maturity level.
+                                <strong>The numbers on the bars show how many sections (out of 4 total) are at each level.</strong>
+                            </p>
+                            <div id="chartLoadingMaturity" class="text-center p-4">
+                                <div class="spinner-border text-success" role="status">
+                                    <span class="visually-hidden">Loading chart...</span>
+                                </div>
+                                <p class="mt-2">Loading maturity chart...</p>
+                            </div>
+                            <canvas id="maturityChart" style="display: none;"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+    <!-- Maturity Level Breakdown -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card shadow-sm fade-in">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-list-check me-2"></i>
+                        Section Maturity Breakdown
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-4">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Here's which specific sections achieved each maturity level:
+                    </p>
+                    
+                    {% set maturity_levels = ['Traditional', 'AI-Assisted', 'AI-Augmented', 'AI-First'] %}
+                    {% set level_colors = ['#6c757d', '#ffc107', '#28a745', '#dc3545'] %}
+                    {% set level_icons = ['bi-archive', 'bi-gear', 'bi-lightning', 'bi-rocket-takeoff'] %}
+                    
+                    <div class="row">
+                        {% for i in range(4) %}
+                        {% set level = maturity_levels[i] %}
+                        {% set color = level_colors[i] %}
+                        {% set icon = level_icons[i] %}
+                        {% set sections_at_level = [] %}
+                        
+                        {% for section in section_scores %}
+                            {% if section.level == level %}
+                                {% set _ = sections_at_level.append(section) %}
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if sections_at_level %}
+                        <div class="col-md-6 col-lg-3 mb-3">
+                            <div class="maturity-breakdown-card h-100" style="border-left: 4px solid {{ color }};">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="bi {{ icon }} me-2" style="color: {{ color }}; font-size: 1.2rem;"></i>
+                                    <h6 class="mb-0 fw-bold">{{ level }}</h6>
+                                    <span class="badge rounded-pill ms-auto" style="background-color: {{ color }};">{{ sections_at_level|length }}</span>
+                                </div>
+                                <ul class="list-unstyled mb-0 small">
+                                    {% for section in sections_at_level %}
+                                    <li class="mb-1">
+                                        <i class="bi bi-check-circle-fill me-1" style="color: {{ color }}; font-size: 0.8rem;"></i>
+                                        {{ section.name }}
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Executive Summary -->
-    <div class="container">
-        <div class="executive-summary mb-5">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h2 class="h4 mb-0">
-                        <i class="bi bi-graph-up me-2"></i>
-                        Executive Summary
-                    </h2>
+    <!-- Insights Row -->
+    <div class="row mb-4 mt-5">
+        <div class="col-12">
+            <h4 class="fw-bold mb-4 fade-in" style="margin-top: 2rem;">
+                <i class="bi bi-lightbulb me-2 text-warning"></i>
+                Key Insights
+            </h4>
+            <div class="row">
+                {% for insight in insights %}
+                <div class="col-md-4 mb-3">
+                    <div class="insight-card {{ insight.type }} p-4 fade-in">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="bi bi-{{ insight.icon }} fs-3 me-3"></i>
+                            <h6 class="mb-0 fw-bold">{{ insight.title }}</h6>
+                        </div>
+                        <p class="mb-0">{{ insight.description }}</p>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-8">
-                            <h3 class="h5 mb-3">Assessment Overview</h3>
-                            <p class="lead">
-                                {{ assessment.organization_name }} has achieved a AFS score of 
-                                <strong>{{ "%.1f"|format(assessment.overall_score) }}</strong>, 
-                                placing the organization at the <strong>{{ assessment.maturity_level }}</strong> 
-                                maturity level for AI-first software engineering practices.
-                            </p>
-                            
-                            <div class="key-findings mb-4">
-                                <h4 class="h6 mb-3">Key Findings:</h4>
-                                <ul class="findings-list">
-                                    <li><strong>Strongest Area:</strong> {{ strongest_section.name }} ({{ "%.1f"|format(strongest_section.score) }})</li>
-                                    <li><strong>Greatest Opportunity:</strong> {{ improvement_section.name }} ({{ "%.1f"|format(improvement_section.score) }})</li>
-                                    <li><strong>Assessment Completion:</strong> {{ total_questions }} questions answered over {{ assessment_duration }}</li>
-                                    <li><strong>Consistency:</strong> {{ consistency_level }} score distribution across sections</li>
-                                </ul>
-                            </div>
-                            
-                            <div class="recommendations-summary">
-                                <h4 class="h6 mb-3">Priority Recommendations:</h4>
-                                <ol class="recommendations-list">
-                                    {% for rec in top_recommendations %}
-                                    <li>{{ rec.title }} ({{ rec.category }}, {{ rec.timeline }})</li>
-                                    {% endfor %}
-                                </ol>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Priority Areas -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h4 class="fw-bold mb-4 fade-in">
+                <i class="bi bi-target me-2 text-danger"></i>
+                Priority Areas for Improvement
+            </h4>
+            <div class="row">
+                {% for area in priority_areas %}
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100 fade-in">
+                        <div class="card-header text-white" style="background: {{ area.color }};">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0">#{{ area.rank }} Priority</h6>
+                                <span class="badge bg-light text-dark">{{ area.level }}</span>
                             </div>
                         </div>
-                        
-                        <div class="col-md-4">
-                            <div class="score-summary text-center">
-                                <div class="overall-score-circle bg-primary text-white rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" 
-                                     style="width: 120px; height: 120px;">
-                                    <div>
-                                        <div class="fw-bold" style="font-size: 2.5rem;">{{ "%.1f"|format(assessment.overall_score) }}</div>
-                                        <div class="small">AFS Score</div>
-                                    </div>
-                                </div>
-                                <h4 class="text-primary mb-3">{{ assessment.maturity_level }}</h4>
-                                
-                                <div class="score-breakdown mt-4">
-                                    {% for section in section_scores %}
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <span class="small">{{ section.name }}</span>
-                                        <span class="badge bg-primary">{{ "%.1f"|format(section.score) }}</span>
-                                    </div>
-                                    {% endfor %}
-                                </div>
+                        <div class="card-body">
+                            <h5 class="fw-bold">{{ area.name }}</h5>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span>Current Score:</span>
+                                <span class="fw-bold fs-4" style="color: {{ area.color }};">
+                                    {{ "%.1f"|format(area.score) }}
+                                </span>
                             </div>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span>Improvement Potential:</span>
+                                <span class="fw-bold text-success">
+                                    +{{ area.improvement_potential }} points
+                                </span>
+                            </div>
+                            {% if area.areas %}
+                            <h6 class="fw-bold mt-3 mb-2">Focus Areas:</h6>
+                            <ul class="list-unstyled">
+                                {% for sub_area in area.areas %}
+                                <li class="mb-1">
+                                    <small class="text-muted">
+                                        {{ sub_area.name }} ({{ "%.1f"|format(sub_area.score) }})
+                                    </small>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
+                {% endfor %}
             </div>
         </div>
+    </div>
 
-        <!-- Detailed Section Analysis -->
-        <div class="page-break"></div>
-        <div class="section-analysis mb-5">
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="h4 mb-0">
-                        <i class="bi bi-list-check me-2"></i>
-                        Detailed Section Analysis
-                    </h2>
-                </div>
-                <div class="card-body">
-                    {% for section in detailed_section_results %}
-                    <div class="section-detail mb-5 {% if not loop.last %}border-bottom pb-4{% endif %}">
-                        <div class="section-header mb-4">
-                            <div class="row align-items-center">
-                                <div class="col-md-8">
-                                    <h3 class="h5 mb-2">
-                                        <i class="bi bi-{{ section.icon }} me-2"></i>
-                                        {{ section.name }}
-                                    </h3>
-                                    <p class="text-muted">{{ section.description }}</p>
-                                </div>
-                                <div class="col-md-4 text-md-end">
-                                    <div class="section-score">
-                                        <div class="fw-bold fs-2 text-primary">{{ "%.1f"|format(section.score) }}</div>
-                                        <div class="text-muted">Section Score</div>
+    <!-- Roadmap Section -->
+    <div class="row">
+        <div class="col-12">
+            <h2 class="fw-bold mb-4 fade-in">
+                <i class="bi bi-map me-2 text-primary"></i>
+                Personalized Maturity Roadmap
+            </h2>
+            <p class="lead text-muted mb-4 fade-in">
+                Based on your responses, here's your step-by-step guide to advancing through maturity levels.
+            </p>
+
+            {% for question_id, roadmap in roadmap_data.items() %}
+            <div class="roadmap-card fade-in">
+                <div class="card-body p-4">
+                    <div class="roadmap-header">
+                        <h5 class="mb-2 fw-bold">
+                            <i class="bi bi-question-circle me-2"></i>
+                            {{ roadmap.area_name }}
+                        </h5>
+                        <p class="mb-0 opacity-75">{{ roadmap.question }}</p>
+                    </div>
+
+                    <!-- Current Level -->
+                    <div class="progress-indicator">
+                        <div class="progress-step current">{{ roadmap.current_level }}</div>
+                        <div>
+                            <h6 class="mb-1 fw-bold">Current Level {{ roadmap.current_level }}</h6>
+                            <p class="text-muted mb-0">{{ roadmap.current_description }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Next Levels Roadmap -->
+                    {% for next_level in roadmap.next_levels %}
+                    <div class="roadmap-level level-{{ next_level.level }}">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="progress-step {% if loop.index == 1 %}next{% else %}future{% endif %}">
+                                {{ next_level.level }}
+                            </div>
+                            <div>
+                                <h6 class="mb-0 fw-bold">Level {{ next_level.level }} Advancement</h6>
+                                {% if next_level.timeline %}
+                                <small class="text-muted">
+                                    <i class="bi bi-clock me-1"></i>{{ next_level.timeline }}
+                                </small>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Prerequisites -->
+                            <div class="col-md-6 mb-3">
+                                <h6 class="fw-bold text-primary">
+                                    <i class="bi bi-list-check me-2"></i>Prerequisites
+                                </h6>
+                                {% if next_level.prerequisites %}
+                                    {% for prerequisite in next_level.prerequisites %}
+                                    <div class="action-item">
+                                        <i class="bi bi-arrow-right me-2 text-primary"></i>
+                                        {{ prerequisite }}
                                     </div>
-                                </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <p class="text-muted">No specific prerequisites defined</p>
+                                {% endif %}
                             </div>
-                        </div>
-                        
-                        <!-- Area Breakdown -->
-                        <div class="area-breakdown mb-4">
-                            <h4 class="h6 mb-3">Area Performance</h4>
-                            <div class="table-responsive">
-                                <table class="table table-sm">
-                                    <thead>
-                                        <tr>
-                                            <th>Area</th>
-                                            <th>Score</th>
-                                            <th>Questions</th>
-                                            <th>Performance</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for area in section.areas %}
-                                        <tr>
-                                            <td>{{ area.name }}</td>
-                                            <td><span class="badge bg-primary">{{ "%.1f"|format(area.score) }}</span></td>
-                                            <td>{{ area.question_count }}</td>
-                                            <td>
-                                                <div class="progress" style="height: 8px;">
-                                                    <div class="progress-bar" role="progressbar" 
-                                                         style="width: {{ (area.score / 4 * 100) }}%">
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        
-                        <!-- Question Details -->
-                        <div class="question-details mb-4">
-                            <h4 class="h6 mb-3">Question Responses</h4>
-                            <div class="row">
-                                {% for question in section.questions %}
-                                <div class="col-md-6 mb-3">
-                                    <div class="question-summary p-3 border rounded">
-                                        <h6 class="mb-2">Q{{ question.number }}: {{ question.text|truncate(60) }}</h6>
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <span class="text-muted small">{{ question.area_name }}</span>
-                                            <span class="badge bg-primary">{{ question.response_score }}</span>
-                                        </div>
-                                        {% if question.response_comments %}
-                                        <div class="mt-2">
-                                            <small class="text-muted">{{ question.response_comments|truncate(100) }}</small>
-                                        </div>
-                                        {% endif %}
+
+                            <!-- Action Items -->
+                            <div class="col-md-6 mb-3">
+                                <h6 class="fw-bold text-success">
+                                    <i class="bi bi-gear me-2"></i>Action Items
+                                </h6>
+                                {% if next_level.action_items %}
+                                    {% for action in next_level.action_items %}
+                                    <div class="action-item">
+                                        <i class="bi bi-play-fill me-2 text-success"></i>
+                                        {{ action }}
                                     </div>
-                                </div>
-                                {% endfor %}
+                                    {% endfor %}
+                                {% else %}
+                                    <p class="text-muted">No specific actions defined</p>
+                                {% endif %}
                             </div>
                         </div>
-                        
-                        <!-- Section Insights -->
-                        <div class="section-insights">
-                            <h4 class="h6 mb-3">Key Insights & Analysis</h4>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <h6 class="small fw-bold mb-2">Strengths:</h6>
-                                    <ul class="insights-list small">
-                                        {% for strength in section.strengths %}
-                                        <li class="mb-1">{{ strength }}</li>
-                                        {% endfor %}
-                                    </ul>
-                                </div>
-                                <div class="col-md-6">
-                                    <h6 class="small fw-bold mb-2">Improvement Areas:</h6>
-                                    <ul class="insights-list small">
-                                        {% for improvement in section.improvements %}
-                                        <li class="mb-1">{{ improvement }}</li>
-                                        {% endfor %}
-                                    </ul>
-                                </div>
+
+                        <div class="row">
+                            <!-- Success Metrics -->
+                            <div class="col-md-6 mb-3">
+                                <h6 class="fw-bold text-warning">
+                                    <i class="bi bi-trophy me-2"></i>Success Metrics
+                                </h6>
+                                {% if next_level.success_metrics %}
+                                    {% for metric in next_level.success_metrics %}
+                                    <div class="action-item">
+                                        <i class="bi bi-check-circle me-2 text-warning"></i>
+                                        {{ metric }}
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <p class="text-muted">No specific metrics defined</p>
+                                {% endif %}
+                            </div>
+
+                            <!-- Common Pitfalls -->
+                            <div class="col-md-6 mb-3">
+                                <h6 class="fw-bold text-danger">
+                                    <i class="bi bi-exclamation-triangle me-2"></i>Common Pitfalls
+                                </h6>
+                                {% if next_level.common_pitfalls %}
+                                    {% for pitfall in next_level.common_pitfalls %}
+                                    <div class="action-item">
+                                        <i class="bi bi-x-circle me-2 text-danger"></i>
+                                        {{ pitfall }}
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <p class="text-muted">No specific pitfalls identified</p>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
                     {% endfor %}
                 </div>
             </div>
-        </div>
+            {% endfor %}
 
-        <!-- Maturity Assessment -->
-        <div class="page-break"></div>
-        <div class="maturity-assessment mb-5">
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="h4 mb-0">
-                        <i class="bi bi-award me-2"></i>
-                        Maturity Level Analysis
-                    </h2>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-8">
-                            <h3 class="h5 mb-3">Current Maturity: {{ assessment.maturity_level }}</h3>
-                            <p class="lead">{{ maturity_description }}</p>
-                            
-                            <div class="maturity-characteristics mb-4">
-                                <h4 class="h6 mb-3">Characteristics at This Level:</h4>
-                                <ul class="characteristics-list">
-                                    {% for characteristic in maturity_characteristics %}
-                                    <li class="mb-2">{{ characteristic }}</li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                            
-                            {% if next_maturity_level %}
-                            <div class="next-level-info">
-                                <h4 class="h6 mb-3">Path to {{ next_maturity_level.name }}:</h4>
-                                <p>{{ next_maturity_level.description }}</p>
-                                <div class="requirements mb-3">
-                                    <h6 class="small fw-bold mb-2">Key Requirements:</h6>
-                                    <ul class="requirements-list small">
-                                        {% for requirement in next_maturity_level.requirements %}
-                                        <li class="mb-1">{{ requirement }}</li>
-                                        {% endfor %}
-                                    </ul>
-                                </div>
-                                <div class="progress-to-next">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <span class="small">Progress to Next Level</span>
-                                        <span class="small">{{ progress_to_next_level }}%</span>
-                                    </div>
-                                    <div class="progress">
-                                        <div class="progress-bar" role="progressbar" 
-                                             style="width: {{ progress_to_next_level }}%">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="col-md-4">
-                            <div class="maturity-ladder">
-                                <h4 class="h6 mb-3">Maturity Progression</h4>
-                                {% for level in maturity_levels %}
-                                <div class="maturity-step mb-3 {{ 'current' if level.name == assessment.maturity_level else '' }} {{ 'completed' if level.order < current_maturity_order else '' }}">
-                                    <div class="d-flex align-items-center">
-                                        <div class="step-indicator me-3">
-                                            {% if level.name == assessment.maturity_level %}
-                                                <i class="bi bi-arrow-right-circle text-primary"></i>
-                                            {% elif level.order < current_maturity_order %}
-                                                <i class="bi bi-check-circle text-success"></i>
-                                            {% else %}
-                                                <i class="bi bi-circle text-muted"></i>
-                                            {% endif %}
-                                        </div>
-                                        <div>
-                                            <h6 class="mb-0 {{ 'text-primary' if level.name == assessment.maturity_level else '' }}">
-                                                {{ level.name }}
-                                            </h6>
-                                            <small class="text-muted">{{ level.score_range }}</small>
-                                        </div>
-                                    </div>
-                                </div>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            {% if not roadmap_data %}
+            <div class="alert alert-info fade-in">
+                <h5 class="alert-heading">
+                    <i class="bi bi-info-circle me-2"></i>
+                    No Roadmap Available
+                </h5>
+                <p class="mb-0">
+                    Complete more assessment questions to generate a personalized roadmap 
+                    for your AI-First maturity journey.
+                </p>
             </div>
+            {% endif %}
         </div>
+    </div>
 
-        <!-- Recommendations & Action Plan -->
-        <div class="page-break"></div>
-        <div class="recommendations-action-plan mb-5">
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="h4 mb-0">
-                        <i class="bi bi-lightbulb me-2"></i>
-                        Recommendations & Action Plan
-                    </h2>
-                </div>
-                <div class="card-body">
-                    <div class="action-plan-intro mb-4">
-                        <p class="lead">
-                            Based on your assessment results, we've identified priority areas for improvement 
-                            and developed a structured action plan to advance your AI-first software engineering maturity.
-                        </p>
-                    </div>
-                    
-                    <!-- Priority Matrix -->
-                    <div class="priority-matrix mb-5">
-                        <h3 class="h5 mb-3">Recommendation Priority Matrix</h3>
-                        <div class="table-responsive">
-                            <table class="table table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>Priority</th>
-                                        <th>Recommendation</th>
-                                        <th>Impact</th>
-                                        <th>Effort</th>
-                                        <th>Timeline</th>
-                                        <th>Section</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for rec in recommendations %}
-                                    <tr>
-                                        <td>
-                                            <span class="badge bg-{{ rec.priority_color }}">{{ rec.priority_order }}</span>
-                                        </td>
-                                        <td>
-                                            <strong>{{ rec.title }}</strong>
-                                            <br><small class="text-muted">{{ rec.description|truncate(80) }}</small>
-                                        </td>
-                                        <td><span class="badge bg-success">{{ rec.impact }}</span></td>
-                                        <td><span class="badge bg-info">{{ rec.effort }}</span></td>
-                                        <td><span class="badge bg-primary">{{ rec.timeline }}</span></td>
-                                        <td>{{ rec.section }}</td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    
-                    <!-- Detailed Recommendations -->
-                    <div class="detailed-recommendations">
-                        <h3 class="h5 mb-4">Detailed Implementation Guide</h3>
-                        {% for rec in recommendations %}
-                        <div class="recommendation-detail mb-4 p-4 border rounded">
-                            <div class="recommendation-header mb-3">
-                                <div class="d-flex align-items-center justify-content-between">
-                                    <h4 class="h6 mb-0">
-                                        <span class="badge bg-{{ rec.priority_color }} me-2">{{ rec.priority_order }}</span>
-                                        {{ rec.title }}
-                                    </h4>
-                                    <span class="badge badge-{{ rec.category.lower() }}">{{ rec.category }}</span>
-                                </div>
-                            </div>
-                            
-                            <div class="recommendation-content">
-                                <p class="mb-3">{{ rec.description }}</p>
-                                
-                                <div class="row mb-3">
-                                    <div class="col-md-3">
-                                        <h6 class="small fw-bold mb-1">Expected Impact</h6>
-                                        <span class="badge bg-success">{{ rec.impact }}</span>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <h6 class="small fw-bold mb-1">Required Effort</h6>
-                                        <span class="badge bg-info">{{ rec.effort }}</span>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <h6 class="small fw-bold mb-1">Timeline</h6>
-                                        <span class="badge bg-primary">{{ rec.timeline }}</span>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <h6 class="small fw-bold mb-1">Target Section</h6>
-                                        <span class="badge bg-secondary">{{ rec.section }}</span>
-                                    </div>
-                                </div>
-                                
-                                {% if rec.implementation_steps %}
-                                <div class="implementation-steps mb-3">
-                                    <h6 class="small fw-bold mb-2">Implementation Steps:</h6>
-                                    <ol class="small">
-                                        {% for step in rec.implementation_steps %}
-                                        <li class="mb-1">{{ step }}</li>
-                                        {% endfor %}
-                                    </ol>
-                                </div>
-                                {% endif %}
-                                
-                                {% if rec.success_metrics %}
-                                <div class="success-metrics mb-3">
-                                    <h6 class="small fw-bold mb-2">Success Metrics:</h6>
-                                    <ul class="small">
-                                        {% for metric in rec.success_metrics %}
-                                        <li class="mb-1">{{ metric }}</li>
-                                        {% endfor %}
-                                    </ul>
-                                </div>
-                                {% endif %}
-                                
-                                {% if rec.resources %}
-                                <div class="resources">
-                                    <h6 class="small fw-bold mb-2">Recommended Resources:</h6>
-                                    <ul class="small">
-                                        {% for resource in rec.resources %}
-                                        <li class="mb-1">
-                                            <a href="{{ resource.url }}" target="_blank">{{ resource.title }}</a>
-                                            {% if resource.type %}- {{ resource.type }}{% endif %}
-                                        </li>
-                                        {% endfor %}
-                                    </ul>
-                                </div>
-                                {% endif %}
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Appendix -->
-        <div class="page-break"></div>
-        <div class="appendix mb-5">
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="h4 mb-0">
-                        <i class="bi bi-file-text me-2"></i>
-                        Appendix
-                    </h2>
-                </div>
-                <div class="card-body">
-                    <!-- Assessment Methodology -->
-                    <div class="methodology mb-4">
-                        <h3 class="h5 mb-3">Assessment Methodology</h3>
-                        <p>
-                            The AI-First Software Engineering Maturity Assessment is based on a comprehensive 
-                            framework that evaluates organizations across four key dimensions:
-                        </p>
-                        <ul>
-                            <li><strong>Engineering Practices:</strong> Code quality, testing, CI/CD, and development workflows</li>
-                            <li><strong>AI Integration:</strong> AI tool adoption, automation, and intelligent systems</li>
-                            <li><strong>Team & Culture:</strong> Collaboration, learning, and organizational readiness</li>
-                            <li><strong>Governance & Risk:</strong> Security, compliance, and risk management practices</li>
-                        </ul>
-                        
-                        <h4 class="h6 mt-4 mb-2">Scoring Scale</h4>
-                        <div class="table-responsive">
-                            <table class="table table-sm">
-                                <thead>
-                                    <tr>
-                                        <th>Score</th>
-                                        <th>Level</th>
-                                        <th>Description</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>1.0</td>
-                                        <td>Reactive</td>
-                                        <td>No formal processes, ad-hoc approach</td>
-                                    </tr>
-                                    <tr>
-                                        <td>2.0</td>
-                                        <td>Evolving</td>
-                                        <td>Basic processes established, some repeatability</td>
-                                    </tr>
-                                    <tr>
-                                        <td>3.0</td>
-                                        <td>Advanced</td>
-                                        <td>Standardized processes, well-documented</td>
-                                    </tr>
-                                    <tr>
-                                        <td>4.0</td>
-                                        <td>Optimized</td>
-                                        <td>Continuous improvement, data-driven optimization</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    
-                    <!-- Assessment Details -->
-                    <div class="assessment-details mb-4">
-                        <h3 class="h5 mb-3">Assessment Details</h3>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <table class="table table-sm">
-                                    <tr>
-                                        <th>Organization:</th>
-                                        <td>{{ assessment.organization_name }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Assessment ID:</th>
-                                        <td>{{ assessment.id }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Started:</th>
-                                        <td>{{ assessment.created_at.strftime('%B %d, %Y at %I:%M %p') }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Completed:</th>
-                                        <td>{{ assessment.completion_date.strftime('%B %d, %Y at %I:%M %p') }}</td>
-                                    </tr>
-                                </table>
-                            </div>
-                            <div class="col-md-6">
-                                <table class="table table-sm">
-                                    <tr>
-                                        <th>Duration:</th>
-                                        <td>{{ assessment_duration }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Questions:</th>
-                                        <td>{{ total_questions }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Assessment Type:</th>
-                                        <td>{{ assessment.assessment_type.title() }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Report Generated:</th>
-                                        <td>{{ current_date.strftime('%B %d, %Y at %I:%M %p') }}</td>
-                                    </tr>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Definitions & Glossary -->
-                    <div class="definitions">
-                        <h3 class="h5 mb-3">Definitions & Glossary</h3>
-                        <dl class="row">
-                            <dt class="col-sm-3">AFS Score</dt>
-                            <dd class="col-sm-9">Development Intelligence Quotient - overall maturity score (1.0-4.0)</dd>
-                            
-                            <dt class="col-sm-3">AI-First</dt>
-                            <dd class="col-sm-9">Approach that prioritizes AI integration in all aspects of software development</dd>
-                            
-                            <dt class="col-sm-3">Maturity Level</dt>
-                            <dd class="col-sm-9">Classification of organizational capability based on AFS score</dd>
-                            
-                            <dt class="col-sm-3">Section Score</dt>
-                            <dd class="col-sm-9">Average score across all areas within a specific section</dd>
-                            
-                            <dt class="col-sm-3">Area Score</dt>
-                            <dd class="col-sm-9">Average score of questions within a specific capability area</dd>
-                        </dl>
-                    </div>
-                </div>
+    <!-- Action Buttons -->
+    <div class="row mt-5">
+        <div class="col-12 text-center fade-in">
+            <div class="btn-group no-print" role="group">
+                <a href="{{ url_for('assessment.results', assessment_id=assessment.id) }}" 
+                   class="btn btn-outline-primary btn-lg">
+                    <i class="bi bi-arrow-left me-2"></i>Back to Results
+                </a>
+                <button type="button" class="btn btn-primary btn-lg" onclick="window.print()">
+                    <i class="bi bi-printer me-2"></i>Print Report
+                </button>
+                <a href="{{ url_for('assessment.start') }}" 
+                   class="btn btn-success btn-lg">
+                    <i class="bi bi-plus-circle me-2"></i>New Assessment
+                </a>
             </div>
         </div>
     </div>
@@ -596,16 +583,367 @@
 {% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Print functionality
-    window.addEventListener('beforeprint', function() {
-        document.title = '{{ assessment.organization_name }} - Assessment Report - {{ assessment.completion_date.strftime("%Y-%m-%d") }}';
-    });
+    console.log('Report script starting...');
     
-    // Initialize tooltips
-    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
+    try {
+        // Animation on scroll
+        const animateOnScroll = () => {
+            const elements = document.querySelectorAll('.fade-in');
+            elements.forEach(element => {
+                const elementTop = element.getBoundingClientRect().top;
+                const elementVisible = 150;
+                
+                if (elementTop < window.innerHeight - elementVisible) {
+                    element.classList.add('animate');
+                }
+            });
+        };
+        
+        window.addEventListener('scroll', animateOnScroll);
+        animateOnScroll(); // Initial check
+        
+        // Wait for Chart.js to load with retry mechanism
+        function waitForChartJs(retries = 0, maxRetries = 50) {
+            if (typeof Chart !== 'undefined') {
+                console.log('Chart.js loaded successfully');
+                initializeCharts();
+            } else if (retries < maxRetries) {
+                console.log(`Waiting for Chart.js... (${retries + 1}/${maxRetries})`);
+                setTimeout(() => waitForChartJs(retries + 1, maxRetries), 100);
+            } else {
+                console.error('Chart.js failed to load after', maxRetries, 'attempts');
+                // Show error in loading divs
+                const sectionLoading = document.getElementById('chartLoadingSection');
+                const maturityLoading = document.getElementById('chartLoadingMaturity');
+                if (sectionLoading) sectionLoading.innerHTML = '<p class="text-danger">Chart.js not loaded</p>';
+                if (maturityLoading) maturityLoading.innerHTML = '<p class="text-danger">Chart.js not loaded</p>';
+            }
+        }
+        
+        function initializeCharts() {
+            // Get data from backend
+            const sectionData = {{ chart_data.section_scores|tojson|safe }};
+            const maturityData = {{ chart_data.maturity_distribution|tojson|safe }};
+        
+        console.log('Section data:', sectionData);
+        console.log('Maturity data:', maturityData);
+        
+        // Section Performance Chart
+        const sectionCanvas = document.getElementById('sectionChart');
+        const sectionLoadingDiv = document.getElementById('chartLoadingSection');
+        if (sectionCanvas && sectionLoadingDiv) {
+            try {
+                // Destroy existing chart if it exists
+                if (window.sectionChartInstance) {
+                    window.sectionChartInstance.destroy();
+                }
+                
+                console.log('Section data for assessment {{ assessment.id }}:', sectionData);
+                
+                if (sectionData && sectionData.length > 0) {
+                    const sectionCtx = sectionCanvas.getContext('2d');
+                    
+                    // Hide loading, show chart
+                    sectionLoadingDiv.style.display = 'none';
+                    sectionCanvas.style.display = 'block';
+                    
+                    // Create new chart instance  
+                    window.sectionChartInstance = new Chart(sectionCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: sectionData.map(s => s.name || 'Unknown'),
+                            datasets: [{
+                                data: sectionData.map(s => Math.max(0, s.score || 0)),
+                                backgroundColor: sectionData.map(s => s.color || '#999999'),
+                                borderWidth: 3,
+                                borderColor: '#fff',
+                                hoverOffset: 8
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        padding: 12,
+                                        usePointStyle: true,
+                                        font: {
+                                            size: 10,
+                                            weight: 'bold'
+                                        },
+                                        generateLabels: function(chart) {
+                                            const data = chart.data;
+                                            if (data.labels.length && data.datasets.length) {
+                                                const dataset = data.datasets[0];
+                                                const total = dataset.data.reduce((a, b) => a + b, 0);
+                                                return data.labels.map((label, i) => {
+                                                    const value = dataset.data[i];
+                                                    const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                                                    // Create more compact labels
+                                                    let shortLabel = label;
+                                                    if (label.includes('FOUNDATIONAL')) shortLabel = 'Foundation';
+                                                    else if (label.includes('TRANSFORMATION')) shortLabel = 'Transformation';
+                                                    else if (label.includes('ENTERPRISE')) shortLabel = 'Enterprise';
+                                                    else if (label.includes('STRATEGIC')) shortLabel = 'Strategic';
+                                                    
+                                                    return {
+                                                        text: `${shortLabel}: ${value.toFixed(1)} (${percentage}%)`,
+                                                        fillStyle: dataset.backgroundColor[i],
+                                                        strokeStyle: dataset.backgroundColor[i],
+                                                        lineWidth: 0,
+                                                        pointStyle: 'circle'
+                                                    };
+                                                });
+                                            }
+                                            return [];
+                                        }
+                                    }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                            const percentage = total > 0 ? Math.round((context.parsed / total) * 100) : 0;
+                                            return context.label + ': ' + context.parsed.toFixed(1) + ' (' + percentage + '%)';
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        plugins: [{
+                            id: 'pieLabelPlugin',
+                            afterDatasetsDraw: function(chart) {
+                                const ctx = chart.ctx;
+                                const dataset = chart.data.datasets[0];
+                                const meta = chart.getDatasetMeta(0);
+                                const total = dataset.data.reduce((a, b) => a + b, 0);
+                                
+                                meta.data.forEach((segment, index) => {
+                                    const value = dataset.data[index];
+                                    const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                                    
+                                    if (percentage >= 8) { // Show labels for segments 8% or larger
+                                        const midAngle = segment.startAngle + (segment.endAngle - segment.startAngle) / 2;
+                                        const x = segment.x + Math.cos(midAngle) * (segment.outerRadius * 0.6);
+                                        const y = segment.y + Math.sin(midAngle) * (segment.outerRadius * 0.6);
+                                        
+                                        ctx.save();
+                                        ctx.fillStyle = '#ffffff';
+                                        ctx.font = 'bold 13px Arial';
+                                        ctx.textAlign = 'center';
+                                        ctx.textBaseline = 'middle';
+                                        ctx.strokeStyle = '#000000';
+                                        ctx.lineWidth = 2;
+                                        
+                                        // Add stroke for better readability
+                                        ctx.strokeText(value.toFixed(1), x, y - 6);
+                                        ctx.fillText(value.toFixed(1), x, y - 6);
+                                        
+                                        ctx.strokeText(`(${percentage}%)`, x, y + 8);
+                                        ctx.fillText(`(${percentage}%)`, x, y + 8);
+                                        ctx.restore();
+                                    }
+                                });
+                            }
+                        }]
+                    });
+                } else {
+                    sectionLoadingDiv.innerHTML = '<p class="text-muted">No section data available</p>';
+                }
+            } catch (e) {
+                console.error('Error creating section chart:', e);
+                sectionLoadingDiv.innerHTML = '<p class="text-danger">Error loading section chart: ' + e.message + '</p>';
+            }
+        }
+
+        // Maturity Distribution Chart
+        const maturityCanvas = document.getElementById('maturityChart');
+        const maturityLoadingDiv = document.getElementById('chartLoadingMaturity');
+        if (maturityCanvas && maturityLoadingDiv) {
+            try {
+                // Destroy existing chart if it exists
+                if (window.maturityChartInstance) {
+                    window.maturityChartInstance.destroy();
+                }
+                
+                const maturityData = {{ chart_data.maturity_distribution|tojson|safe }};
+                
+                console.log('Maturity data for assessment {{ assessment.id }}:', maturityData);
+                
+                if (maturityData && Object.keys(maturityData).length > 0) {
+                    const maturityCtx = maturityCanvas.getContext('2d');
+                    const sectionCount = {{ section_scores|length }} || 4;
+                    
+                    // Hide loading, show chart
+                    maturityLoadingDiv.style.display = 'none';
+                    maturityCanvas.style.display = 'block';
+                    
+                    // Create new chart instance
+                    window.maturityChartInstance = new Chart(maturityCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Traditional', 'AI-Assisted', 'AI-Augmented', 'AI-First'],
+                            datasets: [{
+                                label: 'Number of Sections',
+                                data: [
+                                    maturityData['Traditional'] || 0,
+                                    maturityData['AI-Assisted'] || 0,
+                                    maturityData['AI-Augmented'] || 0,
+                                    maturityData['AI-First'] || 0
+                                ],
+                                backgroundColor: [
+                                    '#dc3545',  // Traditional - Red
+                                    '#ffc107',  // AI-Assisted - Yellow
+                                    '#28a745',  // AI-Augmented - Green
+                                    '#007bff'   // AI-First - Blue
+                                ],
+                                borderRadius: 8,
+                                borderSkipped: false,
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            const total = [
+                                                maturityData['Traditional'] || 0,
+                                                maturityData['AI-Assisted'] || 0,
+                                                maturityData['AI-Augmented'] || 0,
+                                                maturityData['AI-First'] || 0
+                                            ].reduce((a, b) => a + b, 0);
+                                            const percentage = total > 0 ? Math.round((context.parsed.y / total) * 100) : 0;
+                                            const sectionText = context.parsed.y === 1 ? 'section' : 'sections';
+                                            return `${context.parsed.y} ${sectionText} (${percentage}%)`;
+                                        }
+                                    }
+                                }
+                            },
+                            onHover: (event, activeElements) => {
+                                event.native.target.style.cursor = activeElements.length > 0 ? 'pointer' : 'default';
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    max: Math.max(sectionCount, 4),
+                                    ticks: {
+                                        stepSize: 1,
+                                        font: {
+                                            weight: 'bold'
+                                        }
+                                    },
+                                    grid: {
+                                        color: '#f0f0f0'
+                                    }
+                                },
+                                x: {
+                                    ticks: {
+                                        display: true,
+                                        font: {
+                                            weight: 'bold',
+                                            size: 11
+                                        },
+                                        maxRotation: 0,
+                                        color: '#333333',
+                                        padding: 10
+                                    },
+                                    grid: {
+                                        display: false
+                                    }
+                                }
+                            },
+                            animation: {
+                                duration: 1000,
+                                easing: 'easeInOutQuart'
+                            }
+                        },
+                        plugins: [{
+                            id: 'dataLabels',
+                            afterDatasetsDraw: function(chart) {
+                                const ctx = chart.ctx;
+                                chart.data.datasets.forEach(function(dataset, i) {
+                                    const meta = chart.getDatasetMeta(i);
+                                    meta.data.forEach(function(bar, index) {
+                                        const data = dataset.data[index];
+                                        
+                                        if (data > 0) {
+                                            // White text on bar for count with better positioning
+                                            ctx.fillStyle = '#ffffff';
+                                            ctx.font = 'bold 18px Arial';
+                                            ctx.textAlign = 'center';
+                                            ctx.textBaseline = 'middle';
+                                            ctx.strokeStyle = '#000000';
+                                            ctx.lineWidth = 2;
+                                            
+                                            const position = bar.tooltipPosition();
+                                            // Add stroke for better readability
+                                            ctx.strokeText(data, position.x, position.y);
+                                            ctx.fillText(data, position.x, position.y);
+                                        }
+                                    });
+                                });
+                            }
+                        }]
+                    });
+                } else {
+                    maturityLoadingDiv.innerHTML = '<p class="text-muted">No maturity data available</p>';
+                }
+            } catch (e) {
+                console.error('Error creating maturity chart:', e);
+                maturityLoadingDiv.innerHTML = '<p class="text-danger">Error loading maturity chart: ' + e.message + '</p>';
+            }
+        }
+
+        // Smooth scrolling for internal links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Print optimization
+        window.addEventListener('beforeprint', function() {
+            setTimeout(() => {
+                window.print();
+            }, 100);
+        });
+        
+        console.log('Chart initialization completed successfully');
+        } // End of initializeCharts function
+        
+        // Start the Chart.js loading check
+        waitForChartJs();
+        
+        console.log('Report script completed successfully');
+        
+    } catch (error) {
+        console.error('Error in report script:', error);
+        
+        // Show error in loading divs
+        const sectionLoading = document.getElementById('chartLoadingSection');
+        const maturityLoading = document.getElementById('chartLoadingMaturity');
+        
+        if (sectionLoading) {
+            sectionLoading.innerHTML = '<p class="text-danger">Script error: ' + error.message + '</p>';
+        }
+        if (maturityLoading) {
+            maturityLoading.innerHTML = '<p class="text-danger">Script error: ' + error.message + '</p>';
+        }
+    }
 });
 </script>
 {% endblock %}

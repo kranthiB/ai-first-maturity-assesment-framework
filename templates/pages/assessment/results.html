@@ -71,13 +71,13 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="d-flex gap-2 justify-content-md-end">
+                                    <a href="{{ url_for('assessment.report', assessment_id=assessment.id) }}" 
+                                       class="btn btn-primary btn-sm">
+                                        <i class="bi bi-file-text me-1"></i>View Report
+                                    </a>
                                     <button type="button" class="btn btn-outline-primary btn-sm" id="shareBtn">
                                         <i class="bi bi-share me-1"></i>Share
                                     </button>
-                                    <!-- Export functionality removed -->
-                                    <div class="text-muted">
-                                        <small><i class="bi bi-info-circle me-1"></i>Assessment completed successfully</small>
-                                    </div>
                                     <a href="{{ url_for('assessment.start') if url_for else '/assessment/start' }}" 
                                        class="btn btn-success btn-sm">
                                         <i class="bi bi-plus-circle me-1"></i>New Assessment
