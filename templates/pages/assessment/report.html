@@ -189,10 +189,6 @@
                         <i class="bi bi-check-circle me-2"></i>
                         {{ responses_count }}/{{ total_questions }} Questions
                     </span>
-                    <span class="badge bg-light text-dark fs-6 px-3 py-2">
-                        <i class="bi bi-building me-2"></i>
-                        Assessment ID: {{ assessment.id }}
-                    </span>
                 </div>
             </div>
             <div class="col-md-4 text-center">
@@ -207,6 +203,68 @@
             </div>
         </div>
     </div>
+
+    <!-- Organizational Information Row -->
+    {% set has_org_info = assessment.first_name or assessment.last_name or assessment.email or assessment.assessor_name or assessment.account_name %}
+    {% if has_org_info %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm fade-in">
+                <div class="card-body">
+                    <div class="row">
+                        {% if assessment.first_name or assessment.last_name %}
+                        <div class="col-md-6 col-lg-3 mb-3">
+                            <h6 class="text-muted mb-1">
+                                <i class="bi bi-person me-2"></i>Contact Person
+                            </h6>
+                            <p class="mb-0 fw-semibold">
+                                {{ assessment.first_name or '' }} {{ assessment.last_name or '' }}
+                            </p>
+                            {% if assessment.email %}
+                            <small class="text-muted">
+                                <i class="bi bi-envelope me-1"></i>{{ assessment.email }}
+                            </small>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                        
+                        {% if assessment.team_name and assessment.team_name != organization_name %}
+                        <div class="col-md-6 col-lg-3 mb-3">
+                            <h6 class="text-muted mb-1">
+                                <i class="bi bi-people me-2"></i>Team
+                            </h6>
+                            <p class="mb-0 fw-semibold">{{ assessment.team_name }}</p>
+                        </div>
+                        {% endif %}
+                        
+                        {% if assessment.assessor_name %}
+                        <div class="col-md-6 col-lg-3 mb-3">
+                            <h6 class="text-muted mb-1">
+                                <i class="bi bi-clipboard-check me-2"></i>Assessor
+                            </h6>
+                            <p class="mb-0 fw-semibold">{{ assessment.assessor_name }}</p>
+                            {% if assessment.assessor_email %}
+                            <small class="text-muted">
+                                <i class="bi bi-envelope me-1"></i>{{ assessment.assessor_email }}
+                            </small>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                        
+                        {% if assessment.industry %}
+                        <div class="col-md-6 col-lg-3 mb-3">
+                            <h6 class="text-muted mb-1">
+                                <i class="bi bi-diagram-3 me-2"></i>Industry
+                            </h6>
+                            <p class="mb-0 fw-semibold">{{ assessment.industry }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 
     <!-- Key Metrics Row -->
     <div class="row mb-4 fade-in">
