@@ -5,7 +5,7 @@ Assessment blueprint routes for AFS Assessment Framework
 import json
 from flask import (
     Blueprint, render_template, request, redirect, url_for, flash,
-    jsonify, session, current_app
+    jsonify, session, current_app, make_response
 )
 from sqlalchemy.orm import joinedload
 from datetime import datetime
@@ -2104,6 +2104,207 @@ def progress(assessment_id):
         flash('Error loading progress', 'error')
         return redirect(url_for('assessment.detail',
                                 assessment_id=assessment_id))
+
+
+@assessment_bp.route('/<int:assessment_id>/download-pdf')
+def download_pdf(assessment_id):
+    """
+    Generate and download PDF report
+    """
+    try:
+        from playwright.sync_api import sync_playwright
+        from app.extensions import db
+        from sqlalchemy.orm import joinedload
+        from app.models.progression import get_all_progressions_for_area
+        import tempfile
+        import os
+        
+        # Get assessment data (reuse the same logic as report route)
+        assessment = db.session.query(Assessment).get(assessment_id)
+        if not assessment:
+            flash('Assessment not found', 'error')
+            return redirect(url_for('assessment.index'))
+
+        if assessment.status != 'COMPLETED':
+            flash('Assessment not completed yet', 'warning')
+            return redirect(url_for('assessment.detail',
+                                    assessment_id=assessment_id))
+
+        # Get all sections with areas and questions
+        sections = db.session.query(Section).options(
+            joinedload(Section.areas).joinedload(Area.questions)
+        ).order_by(Section.display_order).all()
+
+        # Get all responses for this assessment
+        responses = db.session.query(Response).filter(
+            Response.assessment_id == assessment_id
+        ).all()
+        responses_dict = {r.question_id: r for r in responses}
+
+        # Calculate detailed scores (same logic as report route)
+        section_scores = []
+        area_scores = {}
+        all_scores = []
+
+        for section in sections:
+            section_responses = []
+            section_areas = []
+
+            for area in section.areas:
+                area_responses = []
+                for question in area.questions:
+                    if question.id in responses_dict:
+                        response_score = responses_dict[question.id].score
+                        area_responses.append(response_score)
+
+                if area_responses:
+                    area_score = sum(area_responses) / len(area_responses)
+                    area_scores[area.id] = {
+                        'score': area_score,
+                        'name': area.name,
+                        'responses_count': len(area_responses),
+                        'max_possible': len(area.questions) * 4
+                    }
+                    section_responses.extend(area_responses)
+                    section_areas.append({
+                        'id': area.id,
+                        'name': area.name,
+                        'score': area_score,
+                        'level': _get_maturity_level_from_score(area_score),
+                        'responses_count': len(area_responses)
+                    })
+
+            if section_responses:
+                section_score = sum(section_responses) / len(section_responses)
+                all_scores.extend(section_responses)
+
+                section_scores.append({
+                    'id': section.id,
+                    'name': section.name,
+                    'score': section_score,
+                    'level': _get_maturity_level_from_score(section_score),
+                    'color': _get_section_color(section.id),
+                    'areas': section_areas,
+                    'responses_count': len(section_responses),
+                    'percentage': round((section_score / 4.0) * 100, 1)
+                })
+
+        # Calculate overall metrics
+        overall_score = sum(all_scores) / len(all_scores) if all_scores else 0
+        overall_level = _get_maturity_level_from_score(overall_score)
+
+        # Generate chart data
+        chart_data = {
+            'section_scores': section_scores,
+            'maturity_distribution': _calculate_maturity_distribution(section_scores)
+        }
+
+        # Generate roadmap data for each answered question
+        roadmap_data = {}
+        for question_id, response in responses_dict.items():
+            question = db.session.query(Question).get(question_id)
+            if question and question.area:
+                area_id = question.area.id
+                current_level = response.score
+
+                # Get progression data for next levels
+                progressions = get_all_progressions_for_area(area_id)
+                next_levels = []
+
+                # Up to level 4
+                for target_level in range(current_level + 1, 5):
+                    if target_level in progressions:
+                        prog = progressions[target_level]
+                        next_levels.append({
+                            'level': target_level,
+                            'level_name': _get_maturity_level_from_score(target_level),
+                            'description': prog.prerequisites,
+                            'actions': _parse_progression_text(prog.action_items),
+                            'timeline': prog.timeline,
+                            'resources': _parse_progression_text(prog.success_metrics)
+                        })
+
+                if next_levels:
+                    roadmap_data[question_id] = {
+                        'question': question.question,
+                        'area': question.area.name,
+                        'current_level': current_level,
+                        'current_level_name': _get_maturity_level_from_score(current_level),
+                        'next_levels': next_levels
+                    }
+
+        # Generate insights and recommendations
+        insights = _generate_insights(section_scores, overall_score)
+        priority_areas = _identify_priority_areas(section_scores)
+
+        context = {
+            'assessment': assessment,
+            'overall_score': overall_score,
+            'overall_level': overall_level,
+            'section_scores': section_scores,
+            'area_scores': area_scores,
+            'chart_data': chart_data,
+            'roadmap_data': roadmap_data,
+            'insights': insights,
+            'priority_areas': priority_areas,
+            'responses_count': len(responses_dict),
+            'total_questions': sum(
+                len(area.questions)
+                for section in sections
+                for area in section.areas
+            ),
+            'completion_date': assessment.completion_date,
+            'organization_name': (
+                assessment.organization_name or assessment.team_name
+            ),
+            'is_pdf': True  # Flag to indicate PDF generation
+        }
+
+        # Render the same template with PDF-specific styling
+        html_content = render_template('pages/assessment/report_pdf.html', **context)
+        
+        # Generate PDF using Playwright
+        with sync_playwright() as p:
+            browser = p.chromium.launch()
+            page = browser.new_page()
+            
+            # Set HTML content
+            page.set_content(html_content, wait_until='networkidle')
+            
+            # Generate PDF with options
+            pdf_bytes = page.pdf(
+                format='A4',
+                margin={
+                    'top': '0.75in',
+                    'right': '0.75in', 
+                    'bottom': '0.75in',
+                    'left': '0.75in'
+                },
+                print_background=True,
+                prefer_css_page_size=True
+            )
+            
+            browser.close()
+        
+        # Create response with team name in filename
+        team_name = assessment.team_name or assessment.organization_name or "Unknown_Team"
+        # Clean team name for filename (remove special characters)
+        clean_team_name = "".join(c for c in team_name if c.isalnum() or c in (' ', '-', '_')).rstrip()
+        clean_team_name = clean_team_name.replace(' ', '_')
+        
+        response = make_response(pdf_bytes)
+        response.headers['Content-Type'] = 'application/pdf'
+        response.headers['Content-Disposition'] = f'attachment; filename="AI_Maturity_Assessment_Report_{clean_team_name}.pdf"'
+        
+        return response
+        
+    except ImportError as e:
+        flash('PDF generation not available. Please install Playwright.', 'error')
+        return redirect(url_for('assessment.report', assessment_id=assessment_id))
+    except Exception as e:
+        logger.error(f"Error generating PDF: {e}")
+        flash('Error generating PDF report', 'error')
+        return redirect(url_for('assessment.report', assessment_id=assessment_id))
 
 
 @assessment_bp.route('/api/<int:assessment_id>/progress')

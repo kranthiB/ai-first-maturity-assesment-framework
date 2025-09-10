@@ -161,10 +161,70 @@
     transform: translateY(0);
 }
 
-@media print {
-    .roadmap-card { break-inside: avoid; }
-    .chart-container { break-inside: avoid; }
-    .no-print { display: none !important; }
+.chart-placeholder {
+    width: 100%;
+    height: 300px;
+    background: #f8f9fa;
+    border: 2px dashed #dee2e6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+}
+
+.btn-download-pdf {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    border: none;
+    color: white;
+    font-weight: 600;
+    font-size: 1.1rem;
+    padding: 12px 30px;
+    border-radius: 50px;
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-download-pdf:hover {
+    background: linear-gradient(135deg, #218838 0%, #1ead8a 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+    color: white;
+    text-decoration: none;
+}
+
+.btn-download-pdf:focus {
+    box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.25);
+    color: white;
+    text-decoration: none;
+}
+
+.btn-download-pdf:active {
+    transform: translateY(0);
+}
+
+.btn-download-pdf::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.btn-download-pdf:hover::before {
+    left: 100%;
+}
+
+.btn-download-pdf i {
+    font-size: 1.2rem;
+    margin-right: 8px;
 }
 </style>
 {% endblock %}
@@ -172,23 +232,26 @@
 {% block content %}
 <div class="container-fluid">
     <!-- Report Header -->
-    <div class="report-header p-5 fade-in">
+    <div class="report-header p-4 mb-4 fade-in">
         <div class="row align-items-center">
             <div class="col-md-8">
-                <h1 class="display-4 fw-bold mb-3">
-                    <i class="bi bi-graph-up-arrow me-3"></i>
-                    AI-First Maturity Assessment Report
+                <h1 class="fw-bold mb-3">
+                    <i class="bi bi-graph-up me-3"></i>AI-First Maturity Assessment Report
                 </h1>
-                <h3 class="mb-3">{{ organization_name }}</h3>
+                <h2 class="mb-3">{{ organization_name }}</h2>
                 <div class="d-flex flex-wrap gap-3 mb-3">
-                    <span class="badge bg-light text-dark fs-6 px-3 py-2">
-                        <i class="bi bi-calendar me-2"></i>
-                        Completed: {{ completion_date.strftime('%B %d, %Y') if completion_date else 'N/A' }}
+                    <span class="badge bg-light text-dark px-3 py-2">
+                        <i class="bi bi-calendar-check me-2"></i>Completed: {{ completion_date.strftime('%B %d, %Y') if completion_date else 'N/A' }}
                     </span>
-                    <span class="badge bg-light text-dark fs-6 px-3 py-2">
-                        <i class="bi bi-check-circle me-2"></i>
-                        {{ responses_count }}/{{ total_questions }} Questions
+                    <span class="badge bg-light text-dark px-3 py-2">
+                        <i class="bi bi-clipboard-data me-2"></i>{{ responses_count }}/{{ total_questions }} Questions
                     </span>
+                </div>
+                <div class="mb-4">
+                    <a href="{{ url_for('assessment.download_pdf', assessment_id=assessment.id) }}" 
+                       class="btn-download-pdf" target="_blank">
+                        <i class="bi bi-download me-2"></i>Download PDF Report
+                    </a>
                 </div>
             </div>
             <div class="col-md-4 text-center">
@@ -256,7 +319,7 @@
                             <h6 class="text-muted mb-1">
                                 <i class="bi bi-diagram-3 me-2"></i>Industry
                             </h6>
-                            <p class="mb-0 fw-semibold">{{ assessment.industry }}</p>
+                            <p class="mb-0 fw-semibold">{{ assessment.industry | upper }}</p>
                         </div>
                         {% endif %}
                     </div>
@@ -625,9 +688,6 @@
                    class="btn btn-outline-primary btn-lg">
                     <i class="bi bi-arrow-left me-2"></i>Back to Results
                 </a>
-                <button type="button" class="btn btn-primary btn-lg" onclick="window.print()">
-                    <i class="bi bi-printer me-2"></i>Print Report
-                </button>
                 <a href="{{ url_for('assessment.start') }}" 
                    class="btn btn-success btn-lg">
                     <i class="bi bi-plus-circle me-2"></i>New Assessment
@@ -971,13 +1031,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                 }
             });
-        });
-
-        // Print optimization
-        window.addEventListener('beforeprint', function() {
-            setTimeout(() => {
-                window.print();
-            }, 100);
         });
         
         console.log('Chart initialization completed successfully');
