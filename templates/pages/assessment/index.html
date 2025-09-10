@@ -602,18 +602,22 @@
             {% endif %}
             
             <div class="assessment-actions">
-                {% if assessment.status == 'completed' %}
+                {% if assessment.status|lower == 'completed' %}
                     <a href="{{ url_for('assessment.view_readonly', assessment_id=assessment.id) if url_for else '/assessment/' + assessment.id|string + '/view' }}" 
                        class="btn btn-action btn-view">
                         <i class="bi bi-info-circle me-1"></i>View Details
                     </a>
-                    <a href="{{ url_for('assessment.results', assessment_id=assessment.id) if url_for else '/assessment/' + assessment.id|string + '/results' }}" 
-                       class="btn btn-action btn-continue">
-                        <i class="bi bi-eye me-1"></i>View Results
+                    <a href="#" class="btn btn-action btn-continue">
+                        <i class="bi bi-file-earmark-text me-1"></i>View Report
                     </a>
-                    <a href="{{ url_for('assessment.report', assessment_id=assessment.id) if url_for else '/assessment/' + assessment.id|string + '/report' }}" 
-                       class="btn btn-action btn-export">
-                        <i class="bi bi-download me-1"></i>Export Report
+                {% elif assessment.status|lower == 'in_progress' %}
+                    <a href="{{ url_for('assessment.view_readonly', assessment_id=assessment.id) if url_for else '/assessment/' + assessment.id|string + '/view' }}" 
+                       class="btn btn-action btn-view">
+                        <i class="bi bi-info-circle me-1"></i>View Details
+                    </a>
+                    <a href="{{ url_for('assessment.section_questions', assessment_id=assessment.id, section_id='FC') if url_for else '/assessment/' + assessment.id|string + '/section/FC' }}" 
+                       class="btn btn-action btn-continue">
+                        <i class="bi bi-play-circle me-1"></i>Continue Assessment
                     </a>
                 {% else %}
                     <a href="{{ url_for('assessment.view_readonly', assessment_id=assessment.id) if url_for else '/assessment/' + assessment.id|string + '/view' }}" 
