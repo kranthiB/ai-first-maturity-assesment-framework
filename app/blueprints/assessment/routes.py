@@ -423,20 +423,45 @@ def section_overview(assessment_id):
             flash('Assessment not found', 'error')
             return redirect(url_for('assessment.index'))
         
-        # Validate session consistency
+        # Check if assessment is completed
+        if assessment.status == 'COMPLETED':
+            flash('This assessment has already been completed.', 'info')
+            return redirect(url_for('assessment.report', assessment_id=assessment_id))
+        
+        # Validate session consistency - but allow access for existing assessments
         current_assessment = get_current_assessment()
-        if current_assessment != assessment_id:
-            flash('Session mismatch. Please restart the assessment.', 'warning')
-            clear_assessment_session()
-            return redirect(url_for('assessment.index'))
+        if current_assessment and current_assessment != assessment_id:
+            # Only show warning but don't redirect for existing assessments
+            flash('Session mismatch detected. Continuing with current assessment.', 'warning')
+            # Update session to current assessment
+            session['current_assessment_id'] = assessment_id
         
         # Get all sections with their areas for overview
         sections = db.session.query(Section).options(
             joinedload(Section.areas)
         ).order_by(Section.display_order).all()
         
-        # Get metadata from session
+        # Get metadata from session - recreate if missing
         metadata = session.get('assessment_metadata', {})
+        if not metadata:
+            # Recreate complete session data for existing assessment
+            logger.info(f"Recreating session metadata for assessment {assessment_id}")
+            metadata = {
+                'assessment_id': assessment_id,
+                'organization_name': assessment.organization_name or assessment.team_name or 'Unknown Organization',
+                'account_name': assessment.account_name or '',
+                'first_name': assessment.first_name or '',
+                'last_name': assessment.last_name or '',
+                'email': assessment.email or '',
+                'industry': assessment.industry or '',
+                'assessor_name': assessment.assessor_name or '',
+                'assessor_email': assessment.assessor_email or '',
+                'created_at': assessment.created_at.isoformat() if assessment.created_at else datetime.utcnow().isoformat(),
+                'current_section_index': 0
+            }
+            session['assessment_metadata'] = metadata
+            session['assessment_responses'] = {}
+            session['current_assessment_id'] = assessment_id
         
         context = {
             'assessment': assessment,
@@ -461,25 +486,51 @@ def section_questions(assessment_id, section_id):
     try:
         from app.extensions import db
         
-        # Check session first to verify this is a valid request
-        if 'assessment_metadata' not in session:
-            logger.error(f"No session data for assessment {assessment_id}")
-            flash('Assessment session expired. Please start a new assessment.', 'error')
-            return redirect(url_for('assessment.create'))
-            
-        session_assessment_id = session['assessment_metadata'].get('assessment_id')
-        if session_assessment_id != assessment_id:
-            logger.error(f"Session assessment ID {session_assessment_id} doesn't match URL {assessment_id}")
-            flash('Assessment session mismatch. Please start a new assessment.', 'error')
-            return redirect(url_for('assessment.create'))
-        
-        # Now try to get the assessment from database
+        # First try to get the assessment from database
         assessment = db.session.get(Assessment, assessment_id)
         
-        # If not found in DB but session is valid, create a temporary assessment object
-        if not assessment:
+        # If assessment exists in DB, allow access regardless of session
+        if assessment:
+            # If assessment is completed, redirect to report
+            if assessment.status == 'COMPLETED':
+                flash('This assessment has already been completed.', 'info')
+                return redirect(url_for('assessment.report', assessment_id=assessment_id))
+            
+            # If no session metadata but assessment exists, recreate minimal session data
+            if 'assessment_metadata' not in session:
+                logger.info(f"Recreating session data for existing assessment {assessment_id}")
+                session['assessment_metadata'] = {
+                    'assessment_id': assessment_id,
+                    'organization_name': assessment.organization_name or assessment.team_name or 'Unknown Organization',
+                    'account_name': assessment.account_name or '',
+                    'first_name': assessment.first_name or '',
+                    'last_name': assessment.last_name or '',
+                    'email': assessment.email or '',
+                    'industry': assessment.industry or '',
+                    'assessor_name': assessment.assessor_name or '',
+                    'assessor_email': assessment.assessor_email or '',
+                    'created_at': assessment.created_at.isoformat() if assessment.created_at else datetime.utcnow().isoformat(),
+                    'current_section_index': 0
+                }
+                session['assessment_responses'] = {}
+                # Also set current_assessment_id for consistency with other routes
+                session['current_assessment_id'] = assessment_id
+                
+        else:
+            # Assessment doesn't exist in DB, check session for new assessment creation
+            if 'assessment_metadata' not in session:
+                logger.error(f"No session data and no existing assessment {assessment_id}")
+                flash('Assessment session expired. Please start a new assessment.', 'error')
+                return redirect(url_for('assessment.create'))
+                
+            session_assessment_id = session['assessment_metadata'].get('assessment_id')
+            if session_assessment_id != assessment_id:
+                logger.error(f"Session assessment ID {session_assessment_id} doesn't match URL {assessment_id}")
+                flash('Assessment session mismatch. Please start a new assessment.', 'error')
+                return redirect(url_for('assessment.create'))
+            
+            # If no assessment in DB and session is valid, create a temporary assessment object
             logger.warning(f"Assessment {assessment_id} not in DB yet, using session data")
-            # Create a minimal assessment object for the template
             assessment = type('Assessment', (), {
                 'id': assessment_id,
                 'team_name': session['assessment_metadata'].get('organization_name'),
@@ -2135,3 +2186,72 @@ def api_progress(assessment_id):
             'message': 'Failed to fetch progress',
             'timestamp': datetime.utcnow().isoformat()
         }), 500
+
+
+@assessment_bp.route('/<int:assessment_id>/delete', methods=['DELETE', 'POST'])
+def delete_assessment(assessment_id):
+    """
+    Delete an assessment and all its related data
+    """
+    try:
+        from app.extensions import db
+        assessment_service = AssessmentService(db.session)
+        
+        # Get assessment to verify it exists and check status
+        assessment = assessment_service.get_assessment(assessment_id)
+        if not assessment:
+            if request.method == 'DELETE' or request.headers.get('Content-Type') == 'application/json':
+                return jsonify({
+                    'status': 'error',
+                    'message': 'Assessment not found'
+                }), 404
+            else:
+                flash('Assessment not found', 'error')
+                return redirect(url_for('assessment.index'))
+        
+        # Prevent deletion of completed assessments
+        if assessment.status == 'COMPLETED':
+            if request.method == 'DELETE' or request.headers.get('Content-Type') == 'application/json':
+                return jsonify({
+                    'status': 'error',
+                    'message': 'Cannot delete completed assessments'
+                }), 400
+            else:
+                flash('Cannot delete completed assessments', 'error')
+                return redirect(url_for('assessment.index'))
+        
+        # Store assessment name for feedback
+        assessment_name = assessment.organization_name or assessment.team_name or f"Assessment {assessment_id}"
+        
+        # Delete the assessment and all related data (responses, etc.)
+        # SQLAlchemy will handle cascade deletes based on relationships
+        db.session.delete(assessment)
+        db.session.commit()
+        
+        # Clear any session data related to this assessment
+        if session.get('current_assessment_id') == assessment_id:
+            clear_assessment_session()
+        
+        logger.info(f"Assessment {assessment_id} ({assessment_name}) deleted successfully")
+        
+        if request.method == 'DELETE' or request.headers.get('Content-Type') == 'application/json':
+            return jsonify({
+                'status': 'success',
+                'message': f'Assessment "{assessment_name}" deleted successfully'
+            })
+        else:
+            flash(f'Assessment "{assessment_name}" deleted successfully', 'success')
+            return redirect(url_for('assessment.index'))
+        
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Error deleting assessment {assessment_id}: {e}")
+        
+        if request.method == 'DELETE' or request.headers.get('Content-Type') == 'application/json':
+            return jsonify({
+                'status': 'error',
+                'message': 'Failed to delete assessment'
+            }), 500
+        else:
+            flash('Failed to delete assessment', 'error')
+            return redirect(url_for('assessment.index'))

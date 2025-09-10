@@ -7,6 +7,10 @@
 ] %}
 
 {% block head_extra %}
+<!-- CSRF Token for AJAX requests -->
+{% if csrf_token %}
+<meta name="csrf-token" content="{{ csrf_token() }}">
+{% endif %}
 <!-- Assessment styles handled by Bootstrap -->
 <style>
 .dashboard-header {
@@ -188,6 +192,17 @@
 .btn-continue:hover {
     background: #bfdbfe;
     color: #1d4ed8;
+}
+
+.btn-delete {
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+.btn-delete:hover {
+    background: #fee2e2;
+    color: #b91c1c;
 }
 
 .pagination-wrapper {
@@ -620,6 +635,11 @@
                        class="btn btn-action btn-continue">
                         <i class="bi bi-play-circle me-1"></i>Continue Assessment
                     </a>
+                    <button type="button" class="btn btn-action btn-delete" 
+                            onclick="deleteAssessment({{ assessment.id }}, '{{ assessment.organization_name or assessment.team_name or 'Assessment ' + assessment.id|string }}', '{{ assessment.status or 'draft' }}')"
+                            title="Delete Assessment">
+                        <i class="bi bi-trash me-1"></i>Delete
+                    </button>
                 {% else %}
                     <a href="{{ url_for('assessment.view_readonly', assessment_id=assessment.id) if url_for else '/assessment/' + assessment.id|string + '/view' }}" 
                        class="btn btn-action btn-view">
@@ -629,6 +649,11 @@
                        class="btn btn-action btn-continue">
                         <i class="bi bi-play-circle me-1"></i>Continue Assessment
                     </a>
+                    <button type="button" class="btn btn-action btn-delete" 
+                            onclick="deleteAssessment({{ assessment.id }}, '{{ assessment.organization_name or assessment.team_name or 'Assessment ' + assessment.id|string }}', '{{ assessment.status or 'draft' }}')"
+                            title="Delete Assessment">
+                        <i class="bi bi-trash me-1"></i>Delete
+                    </button>
                 {% endif %}
             </div>
         </div>
@@ -715,6 +740,219 @@
     </div>
     {% endif %}
 </div>
+
+<!-- Custom Delete Confirmation Modal -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header border-0 bg-danger text-white">
+                <div class="d-flex align-items-center">
+                    <div class="modal-icon me-3">
+                        <i class="bi bi-exclamation-triangle-fill fs-2"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title mb-0" id="deleteConfirmModalLabel">Confirm Deletion</h5>
+                        <small class="opacity-75">This action cannot be undone</small>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body p-4">
+                <div class="text-center mb-4">
+                    <div class="alert alert-warning border-0 bg-light">
+                        <i class="bi bi-info-circle text-warning me-2"></i>
+                        <strong>Are you sure you want to delete this assessment?</strong>
+                    </div>
+                </div>
+                
+                <div class="assessment-details bg-light rounded p-3 mb-3">
+                    <div class="row g-2">
+                        <div class="col-4 text-muted small">Assessment:</div>
+                        <div class="col-8 fw-semibold" id="deleteAssessmentName">-</div>
+                        
+                        <div class="col-4 text-muted small">ID:</div>
+                        <div class="col-8 font-monospace small" id="deleteAssessmentId">-</div>
+                        
+                        <div class="col-4 text-muted small">Status:</div>
+                        <div class="col-8">
+                            <span class="badge" id="deleteAssessmentStatus">-</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="warning-text text-center">
+                    <p class="text-muted mb-2">
+                        <i class="bi bi-database-fill-x text-danger me-1"></i>
+                        This will permanently remove:
+                    </p>
+                    <ul class="list-unstyled text-start text-muted small">
+                        <li><i class="bi bi-dot text-danger"></i> All assessment responses and progress</li>
+                        <li><i class="bi bi-dot text-danger"></i> Organization and contact information</li>
+                        <li><i class="bi bi-dot text-danger"></i> Scoring and analysis data</li>
+                        <li><i class="bi bi-dot text-danger"></i> Historical tracking information</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer border-0 bg-light justify-content-center">
+                <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-1"></i>Cancel
+                </button>
+                <button type="button" class="btn btn-danger px-4" id="confirmDeleteBtn">
+                    <i class="bi bi-trash me-1"></i>Delete Assessment
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Success/Error Toast Notifications -->
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 1100;">
+    <div id="notificationToast" class="toast align-items-center border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body d-flex align-items-center">
+                <i class="notification-icon me-2"></i>
+                <span class="notification-message">Notification message</span>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Enhanced Modal Styling */
+.modal-content {
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    padding: 1.5rem;
+}
+
+.modal-icon {
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+}
+
+.assessment-details {
+    border: 1px solid #e5e7eb;
+    background: #f8fafc !important;
+}
+
+.warning-text ul {
+    max-width: 280px;
+    margin: 0 auto;
+}
+
+.modal-footer {
+    padding: 1.5rem;
+    gap: 0.75rem;
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    border: none;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+    transition: all 0.3s ease;
+}
+
+.btn-danger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(220, 38, 38, 0.4);
+    background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+}
+
+.btn-outline-secondary {
+    border: 2px solid #e5e7eb;
+    color: #6b7280;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-secondary:hover {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+    color: #374151;
+    transform: translateY(-1px);
+}
+
+/* Toast Notifications */
+.toast {
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(10px);
+    min-width: 300px;
+}
+
+.toast.success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+}
+
+.toast.error {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+}
+
+.toast.info {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+}
+
+.notification-icon {
+    font-size: 1.25rem;
+}
+
+/* Modal Animation */
+.modal.fade .modal-dialog {
+    transform: scale(0.8) translateY(-50px);
+    transition: all 0.3s ease;
+}
+
+.modal.show .modal-dialog {
+    transform: scale(1) translateY(0);
+}
+
+/* Loading state for delete button */
+.btn-loading {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid transparent;
+    border-top: 2px solid currentColor;
+    border-radius: 50%;
+    animation: btn-loading-spin 1s linear infinite;
+}
+
+@keyframes btn-loading-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.btn-loading .btn-text {
+    opacity: 0;
+}
+
+/* Status badge styling for modal */
+.badge.status-completed { background: #059669; }
+.badge.status-in-progress { background: #d97706; }
+.badge.status-draft { background: #6b7280; }
+</style>
 {% endblock %}
 
 {% block scripts %}
@@ -773,11 +1011,22 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Add loading states to action buttons (except report links)
+    // Add loading states to action buttons (except report links and delete buttons)
     const actionButtons = document.querySelectorAll('.btn-action:not([href*="/report"])');
     actionButtons.forEach(button => {
         button.addEventListener('click', function() {
-            if (!this.classList.contains('btn-export') && !this.href.includes('/report')) {
+            // Skip if it's a delete button or export button
+            if (this.classList.contains('btn-delete') || this.classList.contains('btn-export')) {
+                return;
+            }
+            
+            // Skip if it's a link with href containing '/report'
+            if (this.href && this.href.includes('/report')) {
+                return;
+            }
+            
+            // Only apply loading state to buttons that navigate (have href)
+            if (this.href) {
                 const originalText = this.innerHTML;
                 this.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Loading...';
                 this.disabled = true;
@@ -790,6 +1039,300 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+    
+    // Initialize Bootstrap components
+    const deleteModalElement = document.getElementById('deleteConfirmModal');
+    const toastElement = document.getElementById('notificationToast');
+    let deleteModal = null;
+    
+    if (deleteModalElement && typeof bootstrap !== 'undefined') {
+        deleteModal = new bootstrap.Modal(deleteModalElement);
+    }
+    
+    // Handle delete confirmation
+    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+    if (confirmDeleteBtn) {
+        confirmDeleteBtn.addEventListener('click', function() {
+            const assessmentId = this.dataset.assessmentId;
+            const deleteButton = document.querySelector(`button[data-assessment-id="${assessmentId}"]`);
+            
+        if (!deleteButton) {
+            console.error('Delete button not found for assessment ID:', assessmentId);
+            return;
+        }
+        
+        // Show loading state on confirmation button
+        const originalConfirmText = this.innerHTML;
+        this.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Deleting...';
+        this.disabled = true;
+        
+        // Show loading state on original delete button
+        const originalText = deleteButton.innerHTML;
+        deleteButton.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Deleting...';
+        deleteButton.disabled = true;
+        deleteButton.classList.add('btn-loading');            // Send delete request
+            fetch(`/assessment/${assessmentId}/delete`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': document.querySelector('meta[name=csrf-token]')?.getAttribute('content') || ''
+                },
+                body: JSON.stringify({ _method: 'DELETE' })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Get the deleted assessment's status for stats update
+                    const deletedStatus = currentAssessmentToDelete ? currentAssessmentToDelete.status : null;
+                    
+                    // Force close modal on success
+                    forceCloseModal();
+                    
+                    // Update dashboard stats immediately
+                    updateDashboardStats(deletedStatus);
+                    
+                    // Show success notification
+                    showNotification(data.message, 'success');
+                    
+                    // Remove the assessment card with animation
+                    const assessmentCard = deleteButton.closest('.assessment-card');
+                    if (assessmentCard) {
+                        assessmentCard.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+                        assessmentCard.style.opacity = '0';
+                        assessmentCard.style.transform = 'translateX(-100%) scale(0.8)';
+                        
+                        setTimeout(() => {
+                            assessmentCard.remove();
+                            
+                            // Close any lingering modals after card removal
+                            document.querySelectorAll('.modal.show').forEach(modal => {
+                                const modalInstance = bootstrap.Modal.getInstance(modal);
+                                if (modalInstance) {
+                                    modalInstance.hide();
+                                }
+                            });
+                            
+                            // If no more cards, reload the page to show empty state
+                            const remainingCards = document.querySelectorAll('.assessment-card');
+                            if (remainingCards.length === 0) {
+                                setTimeout(() => window.location.reload(), 500);
+                            }
+                        }, 500);
+                    }
+                } else {
+                    // Show error message
+                    showNotification(data.message || 'Failed to delete assessment', 'error');
+                    
+                // Restore confirmation button state
+                const confirmBtn = document.getElementById('confirmDeleteBtn');
+                if (confirmBtn) {
+                    confirmBtn.innerHTML = originalConfirmText;
+                    confirmBtn.disabled = false;
+                }                    // Restore delete button state
+                    deleteButton.innerHTML = originalText;
+                    deleteButton.disabled = false;
+                    deleteButton.classList.remove('btn-loading');
+                }
+            })
+            .catch(error => {
+                console.error('Delete error:', error);
+                showNotification('Failed to delete assessment. Please try again.', 'error');
+                
+                // Restore confirmation button state
+                const confirmBtn = document.getElementById('confirmDeleteBtn');
+                if (confirmBtn) {
+                    confirmBtn.innerHTML = originalConfirmText;
+                    confirmBtn.disabled = false;
+                }
+                
+                // Restore delete button state
+                deleteButton.innerHTML = originalText;
+                deleteButton.disabled = false;
+                deleteButton.classList.remove('btn-loading');
+            });
+        });
+    }
 });
+
+// Global variables for modal state
+let currentAssessmentToDelete = null;
+
+// Function to force close modal
+function forceCloseModal() {
+    // Close all open modals
+    document.querySelectorAll('.modal.show').forEach(modal => {
+        const modalInstance = bootstrap.Modal.getInstance(modal);
+        if (modalInstance) {
+            modalInstance.hide();
+        }
+    });
+    
+    // Force remove modal backdrop and classes
+    setTimeout(() => {
+        document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
+        document.body.classList.remove('modal-open');
+        document.body.style.paddingRight = '';
+        document.body.style.overflow = '';
+    }, 100);
+}
+
+// Function to update dashboard stats after deletion
+function updateDashboardStats(deletedAssessmentStatus) {
+    // Get current stats from the DOM
+    const statsElements = {
+        total: document.querySelector('.stats-grid .stat-card:nth-child(1) .stat-value'),
+        completed: document.querySelector('.stats-grid .stat-card:nth-child(2) .stat-value'),
+        inProgress: document.querySelector('.stats-grid .stat-card:nth-child(3) .stat-value')
+    };
+    
+    // Update total count (always decrease by 1)
+    if (statsElements.total) {
+        const currentTotal = parseInt(statsElements.total.textContent) || 0;
+        statsElements.total.textContent = Math.max(0, currentTotal - 1);
+        
+        // Add animation to show the change
+        statsElements.total.style.transform = 'scale(1.1)';
+        statsElements.total.style.color = '#dc2626';
+        setTimeout(() => {
+            statsElements.total.style.transform = 'scale(1)';
+            statsElements.total.style.color = '';
+        }, 300);
+    }
+    
+    // Update specific status count based on deleted assessment
+    if (deletedAssessmentStatus) {
+        const status = deletedAssessmentStatus.toLowerCase();
+        let targetElement = null;
+        
+        if (status === 'completed' && statsElements.completed) {
+            targetElement = statsElements.completed;
+        } else if (status === 'in_progress' && statsElements.inProgress) {
+            targetElement = statsElements.inProgress;
+        }
+        
+        if (targetElement) {
+            const currentCount = parseInt(targetElement.textContent) || 0;
+            targetElement.textContent = Math.max(0, currentCount - 1);
+            
+            // Add animation to show the change
+            targetElement.style.transform = 'scale(1.1)';
+            targetElement.style.color = '#dc2626';
+            setTimeout(() => {
+                targetElement.style.transform = 'scale(1)';
+                targetElement.style.color = '';
+            }, 300);
+        }
+    }
+}
+
+// Enhanced delete assessment function with modal
+function deleteAssessment(assessmentId, assessmentName, assessmentStatus = 'Unknown') {
+    // Validate inputs
+    if (!assessmentId || !assessmentName) {
+        console.error('Invalid assessment data for deletion');
+        return;
+    }
+    
+    // Store current assessment info
+    currentAssessmentToDelete = {
+        id: assessmentId,
+        name: assessmentName,
+        status: assessmentStatus
+    };
+    
+    // Populate modal with assessment details
+    const nameElement = document.getElementById('deleteAssessmentName');
+    const idElement = document.getElementById('deleteAssessmentId');
+    const statusBadge = document.getElementById('deleteAssessmentStatus');
+    const confirmBtn = document.getElementById('confirmDeleteBtn');
+    
+    if (nameElement) nameElement.textContent = assessmentName;
+    if (idElement) idElement.textContent = `#${assessmentId}`;
+    
+    if (statusBadge) {
+        statusBadge.textContent = assessmentStatus.replace('_', ' ').toUpperCase();
+        statusBadge.className = `badge status-${assessmentStatus.toLowerCase().replace('_', '-')}`;
+    }
+    
+    // Set assessment ID on confirm button and reset its state
+    if (confirmBtn) {
+        confirmBtn.dataset.assessmentId = assessmentId;
+        // Reset button to original state
+        confirmBtn.innerHTML = '<i class="bi bi-trash me-1"></i>Delete Assessment';
+        confirmBtn.disabled = false;
+        confirmBtn.classList.remove('btn-loading');
+    }
+    
+    // Store reference to delete button for later use
+    const deleteButton = event.target.closest('button');
+    if (deleteButton) {
+        deleteButton.dataset.assessmentId = assessmentId;
+    }
+    
+    // Show modal
+    const modalElement = document.getElementById('deleteConfirmModal');
+    if (modalElement && typeof bootstrap !== 'undefined') {
+        const deleteModal = new bootstrap.Modal(modalElement);
+        deleteModal.show();
+    } else {
+        // Fallback to browser confirm if Bootstrap modal is not available
+        if (confirm(`Are you sure you want to delete "${assessmentName}"?\n\nThis action cannot be undone and will permanently remove all assessment data.`)) {
+            // Trigger the delete directly
+            if (confirmBtn) {
+                confirmBtn.dataset.assessmentId = assessmentId;
+                confirmBtn.click();
+            }
+        }
+    }
+}
+
+// Enhanced notification function with toast
+function showNotification(message, type = 'info') {
+    const toast = document.getElementById('notificationToast');
+    
+    if (!toast) {
+        // Fallback to console if toast element not found
+        console.log(`${type.toUpperCase()}: ${message}`);
+        return;
+    }
+    
+    const toastBody = toast.querySelector('.toast-body');
+    const icon = toast.querySelector('.notification-icon');
+    const messageSpan = toast.querySelector('.notification-message');
+    
+    // Set message
+    if (messageSpan) messageSpan.textContent = message;
+    
+    // Set icon and styling based on type
+    toast.className = `toast align-items-center border-0 ${type}`;
+    
+    if (icon) {
+        switch(type) {
+            case 'success':
+                icon.className = 'notification-icon me-2 bi bi-check-circle-fill';
+                break;
+            case 'error':
+                icon.className = 'notification-icon me-2 bi bi-exclamation-triangle-fill';
+                break;
+            case 'info':
+            default:
+                icon.className = 'notification-icon me-2 bi bi-info-circle-fill';
+                break;
+        }
+    }
+    
+    // Show toast
+    if (typeof bootstrap !== 'undefined') {
+        const bsToast = new bootstrap.Toast(toast, {
+            autohide: true,
+            delay: 5000
+        });
+        bsToast.show();
+    } else {
+        // Fallback notification if Bootstrap is not available
+        alert(`${type.toUpperCase()}: ${message}`);
+    }
+}
 </script>
 {% endblock %}
