@@ -2218,18 +2218,22 @@ def download_pdf(assessment_id):
                         next_levels.append({
                             'level': target_level,
                             'level_name': _get_maturity_level_from_score(target_level),
-                            'description': prog.prerequisites,
-                            'actions': _parse_progression_text(prog.action_items),
+                            'prerequisites': _parse_progression_text(prog.prerequisites),
+                            'action_items': _parse_progression_text(prog.action_items),
+                            'success_metrics': _parse_progression_text(prog.success_metrics),
                             'timeline': prog.timeline,
-                            'resources': _parse_progression_text(prog.success_metrics)
+                            'common_pitfalls': _parse_progression_text(prog.common_pitfall),
+                            'description': prog.prerequisites  # Fallback
                         })
 
                 if next_levels:
                     roadmap_data[question_id] = {
                         'question': question.question,
                         'area': question.area.name,
+                        'area_name': question.area.name,  # For template compatibility
                         'current_level': current_level,
                         'current_level_name': _get_maturity_level_from_score(current_level),
+                        'current_description': _get_level_description(question, current_level),
                         'next_levels': next_levels
                     }
 

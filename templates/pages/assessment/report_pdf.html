@@ -453,18 +453,108 @@
     <div class="page-break">
         <h4 class="fw-bold mb-4">Implementation Roadmap Summary</h4>
         {% for question_id, roadmap in roadmap_data.items() %}
-        <div class="roadmap-section mb-4 p-3" style="border: 1px solid #e9ecef; border-radius: 8px; background-color: #f8f9fa;">
-            <h6 class="fw-bold mb-2" style="color: #495057;">{{ roadmap.area }}</h6>
-            <p class="small text-muted mb-2"><strong>Current Level:</strong> {{ roadmap.current_level_name }}</p>
+        <div class="roadmap-section mb-4" style="border: 1px solid #e9ecef; border-radius: 8px; background-color: #f8f9fa; padding: 20px;">
+            <!-- Header -->
+            <div class="mb-3" style="border-bottom: 1px solid #dee2e6; padding-bottom: 15px;">
+                <h5 class="fw-bold mb-1" style="color: #495057;">
+                    <i class="bi bi-question-circle me-2"></i>{{ roadmap.area_name or roadmap.area }}
+                </h5>
+                <p class="text-muted mb-0 small">{{ roadmap.question if roadmap.question else 'Area assessment question' }}</p>
+            </div>
+
+            <!-- Current Level -->
+            <div class="mb-3" style="background-color: #e3f2fd; padding: 12px; border-radius: 6px; border-left: 4px solid #2196f3;">
+                <h6 class="fw-bold mb-1">Current Level: {{ roadmap.current_level_name }}</h6>
+                <p class="mb-0 small">{{ roadmap.current_description if roadmap.current_description else 'Current assessment level' }}</p>
+            </div>
+
+            <!-- Next Levels -->
             {% if roadmap.next_levels %}
-            {% set next_level = roadmap.next_levels[0] %}
-            <div class="mt-2">
-                <p class="fw-semibold mb-1" style="color: #28a745;"><strong>Next Step:</strong> {{ next_level.level_name }}</p>
-                <p class="small mb-1">{{ next_level.description }}</p>
-                {% if next_level.timeline %}
-                <p class="small text-muted mb-0"><strong>Timeline:</strong> {{ next_level.timeline }} weeks</p>
+            {% for next_level in roadmap.next_levels %}
+            <div class="mb-4" style="border-left: 4px solid #28a745; padding-left: 15px;">
+                <div class="d-flex align-items-center mb-3">
+                    <div style="background-color: #28a745; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 10px;">
+                        {{ next_level.level }}
+                    </div>
+                    <div>
+                        <h6 class="mb-0 fw-bold" style="color: #28a745;">Next Step: {{ next_level.level_name }}</h6>
+                        {% if next_level.timeline %}
+                        <small class="text-muted">
+                            <i class="bi bi-clock me-1"></i>Timeline: {{ next_level.timeline }} weeks
+                        </small>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Prerequisites -->
+                {% if next_level.prerequisites %}
+                <div class="mb-3">
+                    <h6 class="fw-bold mb-2" style="color: #007bff;">
+                        <i class="bi bi-list-check me-2"></i>Prerequisites
+                    </h6>
+                    {% for prerequisite in next_level.prerequisites %}
+                    <div class="small mb-1" style="padding-left: 15px; position: relative;">
+                        <span style="position: absolute; left: 0; color: #007bff;">→</span>
+                        {{ prerequisite }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <!-- Action Items -->
+                {% if next_level.action_items %}
+                <div class="mb-3">
+                    <h6 class="fw-bold mb-2" style="color: #28a745;">
+                        <i class="bi bi-gear me-2"></i>Action Items
+                    </h6>
+                    {% for action in next_level.action_items %}
+                    <div class="small mb-1" style="padding-left: 15px; position: relative;">
+                        <span style="position: absolute; left: 0; color: #28a745;">▶</span>
+                        {{ action }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <!-- Success Metrics -->
+                {% if next_level.success_metrics %}
+                <div class="mb-3">
+                    <h6 class="fw-bold mb-2" style="color: #ffc107;">
+                        <i class="bi bi-trophy me-2"></i>Success Metrics
+                    </h6>
+                    {% for metric in next_level.success_metrics %}
+                    <div class="small mb-1" style="padding-left: 15px; position: relative;">
+                        <span style="position: absolute; left: 0; color: #ffc107;">✓</span>
+                        {{ metric }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <!-- Common Pitfalls -->
+                {% if next_level.common_pitfalls %}
+                <div class="mb-3">
+                    <h6 class="fw-bold mb-2" style="color: #dc3545;">
+                        <i class="bi bi-exclamation-triangle me-2"></i>Common Pitfalls
+                    </h6>
+                    {% for pitfall in next_level.common_pitfalls %}
+                    <div class="small mb-1" style="padding-left: 15px; position: relative;">
+                        <span style="position: absolute; left: 0; color: #dc3545;">⚠</span>
+                        {{ pitfall }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <!-- Basic description fallback -->
+                {% if next_level.description and not (next_level.prerequisites or next_level.action_items or next_level.success_metrics or next_level.common_pitfalls) %}
+                <div class="mb-3">
+                    <h6 class="fw-bold mb-2" style="color: #6c757d;">Description</h6>
+                    <p class="small mb-0">{{ next_level.description }}</p>
+                </div>
                 {% endif %}
             </div>
+            {% endfor %}
             {% endif %}
         </div>
         {% endfor %}
