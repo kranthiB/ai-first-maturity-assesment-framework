@@ -256,35 +256,6 @@ def index():
                                total_sections=4)
 
 
-@assessment_bp.route('/start')
-def start():
-    """
-    Assessment start page with basic information collection
-    """
-    try:
-        from app.extensions import db
-        
-        # Get framework overview for display
-        sections = db.session.query(Section).options(
-            joinedload(Section.areas)
-        ).order_by(Section.display_order).all()
-        
-        total_questions = db.session.query(Question).count()
-        estimated_time = max(15, (total_questions * 1.5))  # 1.5 min per question
-        
-        context = {
-            'sections': sections,
-            'total_questions': total_questions,
-            'estimated_time': int(estimated_time)
-        }
-        
-        return render_template('pages/assessment/start.html', **context)
-        
-    except Exception as e:
-        logger.error(f"Error loading assessment start page: {e}")
-        return render_template('pages/assessment/start.html')
-
-
 @assessment_bp.route('/create', methods=['GET', 'POST'])
 def create():
     """

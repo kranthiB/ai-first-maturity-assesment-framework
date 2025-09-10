@@ -81,7 +81,7 @@
                 <button onclick="history.back()" class="btn btn-outline-secondary btn-lg">
                     <i class="bi bi-arrow-left me-2"></i>Go Back
                 </button>
-                <a href="{{ url_for('assessment.start') if url_for else '/assessment/start' }}" 
+                <a href="{{ url_for('assessment.create') if url_for else '/assessment/create' }}" 
                    class="btn btn-success btn-lg">
                     <i class="bi bi-play-circle me-2"></i>Start Assessment
                 </a>
@@ -115,7 +115,7 @@
                             <h6 class="text-muted">Assessment</h6>
                             <ul class="list-unstyled">
                                 <li>
-                                    <a href="{{ url_for('assessment.start') if url_for else '/assessment/start' }}" 
+                                    <a href="{{ url_for('assessment.create') if url_for else '/assessment/create' }}" 
                                        class="text-decoration-none">
                                         <i class="bi bi-play-circle me-2"></i>Start New Assessment
                                     </a>

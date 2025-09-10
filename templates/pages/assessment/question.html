@@ -4,7 +4,7 @@
 {% set show_progress = true %}
 {% set breadcrumbs = [
     {"name": "Home", "url": url_for('main.index') if url_for else '/'},
-    {"name": "Assessment", "url": url_for('assessment.start') if url_for else '/assessment/start'},
+    {"name": "Assessment", "url": url_for('assessment.create') if url_for else '/assessment/create'},
     {"name": "Question " + question.number|string, "url": "#", "active": true}
 ] %}
 
