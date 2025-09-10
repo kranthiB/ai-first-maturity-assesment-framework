@@ -162,7 +162,7 @@ The assessment framework provides a streamlined workflow:
 - `/assessment/create` - Create new assessment with organization and assessor information
 - `/assessment/{id}/section/{section_id}` - Complete section assessments
 - `/assessment/{id}/final-review` - Review before submission
-- `/assessment/{id}/results` - View assessment results
+- `/assessment/{id}/report` - View comprehensive assessment report
 - `/about` - About the framework and methodology
 
 

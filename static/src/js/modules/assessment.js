@@ -390,7 +390,7 @@ class AssessmentManager {
         .then(result => {
             this.showSubmitIndicator('Submitted successfully!', 'success');
             setTimeout(() => {
-                window.location.href = `/assessment/${this.assessmentId}/results`;
+                window.location.href = `/assessment/${this.assessmentId}/report`;
             }, 1500);
             return result;
         })

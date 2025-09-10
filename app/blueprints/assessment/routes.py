@@ -811,7 +811,7 @@ def generate_report(assessment_id):
         # Check if assessment is already completed
         if assessment_row.status == 'COMPLETED':
             flash('Assessment is already completed', 'info')
-            return redirect(url_for('assessment.results', 
+            return redirect(url_for('assessment.report', 
                                     assessment_id=assessment_id))
         
         # Get responses to check completion
@@ -944,8 +944,8 @@ def generate_report(assessment_id):
             clear_assessment_session()
             
             logger.info(f"Assessment {assessment_id} completed successfully")
-            flash('Assessment completed successfully! Your results are now available.', 'success')
-            return redirect(url_for('assessment.results', 
+            flash('Assessment completed successfully! Your report is now available.', 'success')
+            return redirect(url_for('assessment.report', 
                                     assessment_id=assessment_id))
             
         except Exception as scoring_error:
@@ -1151,7 +1151,7 @@ def question(assessment_id, question_id=None):
         
         # Check if assessment is completed
         if assessment.status == 'COMPLETED':
-            return redirect(url_for('assessment.results', 
+            return redirect(url_for('assessment.report', 
                                     assessment_id=assessment_id))
         
         # Get specific question or next question
@@ -1385,7 +1385,7 @@ def complete(assessment_id):
         
         # Check if already completed
         if assessment.status == 'COMPLETED':
-            return redirect(url_for('assessment.results',
+            return redirect(url_for('assessment.report',
                                     assessment_id=assessment_id))
         
         # Get progress to check if ready for completion
@@ -1431,7 +1431,7 @@ def finalize(assessment_id):
         
         if assessment.status == 'COMPLETED':
             flash('Assessment is already completed', 'info')
-            return redirect(url_for('assessment.results',
+            return redirect(url_for('assessment.report',
                                     assessment_id=assessment_id))
         
         # Check completion requirements
@@ -1480,14 +1480,14 @@ def finalize(assessment_id):
             logger.info(f"Assessment {assessment_id} completed successfully "
                        f"for {organization} by {assessor}")
             
-            flash('Assessment completed successfully! Your results are now available.', 'success')
-            return redirect(url_for('assessment.results',
+            flash('Assessment completed successfully! Your report is now available.', 'success')
+            return redirect(url_for('assessment.report',
                                     assessment_id=assessment_id))
             
         except Exception as scoring_error:
             logger.error(f"Error during assessment scoring/completion: {scoring_error}")
             flash('Error occurred during scoring. Assessment saved but may need manual review.', 'warning')
-            return redirect(url_for('assessment.results',
+            return redirect(url_for('assessment.report',
                                     assessment_id=assessment_id))
         
     except ValidationError as e:
@@ -1517,207 +1517,7 @@ def finalize(assessment_id):
                                 assessment_id=assessment_id))
 
 
-@assessment_bp.route('/<int:assessment_id>/results')
-def results(assessment_id):
-    """
-    Assessment results page with comprehensive scores, recommendations, and analytics
-    """
-    try:
-        assessment_service = get_assessment_service()
-        scoring_service = get_scoring_service()
-        recommendation_service = get_recommendation_service()
-        
-        # Get assessment with all related data
-        assessment = assessment_service.get_assessment(
-            assessment_id, include_responses=True
-        )
-        
-        if not assessment:
-            flash('Assessment not found', 'error')
-            return redirect(url_for('assessment.index'))
-        
-        if assessment.status != 'COMPLETED':
-            flash('Assessment is not completed yet. Please finish the assessment first.', 'warning')
-            return redirect(url_for('assessment.detail',
-                                    assessment_id=assessment_id))
-        
-        # Get comprehensive scoring results
-        try:
-            detailed_scores = scoring_service.calculate_assessment_score(assessment_id)
-            maturity_level = detailed_scores.get('maturity_level', 'Calculating...')
-            raw_section_scores = detailed_scores.get('section_scores', {})
-            area_scores = {}  # Not implemented in current scoring service
-        except Exception as scoring_error:
-            logger.warning(f"Error calculating detailed scores: {scoring_error}")
-            # Fallback to basic scoring
-            detailed_scores = {}
-            maturity_level = 'Calculating...'
-            raw_section_scores = {}
-            area_scores = {}
 
-        # Convert section scores to template format
-        section_scores = []
-        section_scores_dict = {}
-        
-        if raw_section_scores:
-            for section_key, section_data in raw_section_scores.items():
-                if isinstance(section_data, dict) and 'score' in section_data:
-                    # Convert area scores to list format for template
-                    areas_list = []
-                    area_scores_dict = section_data.get('area_scores', {})
-                    for area_key, area_data in area_scores_dict.items():
-                        if isinstance(area_data, dict) and 'score' in area_data:
-                            area_obj = {
-                                'id': area_data.get('area_id', area_key),
-                                'name': area_data.get('area_name', area_key),
-                                'score': area_data.get('score', 0),
-                                'score_display': area_data.get('score_display', '0.0')
-                            }
-                            areas_list.append(area_obj)
-                    
-                    # Format for template list iteration
-                    section_obj = {
-                        'id': section_data.get('section_id', section_key),
-                        'name': section_data.get('section_name', section_key),
-                        'score': section_data.get('score', 0),
-                        'score_display': section_data.get('score_display', '0.0'),
-                        'color': 'primary',  # Default color
-                        'question_count': section_data.get('total_questions', 0),
-                        'percentage': round((section_data.get('score', 0) / 4.0) * 100, 1),
-                        'area_scores': section_data.get('area_scores', {}),
-                        'areas': areas_list  # For template iteration
-                    }
-                    section_scores.append(section_obj)
-                    section_scores_dict[section_key] = section_data
-        
-        # Get recommendations with priority levels
-        try:
-            recommendations_data = recommendation_service.generate_assessment_recommendations(
-                assessment_id
-            )
-            # Extract the list of recommendations from nested structure
-            if isinstance(recommendations_data, dict):
-                recs_dict = recommendations_data.get('recommendations', {})
-                recommendations = recs_dict.get('all', [])
-            else:
-                recommendations = []
-            priority_recommendations = recommendation_service.get_priority_recommendations(
-                assessment_id, limit=5
-            )
-        except Exception as rec_error:
-            logger.warning(f"Error generating recommendations: {rec_error}")
-            recommendations = []
-            priority_recommendations = []
-        
-        # Get progress statistics
-        progress = assessment_service.get_assessment_progress(assessment_id)
-        
-        # Calculate completion statistics
-        completion_stats = {
-            'total_responses': progress.get('answered_questions', 0),
-            'completion_percentage': progress.get('progress_percentage', 0),
-            'completion_date': assessment.completion_date,
-            'duration': _calculate_assessment_duration(assessment)
-        }
-        
-        # Calculate section analysis for template
-        strongest_section = None
-        improvement_section = None
-        score_variance = 0
-        consistency_level = "Good"
-        highest_section_score = 0
-        lowest_section_score = 0
-        section_scores_data = []
-        
-        if section_scores:
-            scores_list = [section['score'] for section in section_scores]
-            
-            if scores_list:
-                # Find strongest and weakest sections
-                strongest_section = max(section_scores, key=lambda x: x['score'])
-                improvement_section = min(section_scores, key=lambda x: x['score'])
-                
-                # Calculate highest and lowest scores for template
-                highest_section_score = max(scores_list)
-                lowest_section_score = min(scores_list)
-                
-                # Prepare data for charts
-                section_scores_data = [
-                    {
-                        'name': section['name'],
-                        'score': section['score']
-                    }
-                    for section in section_scores
-                ]
-                
-                # Calculate score variance for consistency
-                if len(scores_list) > 1:
-                    mean_score = sum(scores_list) / len(scores_list)
-                    variance = sum((score - mean_score) ** 2 
-                                 for score in scores_list) / len(scores_list)
-                    score_variance = round(variance, 2)
-                    
-                    # Determine consistency level
-                    if variance < 0.5:
-                        consistency_level = "Excellent"
-                    elif variance < 1.0:
-                        consistency_level = "Good"
-                    elif variance < 1.5:
-                        consistency_level = "Fair"
-                    else:
-                        consistency_level = "Needs Attention"
-        
-        # Prepare chart data for template
-        if section_scores:
-            section_names = [section['name'] for section in section_scores]
-            section_colors = ['#0066cc', '#28a745', '#ffc107', '#dc3545']
-            section_colors = section_colors[:len(section_names)]
-        else:
-            section_names = []
-            section_colors = []
-        
-        # For historical data (placeholder for now)
-        if assessment.completion_date:
-            date_str = assessment.completion_date.strftime('%Y-%m-%d')
-            assessment_dates = [date_str]
-        else:
-            assessment_dates = ['N/A']
-        historical_scores = [assessment.overall_score or 0]
-        
-        # Prepare comprehensive context
-        context = {
-            'assessment': assessment,
-            'detailed_scores': detailed_scores,
-            'maturity_level': maturity_level,
-            'section_scores': section_scores,
-            'section_scores_dict': section_scores_dict,
-            'area_scores': area_scores,
-            'recommendations': recommendations,
-            'priority_recommendations': priority_recommendations,
-            'progress': progress,
-            'completion_stats': completion_stats,
-            'strongest_section': strongest_section,
-            'improvement_section': improvement_section,
-            'score_variance': score_variance,
-            'consistency_level': consistency_level,
-            'highest_section_score': highest_section_score,
-            'lowest_section_score': lowest_section_score,
-            'section_scores_data': section_scores_data,
-            'section_names': section_names,
-            'section_colors': section_colors,
-            'assessment_dates': assessment_dates,
-            'historical_scores': historical_scores,
-            'show_export_options': True
-        }
-        
-        logger.info(f"Results page loaded for assessment {assessment_id}")
-        return render_template('pages/assessment/results.html', **context)
-        
-    except Exception as e:
-        logger.error(f"Error loading assessment results: {str(e)}")
-        flash('Error loading assessment results. Please try again.', 'error')
-        return redirect(url_for('assessment.detail',
-                                assessment_id=assessment_id))
 
 
 def _calculate_assessment_duration(assessment):
@@ -1929,7 +1729,7 @@ def report(assessment_id):
     except Exception as e:
         logger.error(f"Error loading report: {e}")
         flash('Error loading report', 'error')
-        return redirect(url_for('assessment.results',
+        return redirect(url_for('assessment.detail',
                                 assessment_id=assessment_id))
 
 

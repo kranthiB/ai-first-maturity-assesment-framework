@@ -475,7 +475,7 @@
                             </a>
                             
                             {% if assessment.status == 'COMPLETED' %}
-                            <a href="{{ url_for('assessment.results', assessment_id=assessment.id) }}" 
+                            <a href="{{ url_for('assessment.report', assessment_id=assessment.id) }}" 
                                class="btn-nav btn-primary-nav">
                                 <i class="bi bi-graph-up me-2"></i>
                                 View Results
