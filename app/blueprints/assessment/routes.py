@@ -1688,11 +1688,11 @@ def report(assessment_id):
 
 def _get_maturity_level_from_score(score):
     """Convert numeric score to maturity level name"""
-    if score >= 3.5:
+    if score >= 3.3:
         return 'AI-First'
     elif score >= 2.5:
         return 'AI-Augmented'
-    elif score >= 1.5:
+    elif score >= 1.8:
         return 'AI-Assisted'
     else:
         return 'Traditional'

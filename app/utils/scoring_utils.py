@@ -27,9 +27,9 @@ class ScoringConstants:
 
     # Maturity level thresholds
     MATURITY_THRESHOLDS = {
-        MaturityLevel.TRADITIONAL: (1.0, 1.7),
-        MaturityLevel.ASSISTED: (1.8, 2.4),
-        MaturityLevel.AUGMENTED: (2.5, 3.2),
+        MaturityLevel.TRADITIONAL: (1.0, 1.8),
+        MaturityLevel.ASSISTED: (1.8, 2.5),
+        MaturityLevel.AUGMENTED: (2.5, 3.3),
         MaturityLevel.FIRST: (3.3, 4.0)
     }
 
@@ -97,12 +97,16 @@ def classify_maturity_level(deviq_score: float) -> Tuple[MaturityLevel, str]:
     deviq_score = max(min_score, min(max_score, deviq_score))
 
     thresholds = ScoringConstants.MATURITY_THRESHOLDS
-    for level, (min_threshold, max_threshold) in thresholds.items():
-        if min_threshold <= deviq_score <= max_threshold:
-            return level, level.value
-
-    # Fallback (should not happen with proper thresholds)
-    return MaturityLevel.TRADITIONAL, MaturityLevel.TRADITIONAL.value
+    
+    # Check each level in order (highest to lowest for proper boundary handling)
+    if deviq_score >= thresholds[MaturityLevel.FIRST][0]:
+        return MaturityLevel.FIRST, MaturityLevel.FIRST.value
+    elif deviq_score >= thresholds[MaturityLevel.AUGMENTED][0]:
+        return MaturityLevel.AUGMENTED, MaturityLevel.AUGMENTED.value
+    elif deviq_score >= thresholds[MaturityLevel.ASSISTED][0]:
+        return MaturityLevel.ASSISTED, MaturityLevel.ASSISTED.value
+    else:
+        return MaturityLevel.TRADITIONAL, MaturityLevel.TRADITIONAL.value
 
 
 def get_maturity_level_details(level: MaturityLevel) -> Dict:
