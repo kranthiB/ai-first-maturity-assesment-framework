@@ -1,11 +1,12 @@
 # AI-First Software Engineering Maturity Assessment
 
-<a href="https://drive.google.com/file/d/1gJD9Lh0IHOkRoxd9Fm7WjQNQPiO9_Qmh/view" target="_blank" rel="noopener noreferrer" style="display: block; position: relative; cursor: pointer;">
-  <img src="https://drive.google.com/thumbnail?id=1gJD9Lh0IHOkRoxd9Fm7WjQNQPiO9_Qmh&sz=w1000" alt="Video Demo" style="width: 100%; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); display: block;">
-  <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.8); border-radius: 50%; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
-    ▶️
-  </div>
-</a>
+[![Video Demo](https://drive.google.com/thumbnail?id=1gJD9Lh0IHOkRoxd9Fm7WjQNQPiO9_Qmh&sz=w1000)](https://drive.google.com/file/d/1gJD9Lh0IHOkRoxd9Fm7WjQNQPiO9_Qmh/view)
+
+<div align="center">
+  <a href="https://drive.google.com/file/d/1gJD9Lh0IHOkRoxd9Fm7WjQNQPiO9_Qmh/view" target="_blank" rel="noopener noreferrer">
+    <strong>🎥 ▶️ Click to watch the demo video ▶️ 🎥</strong>
+  </a>
+</div>
 
 ## Table of Contents
 
