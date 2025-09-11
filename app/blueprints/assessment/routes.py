@@ -2022,7 +2022,7 @@ def download_pdf(assessment_id):
         
         # Generate PDF using Playwright
         with sync_playwright() as p:
-            browser = p.chromium.launch()
+            browser = p.chromium.launch(args=["--no-sandbox", "--disable-gpu"])
             page = browser.new_page()
             
             # Set HTML content
