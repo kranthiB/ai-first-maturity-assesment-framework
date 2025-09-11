@@ -33,8 +33,8 @@ case "$1" in
         log_info "Application started at http://localhost:5000"
         ;;
     down|stop)
-        log_info "Stopping application..."
-        docker-compose down
+        log_info "Stopping application and removing volumes..."
+        docker-compose down -v
         ;;
     logs)
         docker-compose logs -f

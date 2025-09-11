@@ -1,467 +1,291 @@
-# AI-First Software Engineering (AFS) Maturity Assessment Framework
+# AI-First Software Engineering Maturity Assessment
 
-[![Python Version](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
-[![Flask Version](https://img.shields.io/badge/flask-2.3%2B-green.svg)](https://flask.palletsprojects.com/)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+## Table of Contents
 
-## Overview
+- [About](#about)
+- [Key Features](#key-features)
+  - [Comprehensive Assessment Platform](#comprehensive-assessment-platform)
+  - [Intelligent User Experience](#intelligent-user-experience)
+  - [Advanced Reporting & Analytics](#advanced-reporting--analytics)
+  - [Assessment Management Dashboard](#assessment-management-dashboard)
+- [Application Architecture](#application-architecture)
+  - [Assessment Workflow](#assessment-workflow)
+  - [Maturity Level Framework](#maturity-level-framework)
+- [Getting Started](#getting-started)
+  - [For Assessment Administrators](#for-assessment-administrators)
+  - [For Assessment Participants](#for-assessment-participants)
+  - [For Leadership Teams](#for-leadership-teams)
+- [Value Proposition](#value-proposition)
+  - [Immediate Benefits](#immediate-benefits)
+  - [Long-term Impact](#long-term-impact)
+  - [Organizational Outcomes](#organizational-outcomes)
+- [Implementation Support](#implementation-support)
+  - [Assessment Methodology](#assessment-methodology)
+  - [Continuous Improvement](#continuous-improvement)
+- [Support and Resources](#support-and-resources)
+- [Setup](#setup)
 
-The **AI-First Software Engineering (AFS) Maturity Assessment Framework** is a comprehensive self-evaluation tool that measures your team's maturity in adopting AI-driven software engineering practices. This assessment evaluates four critical dimensions of modern software development: Foundational Capabilities, Transformation Capabilities, Enterprise Integration, and Strategic Governance.
+## About
 
-## Features
+The **AI-First Software Engineering Maturity Assessment Application** is a comprehensive web-based platform that enables organizations to evaluate, benchmark, and accelerate their AI-driven software development capabilities. This application transforms theoretical assessment frameworks into practical, actionable insights through an intuitive user experience.
 
-### Core Assessment Capabilities
-- **Comprehensive Assessment**: 23 detailed areas across 4 major dimensions
-- **Maturity Scoring**: 4-level maturity classification (Traditional → AI-Assisted → AI-Augmented → AI-First)
-- **Progressive Evaluation**: Section-by-section assessment with guided workflow
-- **Intelligent Question Routing**: Context-aware question navigation
+## Key Features
 
-### Organization & Team Management
-- **Assessor Tracking**: Capture assessor information for audit trails and accountability
-- **Organization Context**: Detailed organization and team information collection
-- **Multi-Assessment Support**: Track multiple assessments across teams and time periods
-- **Industry-Specific Insights**: Industry-aware recommendations and benchmarking
+### Comprehensive Assessment Platform
+- **Multi-dimensional Evaluation**: Assess maturity across 23 capability areas spanning Foundational Capabilities, Transformation Capabilities, Enterprise Integration, and Strategic Governance
+- **Progressive Assessment Flow**: Guided step-by-step evaluation with contextual help and practical guidance
+- **Flexible Scoring System**: Four-level maturity scale (Basic, Evolving, Advanced, Optimized) with detailed AFS scoring from 1.0-4.0
+
+#### Assessment Dimensions Overview
+
+```mermaid
+graph TB
+    subgraph "AI-First Software Engineering Assessment"
+        A[🏗️ Foundational Capabilities<br/>4 Core Areas<br/>Infrastructure, Skills, Code, Documentation]
+        B[🚀 Transformation Capabilities<br/>5 Advanced Areas<br/>Architecture, Testing, CI/CD, Monitoring, Legacy]
+        C[🏢 Enterprise Integration<br/>6 Organizational Areas<br/>Governance, Vendors, Systems, Cost, Performance, Continuity]
+        D[🎯 Strategic Governance<br/>8 Leadership Areas<br/>Ethics, Compliance, IP, Risk, Change, Performance, Collaboration, Innovation]
+    end
+    
+    A --> E[Comprehensive<br/>Assessment Score<br/>AFS 1.0-4.0]
+    B --> E
+    C --> E
+    D --> E
+    
+    style A fill:#e1f5fe
+    style B fill:#f3e5f5
+    style C fill:#fff3e0
+    style D fill:#e8f5e8
+    style E fill:#f1f8e9
+```
+
+### Intelligent User Experience
+- **Contextual Guidance**: Interactive help system providing prerequisites, action items, success metrics, and implementation timelines for each capability area
+- **Organization Profiling**: Structured data collection for organization context, industry classification, and assessment parameters
+- **Progress Tracking**: Visual progress indicators and section completion status throughout the assessment journey
 
 ### Advanced Reporting & Analytics
-- **Interactive Visual Reports**: Rich, interactive assessment results with charts and visualizations
-- **PDF Report Generation**: Professional PDF reports with company branding
-- **Detailed Scoring Breakdowns**: Section, area, and question-level analysis
-- **Maturity Distribution Analysis**: Visual representation of current maturity levels
-- **Priority Areas Identification**: AI-powered identification of improvement focus areas
+- **Comprehensive Reports**: Detailed assessment reports with maturity scores, gap analysis, and actionable recommendations
+- **Download Capabilities**: Export complete assessment reports for offline review and stakeholder sharing
+- **Benchmarking Insights**: Industry comparison and best practice recommendations
 
-### Actionable Roadmaps & Guidance
-- **Personalized Maturity Roadmaps**: Step-by-step progression paths for each assessment area
-- **Steps to Achieve Framework**: Detailed action plans with:
-  - **Prerequisites**: Requirements needed before starting improvements
-  - **Action Items**: Specific, implementable tasks organized by focus area
-  - **Success Metrics**: Measurable outcomes to track progress
-  - **Timeline Estimates**: Realistic timeframes for implementation
-  - **Common Pitfalls**: Known challenges and how to avoid them
-- **Progressive Level Guidance**: Tailored recommendations for advancing from current to target maturity levels
-- **Implementation Tips**: Practical advice for successful AI-first transformation
+### Assessment Management Dashboard
+- **Centralized Overview**: Unified dashboard displaying all organizational assessments with status tracking
+- **Historical Analysis**: Track maturity progression over time with multiple assessment comparisons
+- **Drill-down Views**: Detailed examination of individual assessments with section-by-section analysis
 
-### Technical Infrastructure
-- **Streamlined Workflow**: Intuitive user interface with guided assessment process
-- **Database Migration**: Automated schema migration system for updates
-- **Export Capabilities**: Multiple export formats for data portability
-- **Responsive Design**: Mobile-friendly interface for assessments on any device
+## Application Architecture
 
+### Assessment Workflow
 
-## Assessment Framework
+```mermaid
+flowchart TD
+    A[🏢 Organization Setup<br/>Context & Industry] --> B[🏗️ Foundational Assessment<br/>Infrastructure & Skills]
+    B --> C[🚀 Transformation Evaluation<br/>Advanced Capabilities]
+    C --> D[🏢 Enterprise Integration<br/>Governance & Systems]
+    D --> E[🎯 Strategic Governance<br/>Ethics & Innovation]
+    E --> F[📋 Final Review<br/>Summary & Insights]
+    F --> G[📊 Report Generation<br/>Recommendations & Roadmap]
+    
+    subgraph "Assessment Progress"
+        H[1-2 Hours Total Duration]
+        I[23 Capability Areas]
+        J[Contextual Guidance]
+    end
+    
+    style A fill:#e3f2fd
+    style B fill:#e1f5fe
+    style C fill:#f3e5f5
+    style D fill:#fff3e0
+    style E fill:#e8f5e8
+    style F fill:#fce4ec
+    style G fill:#f1f8e9
+```
 
-### Four Key Dimensions
+1. **Organization Setup**: Capture organizational context, industry, and assessor information
+2. **Foundational Assessment**: Evaluate core AI infrastructure, team skills, code generation, and knowledge management
+3. **Transformation Evaluation**: Assess advanced capabilities including architecture translation, AI-driven testing, CI/CD, and monitoring
+4. **Enterprise Integration**: Review data governance, vendor management, system integration, and performance management
+5. **Strategic Governance**: Examine AI ethics, compliance, IP management, risk management, and innovation readiness
+6. **Final Review**: Comprehensive assessment summary with immediate insights
+7. **Report Generation**: Detailed documentation with recommendations and roadmap
 
-1. **Foundational Capabilities (FC)** - 4 areas
-   - AI Infrastructure & Tooling
-   - Team AI Literacy & Skills
-   - Code Generation & Review
-   - Documentation & Knowledge Management
+### Maturity Level Framework
 
-2. **Transformation Capabilities (TC)** - 5 areas
-   - Intent-to-Architecture Translation
-   - AI-Driven Testing & Quality Assurance
-   - Continuous Integration & Deployment
-   - Monitoring & Observability
-   - Legacy System Modernization
+```mermaid
+graph LR
+    A[Level 1: Traditional<br/>📊 AFS Score: 1.0-1.7<br/>🔧 Manual processes<br/>⚪ No AI assistance<br/>📚 Limited AI awareness] 
+    
+    A --> B[Level 2: AI-Assisted<br/>📊 AFS Score: 1.8-2.4<br/>🤖 Basic AI tools<br/>👤 Individual usage<br/>📖 Team learning]
+    
+    B --> C[Level 3: AI-Augmented<br/>📊 AFS Score: 2.5-3.2<br/>⚙️ Systematic integration<br/>👥 Coordinated usage<br/>📈 Productivity gains]
+    
+    C --> D[Level 4: AI-First<br/>📊 AFS Score: 3.3-4.0<br/>🚀 Autonomous systems<br/>🧠 Intelligent workflows<br/>🔄 Self-improving]
+    
+    style A fill:#ffebee,stroke:#c62828
+    style B fill:#fff3e0,stroke:#ef6c00
+    style C fill:#e8f5e8,stroke:#2e7d32
+    style D fill:#e3f2fd,stroke:#1565c0
+```
 
-3. **Enterprise Integration (EI)** - 6 areas
-   - Data Governance & Management
-   - Vendor & Tool Standardization
-   - Integration with Enterprise Systems
-   - Cost Management & ROI Tracking
-   - Performance & Scalability Management
-   - Business Continuity & Disaster Recovery
+**Level 1: Traditional Development (AFS Score: 1.0-1.7)**
+- Manual processes with minimal AI integration
+- Teams rely on traditional development tools and practices
+- Limited awareness of AI-first methodologies
 
-4. **Strategic Governance (SG)** - 8 areas
-   - AI Ethics & Responsible AI
-   - Performance Measurement & Value Realization
-   - Intellectual Property Management
-   - Risk Management & Security
-   - Organizational Change Management
-   - Cross-functional AI Collaboration
-   - Regulatory Compliance
-   - Innovation & Future Readiness
+**Level 2: AI-Assisted Development (AFS Score: 1.8-2.4)**
+- Basic AI tool adoption with individual usage patterns
+- Initial AI assistance for code completion and documentation
+- Beginning team skill development
 
-### Maturity Levels
+**Level 3: AI-Augmented Development (AFS Score: 2.5-3.2)**
+- Systematic AI integration across development workflows
+- Standardized AI practices with coordinated usage
+- Measurable productivity improvements
 
-- **Level 1 (Basic)**: Traditional/manual approaches
-- **Level 2 (Evolving)**: Basic AI assistance
-- **Level 3 (Advanced)**: Systematic AI integration
-- **Level 4 (Optimized)**: Autonomous/AI-first approaches
+**Level 4: AI-First Development (AFS Score: 3.3-4.0)**
+- Advanced AI-native development with autonomous capabilities
+- Intelligent systems for most development activities
+- Predictive and self-improving processes
+
+## Getting Started
+
+### For Assessment Administrators
+1. Access the application homepage
+2. Navigate to "Create Assessment" to begin a new evaluation
+3. Complete organization information setup
+4. Progress through each assessment dimension
+5. Review results and generate comprehensive reports
+
+### For Assessment Participants
+1. Receive assessment invitation with organization context
+2. Follow guided assessment flow with contextual help
+3. Utilize help icons for detailed guidance on each capability area
+4. Complete all sections for comprehensive evaluation
+
+### For Leadership Teams
+1. Access the dashboard for organizational assessment overview
+2. Review detailed assessment reports and recommendations
+3. Track progress across multiple assessment cycles
+4. Download reports for stakeholder communication and planning
+
+## Value Proposition
+
+```mermaid
+graph TD
+    A[Assessment Input<br/>Current State Evaluation] --> B[Analysis Engine<br/>Gap Identification & Benchmarking]
+    
+    B --> C[Immediate Benefits<br/>⚡ Rapid Assessment<br/>🎯 Actionable Insights<br/>📊 Benchmark Positioning<br/>🗺️ Strategic Planning]
+    
+    B --> D[Long-term Impact<br/>📈 30-80% Productivity Gains<br/>✨ Quality Enhancement<br/>🛡️ Risk Mitigation<br/>🏆 Competitive Advantage]
+    
+    B --> E[Organizational Outcomes<br/>🔄 Digital Transformation<br/>💡 Innovation Capability<br/>⚙️ Operational Excellence<br/>🚀 Future Readiness]
+    
+    C --> F[Strategic Decision Making<br/>Data-Driven AI Transformation]
+    D --> F
+    E --> F
+    
+    style A fill:#e3f2fd
+    style B fill:#fff3e0
+    style C fill:#e8f5e8
+    style D fill:#f3e5f5
+    style E fill:#fce4ec
+    style F fill:#e1f5fe
+```
+
+### Immediate Benefits
+- **Rapid Assessment**: Complete comprehensive evaluation in 1-2 hours
+- **Actionable Insights**: Specific recommendations with implementation timelines
+- **Benchmark Positioning**: Understanding of current maturity relative to industry standards
+- **Strategic Planning**: Clear roadmap for AI transformation initiatives
+
+### Long-term Impact
+- **Productivity Gains**: 30-80% improvement in development velocity through systematic AI adoption
+- **Quality Enhancement**: Intelligent quality assurance and automated review processes
+- **Risk Mitigation**: Structured approach to AI implementation with proven practices
+- **Competitive Advantage**: Industry-leading AI development capabilities
+
+### Organizational Outcomes
+- **Digital Transformation**: Accelerated enterprise-wide AI adoption
+- **Innovation Capability**: Enhanced ability to develop AI-driven solutions
+- **Operational Excellence**: Optimized development processes and workflows
+- **Future Readiness**: Preparation for emerging AI technologies and methodologies
 
 ## Assessment Methodology
+The application employs a research-based, industry-validated assessment methodology that evaluates organizational capabilities across multiple dimensions. Each capability area includes:
 
-The framework uses a comprehensive, evidence-based approach designed for practical implementation:
+- **Prerequisites**: Foundational requirements for advancement
+- **Action Items**: Specific implementation steps with detailed guidance
+- **Success Metrics**: Measurable indicators for progress tracking
+- **Timeline Estimates**: Realistic implementation timeframes
+- **Common Pitfalls**: Risk mitigation strategies and lessons learned
 
-### Multi-Dimensional Evaluation
-- **Structured Questions**: Each area contains specific questions designed to evaluate current practices and capabilities
-- **Evidence-Based Scoring**: Responses map to maturity levels based on observable practices and measurable capabilities
-- **Holistic Assessment**: Evaluation covers both technical implementation and organizational readiness factors
-- **Progressive Difficulty**: Questions are designed to differentiate across all maturity levels
+## Continuous Improvement
+- **Regular Updates**: Framework updates based on industry developments and user feedback
+- **Benchmark Evolution**: Continuous refinement of industry benchmarks and best practices
+- **Feature Enhancement**: Ongoing platform improvements based on user experience research
 
-### Practical Implementation Guidance
-- **Benchmarking**: Results provide comparison against AI-first development best practices and industry standards
-- **Actionable Roadmaps**: Detailed progression plans with specific steps, timelines, and success metrics
-- **Risk Mitigation**: Common pitfalls identification and avoidance strategies for each progression path
-- **Resource Planning**: Realistic timeline estimates and resource requirements for implementation
+## Support and Resources
 
-### Continuous Improvement Framework
-- **Progress Tracking**: Historical assessment data enables maturity evolution monitoring
-- **Iterative Assessment**: Framework supports regular re-assessment to track improvement over time
-- **Adaptive Recommendations**: Guidance adapts based on current maturity level and organizational context
-- **Success Metrics**: Clear, measurable outcomes for each improvement initiative
+The application provides comprehensive support through:
+- Interactive help system with contextual guidance
+- Detailed framework documentation
+- Implementation roadmaps and best practices
+- Industry benchmarking and comparison data
 
-### Steps to Achieve Framework
-Each assessment area includes detailed progression guidance:
+## Setup
 
-#### Prerequisites
-- Current state requirements needed before starting improvement initiatives
-- Foundational capabilities and organizational readiness factors
-- Resource and stakeholder engagement requirements
+You can run and manage the application using the provided deployment scripts for Linux/macOS (`docker-deploy.sh`) and Windows (`docker-deploy.bat`).
 
-#### Action Items  
-- Specific, implementable tasks organized by strategic focus areas
-- Prioritized based on impact and implementation complexity
-- Includes both technical and organizational change activities
+### Linux/macOS (`docker-deploy.sh`)
 
-#### Success Metrics
-- Measurable outcomes to validate successful implementation
-- Both quantitative metrics and qualitative indicators
-- Milestone-based tracking for large initiatives
+```sh
+# Build the Docker image
+./docker-deploy.sh build
 
-#### Implementation Timelines
-- Realistic timeframe estimates based on organizational complexity
-- Considers dependencies and resource availability
-- Flexible scheduling to accommodate varying organizational contexts
+# Start the application
+./docker-deploy.sh start
 
-#### Common Pitfalls & Risk Mitigation
-- Known challenges and failure modes for each improvement area
-- Proven strategies for avoiding common implementation mistakes
-- Risk indicators and early warning signs
+# Run database setup script
+./docker-deploy.sh setup
 
-## Technology Stack
+# Stop the application and remove volumes
+./docker-deploy.sh stop
 
-### Backend Architecture
-- **Python 3.8+**: Core application runtime with modern language features
-- **Flask 2.3+**: Lightweight web framework with blueprint organization
-- **SQLAlchemy**: Database ORM with model abstraction and migration support
-- **Jinja2**: Template engine for dynamic HTML generation
+# View application logs
+./docker-deploy.sh logs
 
-### Database & Storage
-- **SQLite**: Default database with zero-configuration setup
-- **Multi-Database Support**: Pluggable database adapters for PostgreSQL, MySQL
-- **Automated Migrations**: Schema versioning and migration management
-- **Data Export**: Multiple format support (JSON, CSV, PDF)
-
-### Frontend & User Experience
-- **Bootstrap 5**: Responsive UI framework with modern design components
-- **Custom JavaScript**: Enhanced interactivity and assessment flow management
-- **Chart.js**: Interactive data visualizations and progress tracking
-- **Responsive Design**: Mobile-friendly interface optimized for all devices
-
-### Report Generation & Export
-- **Playwright**: Automated PDF generation from HTML templates
-- **Template-Based Reports**: Customizable report layouts and styling
-- **Interactive Charts**: Dynamic visualizations embedded in reports
-- **Professional Formatting**: Enterprise-ready report presentation
-
-### Development & Deployment
-- **Blueprint Architecture**: Modular application structure with separated concerns
-- **Environment Configuration**: Flexible configuration management
-- **Logging & Monitoring**: Comprehensive application logging and error tracking
-- **Hot Reload**: Development-friendly auto-reloading capabilities
-
-## Quick Start
-
-### Prerequisites
-
-- Python 3.8 or higher
-- Git
-
-### Installation
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/your-org/ai-first-software-engineering-maturity-assessment-framework.git
-   cd ai-first-software-engineering-maturity-assessment-framework
-   ```
-
-2. **Set up virtual environment**
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
-
-3. **Install dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. **Initialize the database**
-   ```bash
-   python scripts/setup_database.py
-   ```
-
-   This will:
-   - Create the database schema (tables, indexes, views)
-   - Populate with framework seed data (sections, areas, questions)
-   - Verify the setup was successful
-
-5. **Start the application**
-   ```bash
-   python run.py
-   ```
-
-   The application will be available at `http://127.0.0.1:5000`
-
-## Configuration
-
-For custom configuration, copy `.env.example` to `.env` and modify as needed:
-
-```bash
-cp .env.example .env
+# Access application shell
+./docker-deploy.sh shell
 ```
 
-The default configuration uses SQLite and is ready to run without additional setup.
+### Windows (`docker-deploy.bat`)
 
-## Database Structure
+```bat
+REM Build the Docker image
+docker-deploy.bat build
 
-The framework includes a comprehensive database schema supporting:
+REM Start the application
+docker-deploy.bat start
 
-### Core Framework Tables
-- **sections**: Four main assessment dimensions (FC, TC, EI, SG)
-- **areas**: 23 specialized assessment areas within sections  
-- **questions**: Detailed assessment questions for each area
-- **maturity_progressions**: Steps to achieve framework data with prerequisites, action items, success metrics, timelines, and common pitfalls
+REM Run database setup script
+docker-deploy.bat setup
 
-### Assessment Management Tables
-- **assessments**: Assessment instances with organization, assessor, and completion details
-- **responses**: Individual question responses with scoring
-- **assessment_sections**: Section-level progress and completion tracking
+REM Stop the application and remove volumes
+docker-deploy.bat stop
 
-### Analytics & Reporting Tables  
-- **analytics_summary**: Aggregated assessment insights and trends
-- **question_analytics**: Question-level performance and response patterns
-- **team_progress**: Historical progression tracking across assessments
-- **assessment_recommendations**: AI-generated improvement recommendations
-- **assessment_exports**: Export history and data portability
+REM View application logs
+docker-deploy.bat logs
 
-### Performance & Infrastructure
-- **Database Views**: Optimized views for analytics and reporting performance
-- **Migration Tracking**: Schema versioning with automated migration system
-- **Indexes**: Performance-optimized database indexes for fast queries
-- **Constraints**: Data integrity and validation at the database level
-
-## Key Application Screenshots
-
-The `/images` folder contains comprehensive visual documentation of the application:
-
-### Core Workflow Documentation
-- **0001-HomePage.pdf**: Main landing page with framework overview and statistics
-- **0002-AboutPage.pdf**: Detailed methodology and assessment approach documentation
-
-### Assessment Creation & Management  
-- **0003-Create-Assessment-Org-Information.pdf**: Organization and assessor information capture
-- **0003-Create-Assessment-[Section].pdf**: Section-specific assessment interfaces for:
-  - Foundation Capabilities
-  - Transformation Capabilities  
-  - Enterprise Integration
-  - Strategic Governance
-
-### Steps to Achieve Framework
-- **0003-Create-Assessment-Steps-To-Achieve-Prerequisites.pdf**: Prerequisites display and guidance
-- **0003-Create-Assessment-Steps-To-Achieve-ActionItems.pdf**: Detailed action item presentation
-- **0003-Create-Assessment-Steps-To-Achieve-Metrics.pdf**: Success metrics and KPIs
-- **0003-Create-Assessment-Steps-To-Achieve-Tips.pdf**: Implementation tips and best practices
-
-### Assessment Completion & Review
-- **0003-Create-Assessment-final-review.pdf**: Pre-submission review interface
-- **0003-Create-Assessment-Generate-Report-Modal.pdf**: Report generation progress and options
-
-### Results & Reporting
-- **0004-View-Report.pdf**: Interactive assessment report with charts and insights
-- **0005-Download-Report.pdf**: PDF export functionality and report download
-- **0006-All-Assessments.pdf**: Assessment dashboard and management interface
-
-### Detailed Assessment Views
-- **0007-View-Assessment-[Section].pdf**: Detailed section-level results and analysis for each dimension
-- **0007-View-Assessment-Sections.pdf**: Overall section comparison and progress tracking
-
-## Core Workflow
-
-The assessment framework provides a comprehensive, guided workflow:
-
-### Assessment Journey
-1. **Home Page**: Overview and introduction with assessment statistics and framework introduction
-2. **About Page**: Detailed methodology and framework explanation
-3. **Organization Information**: Capture comprehensive organization details and assessor information
-4. **Section-by-Section Evaluation**: Progressive assessment across four key dimensions:
-   - **Foundational Capabilities (FC)** - 4 areas: AI Infrastructure, Team Skills, Code Generation, Documentation
-   - **Transformation Capabilities (TC)** - 5 areas: Architecture Translation, Testing, CI/CD, Monitoring, Legacy Modernization  
-   - **Enterprise Integration (EI)** - 6 areas: Data Governance, Vendor Standardization, System Integration, Cost Management, Performance, Business Continuity
-   - **Strategic Governance (SG)** - 8 areas: AI Ethics, Performance Measurement, IP Management, Risk Management, Change Management, Collaboration, Compliance, Innovation
-
-### Assessment Features per Section
-- **Progress Tracking**: Real-time completion percentage and section navigation
-- **Steps to Achieve Modal**: Interactive guidance showing:
-  - Current maturity level assessment
-  - Prerequisites for progression
-  - Detailed action items for improvement
-  - Success metrics and KPIs
-  - Implementation timelines
-  - Common pitfalls and avoidance strategies
-- **Contextual Help**: In-line guidance and explanations for each question
-
-### Review & Completion
-4. **Final Review**: Comprehensive review of all responses before submission with completion validation
-5. **Report Generation**: Advanced processing to create detailed maturity assessment
-6. **Interactive Results**: Rich, visual report with:
-   - Overall maturity score and level classification
-   - Section-by-section breakdowns with visual charts
-   - Area-specific insights and recommendations
-   - Personalized roadmap with step-by-step progression plans
-   - Priority improvement areas with actionable guidance
-7. **PDF Export**: Professional report download for sharing and archival
-
-### Assessment Management
-- **All Assessments View**: Dashboard showing all completed and in-progress assessments
-- **Assessment Details**: Detailed view of individual assessment progress and results
-- **Data Export**: Multiple export options for analysis and reporting
-
-### Available URLs
-
-#### Main Application Routes
-- `/` - Home page with framework overview, statistics, and getting started guidance
-- `/about` - Comprehensive framework methodology and assessment approach documentation
-
-#### Assessment Workflow
-- `/assessment/` - Assessment dashboard showing all assessments and their status
-- `/assessment/create` - Create new assessment with organization and assessor information capture
-- `/assessment/{id}/section/{section_id}` - Section-by-section assessment with interactive questions
-- `/assessment/{id}/final-review` - Pre-submission review with completion validation and force-completion options
-- `/assessment/{id}/generate-report` - Report generation processing and completion
-
-#### Results & Reporting  
-- `/assessment/{id}/report` - Interactive assessment report with charts, insights, and personalized roadmaps
-- `/assessment/{id}/download-pdf` - Generate and download professional PDF assessment report
-- `/assessment/{id}` - Individual assessment details and progress view
-
-#### Additional Features
-- **Steps to Achieve Modal**: Embedded in each section, providing detailed progression guidance
-- **Progress Tracking**: Real-time completion status across all assessment sections
-- **Export Options**: Multiple data export formats for further analysis
-
-
-## Project Structure
-
-```
-├── app/                           # Main application package
-│   ├── api/                      # REST API endpoints and business logic
-│   │   ├── basic_api.py          # Core API endpoints
-│   │   ├── db_helper.py          # Database utility functions
-│   │   └── responses.py          # API response formatting
-│   ├── blueprints/               # Flask blueprints for web routes
-│   │   ├── main/                 # Main pages (home, about, navigation)
-│   │   └── assessment/           # Assessment workflow and management
-│   │       ├── routes.py         # Assessment routes and handlers
-│   │       └── org_information.html  # Organization info collection
-│   ├── core/                     # Core utilities and infrastructure
-│   │   ├── cache.py              # Caching layer and optimization
-│   │   └── logging.py            # Application logging configuration
-│   ├── models/                   # Database models and data access
-│   │   ├── assessment.py         # Assessment entity with org/assessor fields
-│   │   ├── question.py           # Question and area models
-│   │   ├── response.py           # Assessment response tracking
-│   │   ├── progression.py        # Steps to achieve progression data
-│   │   └── database/             # Multi-database adapter support
-│   ├── services/                 # Business logic and service layer
-│   │   ├── assessment_service.py # Assessment management and workflow
-│   │   ├── scoring_service.py    # Scoring calculations and analytics
-│   │   └── recommendation_service.py # Recommendation generation
-│   └── utils/                    # Utility functions and helpers
-├── config/                       # Configuration management
-│   ├── base.py                   # Base configuration settings
-│   ├── development.py            # Development environment config
-│   ├── production.py             # Production deployment config
-│   └── testing.py                # Test environment configuration
-├── data/                         # Database migrations and exports
-│   └── exports/                  # Assessment export storage
-├── scripts/                      # Management and deployment scripts
-│   ├── setup_database.py         # Automated database initialization
-│   ├── database_schema.sql       # Complete database schema (DDL)
-│   └── database_seed_data.sql    # Framework seed data (DML)
-├── static/                       # Static assets and resources
-│   ├── manifest.json             # PWA configuration
-│   ├── assets/                   # Images, icons, and media files
-│   └── src/                      # CSS, JavaScript, and frontend assets
-├── templates/                    # Jinja2 HTML templates
-│   ├── base/                     # Base templates and layouts
-│   ├── errors/                   # Error page templates
-│   └── pages/                    # Application page templates
-│       └── assessment/           # Assessment-specific templates
-│           ├── create.html       # Assessment creation form
-│           ├── section_questions.html # Section assessment interface
-│           ├── final_review.html # Pre-submission review
-│           ├── report.html       # Interactive assessment report
-│           └── report_pdf.html   # PDF report template
-├── instance/                     # Instance-specific files
-│   └── app_dev.db               # Development database file
-├── logs/                         # Application logs and diagnostics
-│   └── app.log                  # Main application log file
-├── images/                       # Application screenshots and documentation
-│   ├── 0001-HomePage.pdf        # Home page interface
-│   ├── 0002-AboutPage.pdf       # About page and methodology
-│   ├── 0003-Create-Assessment-*.pdf # Assessment creation workflow
-│   ├── 0004-View-Report.pdf     # Report visualization
-│   ├── 0005-Download-Report.pdf # PDF export functionality
-│   └── 0006-All-Assessments.pdf # Assessment management
-├── requirements.txt              # Python dependencies and versions
-├── run.py                       # Application entry point and server
-├── step-to-achieve.md           # Steps to achieve framework documentation
-└── README.md                    # Project documentation and setup guide
+REM Access application shell
+docker-deploy.bat shell
 ```
 
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-Please read [CONTRIBUTING.md](docs/CONTRIBUTING.md) for details on our code of conduct and development process.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Support
-
-- **Documentation**: [docs/](docs/)
-- **Issues**: [GitHub Issues](https://github.com/your-org/ai-first-software-engineering-maturity-assessment-framework/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/your-org/ai-first-software-engineering-maturity-assessment-framework/discussions)
-
-## Roadmap
-
-### Near-term Enhancements (Q1-Q2 2026)
-- [ ] **Enhanced Assessment Analytics**: Advanced analytics dashboard with trend analysis and benchmarking
-- [ ] **Collaborative Assessments**: Multi-user assessment completion with role-based access
-- [ ] **Assessment Templates**: Pre-configured assessment templates for different organization types
-- [ ] **Integration APIs**: REST APIs for integration with enterprise tools and systems
-
-### Medium-term Features (Q3-Q4 2026)
-- [ ] **Industry-Specific Variations**: Customized assessment frameworks for different industry verticals
-- [ ] **AI-Powered Insights**: Machine learning-enhanced recommendations and trend prediction
-- [ ] **Advanced Reporting**: Executive dashboards and comparative analysis across assessments
-- [ ] **Team Progression Tracking**: Historical analysis and maturity evolution visualization
-
-### Long-term Vision (2027+)
-- [ ] **Integration with Popular AI Development Tools**: Direct integration with GitHub, VS Code, and other development platforms
-- [ ] **Multi-language Support**: Internationalization for global organization deployment
-- [ ] **Assessment Marketplace**: Community-driven assessment modules and best practice sharing
-- [ ] **Real-time Maturity Monitoring**: Continuous assessment based on actual tool usage and development practices
-- [ ] **AI Coach Integration**: Personalized AI assistant for maturity improvement guidance
+**Note:**
+- The `stop` command will also remove all persistent volumes (database, uploads, logs).
+- The `setup` command runs the database initialization script inside the container.
+- The `shell` command opens a shell inside the running container for advanced troubleshooting or manual operations.
 
 ---
 
-*Transform your development practices. Measure your AFS maturity today.*
+Transform your software engineering organization with AI-first practices. Begin your assessment journey today to understand your current maturity and chart your path toward AI-driven development excellence.
