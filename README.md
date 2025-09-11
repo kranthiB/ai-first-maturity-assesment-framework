@@ -8,6 +8,12 @@
   </a>
 </div>
 
+<div align="center">
+  <a href="https://github.com/kranthiB/ai-first-maturity-assesment-framework/raw/main/output/AI_Maturity_Assessment_Report_Engineering_Excellence_Team.pdf" target="_blank" rel="noopener noreferrer">
+    <strong>📄 📥 Download Sample Report (PDF) 📥 📄</strong>
+  </a>
+</div>
+
 ## Table of Contents
 
 - [About](#about)
