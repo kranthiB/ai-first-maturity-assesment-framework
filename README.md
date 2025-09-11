@@ -1,6 +1,8 @@
 # AI-First Software Engineering Maturity Assessment
 
-[![Video Demo](https://drive.google.com/thumbnail?id=1gJD9Lh0IHOkRoxd9Fm7WjQNQPiO9_Qmh&sz=w1000)](https://drive.google.com/file/d/1gJD9Lh0IHOkRoxd9Fm7WjQNQPiO9_Qmh/view)
+<a href="https://drive.google.com/file/d/1gJD9Lh0IHOkRoxd9Fm7WjQNQPiO9_Qmh/view" target="_blank">
+  <img src="https://drive.google.com/thumbnail?id=1gJD9Lh0IHOkRoxd9Fm7WjQNQPiO9_Qmh&sz=w1000" alt="Video Demo">
+</a>
 
 ## Table of Contents
 
