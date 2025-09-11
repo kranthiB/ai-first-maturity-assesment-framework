@@ -1,8 +1,19 @@
 # AI-First Software Engineering Maturity Assessment
 
-<a href="https://drive.google.com/file/d/1gJD9Lh0IHOkRoxd9Fm7WjQNQPiO9_Qmh/view" target="_blank" rel="noopener noreferrer">
-  <img src="https://drive.google.com/thumbnail?id=1gJD9Lh0IHOkRoxd9Fm7WjQNQPiO9_Qmh&sz=w1000" alt="Video Demo" width="600">
-</a>
+<div align="center">
+  <a href="https://drive.google.com/file/d/1gJD9Lh0IHOkRoxd9Fm7WjQNQPiO9_Qmh/view" target="_blank" rel="noopener noreferrer">
+    <div style="position: relative; display: inline-block; cursor: pointer;">
+      <img src="https://drive.google.com/thumbnail?id=1gJD9Lh0IHOkRoxd9Fm7WjQNQPiO9_Qmh&sz=w1000" alt="Video Demo" width="600" style="border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+      <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.7); border-radius: 50%; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="white" style="margin-left: 4px;">
+          <path d="M8 5v14l11-7z"/>
+        </svg>
+      </div>
+    </div>
+  </a>
+</div>
+
+**🎥 Click to watch the demo video - opens in new tab**
 
 ## Table of Contents
 
