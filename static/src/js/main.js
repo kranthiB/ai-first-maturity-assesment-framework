@@ -383,7 +383,7 @@ class MaturityAssessmentApp {
             // Retry failed requests
             this.retryFailedRequests();
         } else {
-            this.safeUtils('showToast', 'Connection lost - working offline', 'warning', 5000);
+            this.safeUtils('showToast', 'Connection lost - working offline', 'warning', 5001);
         }
         
         this.dispatchEvent('network:status', { online });

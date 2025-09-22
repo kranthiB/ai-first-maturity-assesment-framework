@@ -48,7 +48,7 @@ COPY . .
 RUN mkdir -p logs data/exports static/uploads backups instance
 
 # Expose port
-EXPOSE 5000
+EXPOSE 5001
 
 # Environment variables
 ENV FLASK_APP=run.py \

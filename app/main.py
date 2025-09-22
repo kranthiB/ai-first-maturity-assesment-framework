@@ -90,7 +90,7 @@ if __name__ == '__main__':
     """
     # Get configuration from environment
     host = os.environ.get('HOST', '0.0.0.0')
-    port = int(os.environ.get('PORT', 5000))
+    port = int(os.environ.get('PORT', 5001))
     debug = os.environ.get('DEBUG', 'False').lower() in ['true', '1', 'yes']
     
     print(f"Starting AFS Assessment Framework on {host}:{port}")

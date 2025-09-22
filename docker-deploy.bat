@@ -14,7 +14,7 @@ if "%1"=="build" (
 if "%1"=="start" (
     echo [INFO] Starting application...
     docker-compose up -d
-    echo [INFO] Application started at http://localhost:5000
+    echo [INFO] Application started at http://localhost:5001
     exit /b
 )
 

@@ -30,7 +30,7 @@ case "$1" in
     up|start)
         log_info "Starting application..."
         docker-compose up -d
-        log_info "Application started at http://localhost:5000"
+        log_info "Application started at http://localhost:5001"
         ;;
     down|stop)
         log_info "Stopping application and removing volumes..."
