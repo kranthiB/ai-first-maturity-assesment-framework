@@ -1993,6 +1993,7 @@ def download_pdf(assessment_id):
                         'current_level': current_level,
                         'current_level_name': _get_maturity_level_from_score(current_level),
                         'current_description': _get_level_description(question, current_level),
+                        'notes': getattr(response, 'notes', ''),
                         'next_levels': next_levels
                     }
 

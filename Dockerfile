@@ -1,7 +1,6 @@
-
 FROM python:3.11-slim
 
-# Install system dependencies required for Chromium/Playwright
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     curl \
     wget \
@@ -31,33 +30,15 @@ RUN apt-get update && apt-get install -y \
     libgl1 \
     libgles2 \
     libcurl4 \
-    libx11-xcb1 \
-    libxext6 \
-    libxi6 \
-    libxtst6 \
-    libxss1 \
-    libxinerama1 \
-    libatspi2.0-0 \
-    libappindicator3-1 \
-    libcups2 \
-    libdbus-1-3 \
-    libgdk-pixbuf2.0-0 \
-    libnspr4 \
-    lsb-release \
-    xdg-utils \
     && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
 WORKDIR /app
 
-# Add non-root user for Chromium/Playwright
-RUN useradd -m chrome && mkdir -p /home/chrome && chown -R chrome:chrome /home/chrome
-USER chrome
-
 # Copy requirements and install dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-# Install Playwright browsers and dependencies
+# Install Playwright browsers
 RUN python -m playwright install
 
 # Copy application code

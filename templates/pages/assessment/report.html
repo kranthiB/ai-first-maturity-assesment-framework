@@ -560,11 +560,6 @@
                             {{ roadmap.area_name }}
                         </h5>
                         <p class="mb-0 opacity-75">{{ roadmap.question }}</p>
-            {% if roadmap.notes %}
-            <div class="mt-2">
-                <span class="fw-bold" style="color: #ffffff;"><i class="bi bi-chat-text me-1"></i>Notes: <p class="mb-0 opacity-75">{{ roadmap.notes }}</p></span>
-            </div>
-            {% endif %}
                     </div>
 
                     <!-- Current Level -->
@@ -573,6 +568,9 @@
                         <div>
                             <h6 class="mb-1 fw-bold">Current Level {{ roadmap.current_level }}</h6>
                             <p class="text-muted mb-0">{{ roadmap.current_description }}</p>
+                            {% if roadmap.notes %}
+                                <span class="fw-bold" style="color: #0d6efd;"><i class="bi bi-chat-text me-1"></i>Notes: <p class="text-muted mb-0">{{ roadmap.notes }}</p></span>
+                            {% endif %}
                         </div>
                     </div>
 

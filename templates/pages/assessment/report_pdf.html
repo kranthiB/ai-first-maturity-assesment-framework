@@ -466,14 +466,11 @@
             <div class="mb-3" style="background-color: #e3f2fd; padding: 12px; border-radius: 6px; border-left: 4px solid #2196f3;">
                 <h6 class="fw-bold mb-1">Current Level: {{ roadmap.current_level_name }}</h6>
                 <p class="mb-0 small">{{ roadmap.current_description if roadmap.current_description else 'Current assessment level' }}</p>
-            </div>
-
-            {% if roadmap.notes %}
-            <div class="mt-2">
+                {% if roadmap.notes %}
                 <span class="fw-bold text-info"><i class="bi bi-chat-text me-1"></i>Notes:</span>
                 <span class="text-muted">{{ roadmap.notes }}</span>
+                {% endif %}
             </div>
-            {% endif %}
 
             <!-- Next Levels -->
             {% if roadmap.next_levels %}
