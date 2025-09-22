@@ -39,11 +39,20 @@ RUN apt-get update && apt-get install -y \
     libxinerama1 \
     libatspi2.0-0 \
     libappindicator3-1 \
+    libcups2 \
+    libdbus-1-3 \
+    libgdk-pixbuf2.0-0 \
+    libnspr4 \
     lsb-release \
+    xdg-utils \
     && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
 WORKDIR /app
+
+# Add non-root user for Chromium/Playwright
+RUN useradd -m chrome && mkdir -p /home/chrome && chown -R chrome:chrome /home/chrome
+USER chrome
 
 # Copy requirements and install dependencies
 COPY requirements.txt .

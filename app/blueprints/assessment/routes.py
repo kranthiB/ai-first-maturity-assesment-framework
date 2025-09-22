@@ -584,6 +584,8 @@ def submit_section_responses(assessment_id, section_id):
         # Save or update responses directly to avoid transaction isolation issues
         for question_id, answer_value in responses_data.items():
             if answer_value:  # Only save if response provided
+                # Get notes for this question if present
+                notes = notes_data.get(question_id)
                 # Check if response already exists
                 existing_response = db.session.query(Response).filter(
                     Response.assessment_id == assessment_id,
@@ -594,17 +596,20 @@ def submit_section_responses(assessment_id, section_id):
                     # Update existing response
                     existing_response.score = int(answer_value)
                     existing_response.timestamp = datetime.utcnow()
-                    logger.info(f"Updated response for {question_id}: {answer_value}")
+                    if notes is not None:
+                        existing_response.notes = notes
+                    logger.info(f"Updated response for {question_id}: {answer_value}, notes: {notes}")
                 else:
                     # Create new response
                     new_response = Response(
                         assessment_id=assessment_id,
                         question_id=question_id,
                         score=int(answer_value),
+                        notes=notes,
                         timestamp=datetime.utcnow()
                     )
                     db.session.add(new_response)
-                    logger.info(f"Created new response for {question_id}: {answer_value}")
+                    logger.info(f"Created new response for {question_id}: {answer_value}, notes: {notes}")
         
         # Commit the responses
         db.session.commit()
@@ -1628,6 +1633,7 @@ def report(assessment_id):
                         'current_description': _get_level_description(
                             question, current_level
                         ),
+                        'notes': getattr(response, 'notes', ''),
                         'next_levels': next_levels
                     }
         
@@ -2062,7 +2068,6 @@ def download_pdf(assessment_id):
         logger.error(f"Error generating PDF: {e}")
         flash('Error generating PDF report', 'error')
         return redirect(url_for('assessment.report', assessment_id=assessment_id))
-
 
 @assessment_bp.route('/api/<int:assessment_id>/progress')
 def api_progress(assessment_id):
