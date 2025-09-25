@@ -1589,7 +1589,7 @@ def report(assessment_id):
                 })
         
         # Calculate overall metrics
-        overall_score = sum(all_scores) / len(all_scores) if all_scores else 0
+        overall_score = round(sum(all_scores) / len(all_scores), 1) if all_scores else 0
         overall_level = _get_maturity_level_from_score(overall_score)
         
         # Generate roadmap data for each answered question
@@ -1949,7 +1949,7 @@ def download_pdf(assessment_id):
                 })
 
         # Calculate overall metrics
-        overall_score = sum(all_scores) / len(all_scores) if all_scores else 0
+        overall_score = round(sum(all_scores) / len(all_scores), 1) if all_scores else 0
         overall_level = _get_maturity_level_from_score(overall_score)
 
         # Generate chart data
